@@ -9,7 +9,7 @@
 		java.lang.Exception: Don't worry! This is a test!
 	at sketch_GameEngine_Simpler_ECS.engineSetup(sketch_GameEngine_Simpler_ECS.java:2302)
 	at sketch_GameEngine_Simpler_ECS.setup(sketch_GameEngine_Simpler_ECS.java:223)
-	at processing.core.PApplet.handleDraw(PApplet.java:2432)
+	at processing.core.PApplet.handleDraw(PApplet.java:2432)sdfsdf
 	at processing.opengl.PSurfaceJOGL$DrawListener.display(PSurfaceJOGL.java:866)
 	at jogamp.opengl.GLDrawableHelper.displayImpl(GLDrawableHelper.java:692)
 	at jogamp.opengl.GLDrawableHelper.display(GLDrawableHelper.java:674)
