@@ -3,3 +3,4 @@ application.windows64
 application.windows32
 build/builds
 data/cursors
+sketch_GameEngine_Simpler_ECS.log
