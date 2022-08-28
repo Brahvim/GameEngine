@@ -110,10 +110,9 @@ Scene testScene = new Scene() {
 
     circle = new Entity() {
       Transform form = new Transform(this);
-      Renderer display = new Renderer(this, this.form, boxTexture);
+      Renderer display = new Renderer(this, this.form, RendererType.ELLIPSE, boxTexture);
 
       public void setup() {
-        this.display.type = RendererType.ELLIPSE;
         this.display.fill = color(230);
         this.display.stroke = color(0);
         this.display.strokeWeight = 0.05f;
@@ -124,7 +123,6 @@ Scene testScene = new Scene() {
 
       public void update() {
         this.form.pos.set(cx, cy);
-        logInfo(mouse);
       }
     };
 
@@ -139,9 +137,9 @@ Scene testScene = new Scene() {
 
         logInfo("Quad setup.");
 
-        println("Quad components:");
+        logInfo("Quad components:");
         for (Component c : this.components)
-          println(c);
+          logInfo("\t", c);
 
         this.display.strokeWeight = 0.05f;
         this.form.scale.mult(15);
@@ -158,7 +156,7 @@ Scene testScene = new Scene() {
 
       public void setup() {
         quadForm = quad.getComponent(Transform.class);
-        this.light.col.set(255, 255, 255);
+        this.light.col.set(0, 255, 255);
       }
 
       public void update() {
@@ -172,12 +170,14 @@ Scene testScene = new Scene() {
       Renderer display = new Renderer(this, this.form, RendererType.BOX);
 
       public void setup() {
-        //this.
+        this.display.fill = color(255);
+        this.display.strokeWeight = 0.1f;
         this.form.scale.set(150, 50, 150);
         rev.doScript = false;
       }
 
       public void update() {
+        println(boxTexture.ploaded);
         this.form.pos.set(cx, cy + 50, 0);
       }
     };

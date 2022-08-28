@@ -216,9 +216,10 @@ class ShapeRenderer extends Component {
 class Renderer extends Component {
   Transform form;
   RendererType type;
-  color fill, stroke;
+  color fill, stroke, tint;
   float strokeWeight = 1;
-  boolean doFill = true, doStroke = true, doTexture = true;
+  boolean doFill = true, doStroke = true, 
+    doTexture = true, doTint = false;
 
   // Texturing:
   Asset textureLoader;
@@ -264,7 +265,7 @@ class Renderer extends Component {
   Renderer(Entity p_entity, Transform p_parentForm, PImage p_texture) {
     super(p_entity);
     this.form = p_parentForm;
-    this.texture = p_texture;
+    this.texture = p_texture.copy();
 
     if (currentScene != null)
       currentScene.renderers.add(this);
@@ -294,10 +295,10 @@ class Renderer extends Component {
 
     // Do this only once:
     if (this.textureLoader != null && 
-      //!this.textureLoader.ploaded &&
+      !this.textureLoader.ploaded &&
       // ^^^ This check prevents it from assigning the texture for some reason.
       this.textureLoader.loaded)
-      this.texture = Assets.getPicture(this.textureLoader);
+      this.texture = Assets.getPicture(this.textureLoader).copy();
 
     // For the Bullet Physics Engine!:
     // Yes, it might be slow, but it's something we'll have to do.

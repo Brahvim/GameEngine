@@ -62,7 +62,7 @@ public static void logWarn(String p_message) {
     System.out.println("[!] " + p_message);
 
     if (Log.logToFile) {
-      Log.fileLogger.printf("[WARN] [%s] %s\n", Log.dateFormat.format(new Date()), p_message);
+      Log.fileLogger.printf("[Warn] [%s] %s\n", Log.dateFormat.format(new Date()), p_message);
       Log.fileLogger.flush();
     }
   }
@@ -185,7 +185,7 @@ void logToFile(int p_lv, Object... p_args) {
 
   if (Log.logToFile) {
     Log.fileLogger.printf(
-      p_lv == Log.lvError? "[ERROR]" : p_lv == Log.lvWarn? "[WARN]" : "[Info]" 
+      p_lv == Log.lvError? "[ERROR]" : p_lv == Log.lvWarn? "[Warn]" : "[Info]" 
       + " [%s] ", Log.dateFormat.format(new Date()));
 
     for (int i = 0; i < p_args.length; i++)
