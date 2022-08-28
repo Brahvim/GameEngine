@@ -216,10 +216,10 @@ class ShapeRenderer extends Component {
 class Renderer extends Component {
   Transform form;
   RendererType type;
-  color fill, stroke, tint;
+  color fill, stroke; // Tinting should be done by the user themselves.
   float strokeWeight = 1;
-  boolean doFill = true, doStroke = true, 
-    doTexture = true, doTint = false;
+  int strokeCap = MITER, strokeJoin = ROUND;
+  boolean doFill = true, doStroke = true, doTexture = true;
 
   // Texturing:
   Asset textureLoader;
@@ -295,9 +295,10 @@ class Renderer extends Component {
 
     // Do this only once:
     if (this.textureLoader != null && 
-      !this.textureLoader.ploaded &&
+      //!this.textureLoader.ploaded &&
       // ^^^ This check prevents it from assigning the texture for some reason.
-      this.textureLoader.loaded)
+      //this.textureLoader.loaded && 
+      frameCount == this.textureLoader.loadFrame)
       this.texture = Assets.getPicture(this.textureLoader).copy();
 
     // For the Bullet Physics Engine!:
@@ -308,6 +309,8 @@ class Renderer extends Component {
       fill(this.fill);
     if (this.doStroke) {
       stroke(this.stroke);
+      strokeCap(this.strokeCap);
+      strokeJoin(this.strokeJoin);
       strokeWeight(this.strokeWeight);
     }
 

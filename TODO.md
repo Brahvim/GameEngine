@@ -1,7 +1,12 @@
+[The Trello Board!](https://trello.com/b/XlsD96xS/nerd-engine)
+
+
 # Priority -  `1`
 - Reinvent `SineWave` to use `deltaTime`.
 - `FPSCamera` wrapper class for... well, FPS cameras!
 - Some kinda' key combo utility (not `keysHeld` LOL).
+- Instanced Rendering.
+- Texture asset loading bug.
 
 
 # Priority - `2`:

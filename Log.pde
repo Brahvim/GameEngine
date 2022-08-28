@@ -1,7 +1,7 @@
 static class Log {
   public static byte lvInfo = 0, lvWarn = 1, lvError = 2;
   public static byte logLevel = Log.lvError;
-  public static boolean logToFile = true, openFileOnExit = true, 
+  public static boolean logToFile = true, openFileOnExit = false, 
     logToConsole = true, enabled = true;
 
   public static SimpleDateFormat dateFormat
@@ -32,7 +32,7 @@ public void initLog() {
   }
 
   Log.logFile.setWritable(true);
-  println("Absolute log path:", Log.logFile.getAbsolutePath());
+  //println("Absolute log path:", Log.logFile.getAbsolutePath());
   try {
     Log.fileLogger = new PrintWriter(Log.logFile);
   }

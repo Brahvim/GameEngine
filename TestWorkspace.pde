@@ -42,9 +42,8 @@ void engineSetup() {
   Assets.init(1, 1, 0);
 
   //Form settingsForm = uibn.createForm(SKETCH_NAME + ".exe")
-  //  .addSelection("Graphical Quality", "Fair", "Decent", "Powerful").run();
-  //while (!settingsForm.isClosedByUser());  
-
+  //.addSelection("Graphical Quality", "Fair", "Decent", "Powerful").run();
+  //while (!settingsForm.isClosedByUser());
 
   logInfo("`engineSetup()` called.");
   logWarn("Test warning!");
@@ -63,7 +62,6 @@ void engineSetup() {
 
   b2d = createB2DWorld(500, 500);
   bt = createBTWorld();
-
 
   //PhysicsRigidBody a = null;
   //a.activate(false);
@@ -103,6 +101,7 @@ Scene testScene = new Scene() {
 
     boxTexture = new Asset("LearnOpenGL_container2.png", AssetType.PICTURE, new Runnable() {
       public void run() {
+        //((Renderer)circle.getComponent(Renderer.class)).texture = (PImage)boxTexture.loadedData;
         println("Box texture done loading!");
       }
     }
@@ -110,9 +109,10 @@ Scene testScene = new Scene() {
 
     circle = new Entity() {
       Transform form = new Transform(this);
-      Renderer display = new Renderer(this, this.form, RendererType.ELLIPSE, boxTexture);
+      Renderer display;
 
       public void setup() {
+        this.display = new Renderer(this, this.form, RendererType.ELLIPSE, boxTexture);
         this.display.fill = color(230);
         this.display.stroke = color(0);
         this.display.strokeWeight = 0.05f;
@@ -155,29 +155,31 @@ Scene testScene = new Scene() {
       Light light = new Light(this, this.form, POINT);
 
       public void setup() {
+        light.enabled = false;
         quadForm = quad.getComponent(Transform.class);
-        this.light.col.set(0, 255, 255);
+        this.light.col.set(255, 255, 255);
       }
 
       public void update() {
         this.form.set((Transform)quadForm);
-        this.form.pos.z += 50;
+        //this.form.pos.z += 50;
       }
     };
 
     groundBox = new Entity() {
       Transform form = new Transform(this);
-      Renderer display = new Renderer(this, this.form, RendererType.BOX);
+      Renderer display;
 
       public void setup() {
+        this.display = new Renderer(this, this.form, RendererType.BOX, boxTexture);
         this.display.fill = color(255);
         this.display.strokeWeight = 0.1f;
-        this.form.scale.set(150, 50, 150);
-        rev.doScript = false;
+        //this.form.scale.set(150, 50, 150); // *On* the box.
+        this.form.scale.set(255, 255, 255); // In the box we go!
       }
 
       public void update() {
-        println(boxTexture.ploaded);
+        //println(boxTexture.ploaded);
         this.form.pos.set(cx, cy + 50, 0);
       }
     };
@@ -206,7 +208,12 @@ Scene testScene = new Scene() {
     };
 
     rev.doScript = false;
+
+    fxApplier.setResolution(INIT_WIDTH, INIT_HEIGHT);
+    bPass = new BloomPass(SKETCH, 0.5f, 20, 30);
   }
+
+  BloomPass bPass;
 
   public void draw() {
     currentCam.applyMatrix();
@@ -215,7 +222,7 @@ Scene testScene = new Scene() {
       camLerpUpdate(cam, rev, (float)mouseX / (float)width, 0, 1);
     else camIsLerp = false;
 
-    //pointLight(255, 255, 255, mouse.x, mouse.y, mouse.z);
+    fxApplier.pass(bPass);
 
 
     //gl.enable(PGL.CULL_FACE);
@@ -239,5 +246,8 @@ Scene testScene = new Scene() {
   public void mousePressed() {
     if (mouseButton == RIGHT)
       setCam(currentCam == rev? cam : rev);
+    else if (mouseButton == CENTER) {
+      light.enabled = !light.enabled;
+    }
   }
 };

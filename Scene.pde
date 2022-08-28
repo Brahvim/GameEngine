@@ -167,23 +167,6 @@ class Scene extends EventReceiver {
   void drawUI() {
   }
 
-  // Window events:
-
-  void fullscreenGained() {
-  }
-
-  void fullscreenLost() {
-  }
-
-  void windowResized() {
-  }
-
-  void focusLost() {
-  }
-
-  void focusGained() {
-  }
-
   // Unity also does this.
   // Can be disabled by setting `deleteOnUnload` to `false`,
   // ...if the scene is loaded up often.
@@ -200,37 +183,4 @@ class Scene extends EventReceiver {
   // Should have a way to initialize Scenes without object creation (now called `.reset()`).
   // That should be done with a method, since certain objects' constructors might rely on others'.
   // Cannot expect user to do it when declaring variables in the class that extends `Scene`...
-}
-
-
-class EventReceiver {
-  // Input Events:
-
-  void mousePressed() {
-  }
-
-  void mouseMoved() {
-  }
-
-  @SuppressWarnings("unused")
-    void mouseWheel(MouseEvent p_event) {
-  }
-
-  void mouseClicked() {
-  }
-
-  void mouseDragged() {
-  }
-
-  void mouseReleased() {
-  }
-
-  void keyPressed() {
-  }
-
-  void keyTyped() {
-  }
-
-  void keyReleased() {
-  }
 }

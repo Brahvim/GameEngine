@@ -15,10 +15,17 @@ import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.io.*;
 
+// "PostFX for Processing":
+import ch.bildspur.postfx.builder.*;
+import ch.bildspur.postfx.pass.*;
+import ch.bildspur.postfx.*;
+
 // Deeper access into Processing's inner workings:
 static GLWindow window;
 static PGraphicsOpenGL glGraphics;
 static PGL gl;
+PostFXSupervisor fxApplier;
+PGraphics posted;
 //GLU glu;
 final PApplet SKETCH = this;
 String SKETCH_NAME = this.getClass().getSimpleName();
@@ -56,19 +63,19 @@ float frameStartTime, deltaTime, pframeTime, frameTime;
 
 // Failed to get these via reflection, copy-pasted them:
 // [https://github.com/processing/processing/blob/master/core/src/processing/core/PGraphics.java]
-static float[] sinLUT;
-static float[] cosLUT;
-static float SINCOS_PRECISION = 0.5f;
-static int SINCOS_LENGTH = (int) (360.0f / SINCOS_PRECISION);
+//static float[] sinLUT;
+//static float[] cosLUT;
+//static float SINCOS_PRECISION = 0.5f;
+//static int SINCOS_LENGTH = (int) (360.0f / SINCOS_PRECISION);
 
-static {
-  sinLUT = new float[SINCOS_LENGTH];
-  cosLUT = new float[SINCOS_LENGTH];
-  for (int i = 0; i < SINCOS_LENGTH; i++) {
-    sinLUT[i] = (float) Math.sin(i * DEG_TO_RAD * SINCOS_PRECISION);
-    cosLUT[i] = (float) Math.cos(i * DEG_TO_RAD * SINCOS_PRECISION);
-  }
-}
+//static {
+//  sinLUT = new float[SINCOS_LENGTH];
+//  cosLUT = new float[SINCOS_LENGTH];
+//  for (int i = 0; i < SINCOS_LENGTH; i++) {
+//    sinLUT[i] = (float) Math.sin(i * DEG_TO_RAD * SINCOS_PRECISION);
+//    cosLUT[i] = (float) Math.cos(i * DEG_TO_RAD * SINCOS_PRECISION);
+//  }
+//}
 
 void updateRatios() {
   cx = width * 0.5f;
@@ -79,13 +86,14 @@ void updateRatios() {
   q3y = cy + qy;
 }
 
-void transform(PVector p_pos, PVector p_rot, PVector p_scale) {
-  translate(p_pos.x, p_pos.y, p_pos.z);
-  rotateX(p_rot.x);
-  rotateY(p_rot.y);
-  rotateZ(p_rot.z);
-  scale(p_scale.x, p_scale.y, p_scale.z);
-}
+// Now that the `Transform` class has `applyMatrix()`, well...
+//void transform(PVector p_pos, PVector p_rot, PVector p_scale) {
+//  translate(p_pos.x, p_pos.y, p_pos.z);
+//  rotateX(p_rot.x);
+//  rotateY(p_rot.y);
+//  rotateZ(p_rot.z);
+//  scale(p_scale.x, p_scale.y, p_scale.z);
+//}
 
 void push() {
   pushMatrix();

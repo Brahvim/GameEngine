@@ -1,3 +1,5 @@
+
+
 // YO! Go work on the Renderer class.
 // The `update()` method's `switch` needs stuff to draw! (For `SPHERE`!)
 // Also, get it textured! :joy: 
@@ -11,7 +13,7 @@ void settings() {
   smooth(2);
   PJOGL.setIcon("sunglass_nerd.png");
   //PJOGL.setIcon(new String[]{"sunglass_nerd.png"});
-  //For when you need to provide multiple resolution icons yourself!
+  // For when you need to provide multiple resolution icons yourself!
 }
 
 
@@ -38,30 +40,32 @@ void dispose() {
   catch(IOException ioe) {
   }
 
-  //With proper monitoring of window fullscreen events in `post()` now, this is superfast :D
+  // With proper monitoring of window fullscreen events in `post()` now, this is superfast :D
   //super.exit(); // This is now `dispose()` and not `exit()`.
 
-  //Fun fact: `Ctrl + G` continues to search for the text you last searched for.
+  // Fun fact: `Ctrl + G` continues to search for the text you last searched for.
 
   //window.destroy(); // Faster, but might let the application stop responding completely!
-  //No longer needed though :D
+  // No longer needed though :D
 }
 
 void setup() {
   //new TTS().speak(new File("").getAbsolutePath());
   updateRatios();
 
-  //Should load this up from a save file:
+  posted = createGraphics(INIT_WIDTH, INIT_HEIGHT, P3D);
+
+  // Should load this up from a save file:
   //int a = 2;
   //smooth(a);
-  //`smooth()`can be called in `setup()` :D
+  // `smooth()`can be called in `setup()` :D
 
   surface.setTitle("Nerd Engine");
   //cursor(loadImage("Unnamed_RPG_cursor.png"));
 
   //g = createPrimaryGraphics(); // Super important discovery!
-  //[https://github.com/processing/processing/blob/8b15e4f548c1426df3a5ebe4c2106619faf7c4ba/
-  //core/src/processing/core/PApplet.java#L2343]
+  // [https://github.com/processing/processing/blob/8b15e4f548c1426df3a5ebe4c2106619faf7c4ba/
+  // core/src/processing/core/PApplet.java#L2343]
 
   String sketchArgsStr = System.getProperty("sun.java.command");
   sketchArgs = sketchArgsStr.split(" ");
@@ -73,8 +77,9 @@ void setup() {
 
   println(new File(sketchPath("lib\\")).getAbsolutePath());
 
-  //Library initialization:
-
+  // Library initialization:
+  //fx = new PostFX(this);
+  fxApplier = new PostFXSupervisor(this);
   Fisica.init(this);
   NativeLibraryLoader.loadLibbulletjme(true, 
     new File("C:\\ProcessingSketches\\libraries\\LibBulletJME\\library\\"), 
@@ -120,11 +125,11 @@ void setup() {
   for (int i = 0; i < javaScreens.length; i++)
     refreshRates[i] = javaScreens[i].getDisplayMode().getRefreshRate();
 
-  //[https://developer.android.com/reference/android/view/Display#getSupportedModes()]:
+  // [https://developer.android.com/reference/android/view/Display#getSupportedModes()]:
   //REFRESH_RATE = getActivity().getWindowManager().getDefaultDisplay()
   //.getSupportedDisplayModes()[0].getRefreshRate();
 
-  //Alternative:
+  // Alternative:
   //REFRESH_RATE = getActivity().getWindowManager().getDefaultDisplay().getRefreshRate();
 
   if (REFRESH_RATE == DisplayMode.REFRESH_RATE_UNKNOWN)
@@ -191,17 +196,19 @@ void draw() {
   pframeTime = frameStartTime;
   deltaTime = frameTime * 0.01f;
 
+  fxApplier.render(g);
+
   gl = beginPGL();
   //gl.enable(PGL.CULL_FACE);
   //gl.cullFace(PGL.FRONT); // :(
   //gl.frontFace(PGL.CCW);
-  //Everything else works by the way : D
+  // Everything else works by the way : D
   //flush();
 
 
-  //Apply transformations first, so
-  //that entities can use methods such
-  //as `modelX()`, and check matrices.
+  // Apply transformations first, so
+  // that entities can use methods such
+  // as `modelX()`, and check matrices.
 
   lights(); //camera(); // `action();`! ";D!
 
@@ -239,15 +246,23 @@ void draw() {
         r.update();
     }
 
-  //Step the Physics Engines later, because...
-  //I'd like to be at the origin of the world on my first frame...
-  //Also, the user changes Physics- related data in their updates.
+  // Step the Physics Engines later, because...
+  // I'd like to be at the origin of the world on my first frame...
+  // Also, the user changes Physics- related data in their updates.
   if (b2d != null && b2dShouldUpdate)
     b2d.step(deltaTime);
 
   if (bt!= null && btShouldUpdate)
     bt.update(deltaTime);
   pop();
+
+  // Post processing:
+  // (...get it? :rofl:)
+
+  //translate(cx, cy);
+  //fxApplier.compose(g);
+  //image(posted, 0, 0);
+  //translate(-cx, -cy);
 
   noLights();
   begin2D();
@@ -262,9 +277,6 @@ void post() {
   pwidth = width;
   pheight = height;
   pfocused = focused;
-
-  for (Asset a : ASSETS)
-    a.ploaded = a.loaded;
 
   pmouse.set(mouse);
   pmouseLeft = mouseLeft;
@@ -289,6 +301,10 @@ void post() {
 
   window.setPointerVisible(cursorVisible);
   while (cursorVisible ? !window.isPointerVisible() : window.isPointerVisible());
+
+  // Doing this in the end as a test:
+  for (Asset a : ASSETS)
+    a.ploaded = a.loaded;
 }
 
 void mousePressed() {
@@ -305,7 +321,7 @@ void mousePressed() {
     break;
   }
 
-  //Calling this later so that our variables have the latest values:
+  // Calling this later so that our variables have the latest values:
   currentScene.mousePressed();
   for (Entity e : currentScene.entities)
     e.mousePressed();
@@ -324,7 +340,7 @@ void mouseReleased() {
     break;
   }
 
-  //Calling this later so that our variables have the latest values:
+  // Calling this later so that our variables have the latest values:
   currentScene.mouseReleased();
   for (Entity e : currentScene.entities)
     e.mouseReleased();
@@ -359,13 +375,13 @@ void mouseWheel(MouseEvent p_event) {
 void keyPressed() {
   lastKeyPressTime = millis();
 
-  //`Shift + Esc` to close, by the way.
+  // `Shift + Esc` to close, by the way.
   if (keyCode == 27) // If `Esc` is pressed,
     if (!keyIsPressed(16)) { // Check if `Shift` wasN'T held.
       key = 0; // If `Shift` wasn't held, reset `key` to not be `Esc`, so the sketch does not close.
     } else {
       exit();
-      //window.destroy(); // THAT WORKED?!
+      //window.destroy(); // THAT WORKED?! *Does not anymore now that we have a proper way of exiting!*
     }
 
 
@@ -376,7 +392,7 @@ void keyPressed() {
 
   keysHeld.add(keyCode);
 
-  //Calling this later so that our variables have the latest values:
+  // Calling this later so that our variables have the latest values:
   currentScene.keyPressed();
 
   for (Entity e : currentScene.entities)
@@ -390,7 +406,7 @@ void keyReleased() {
   catch(IndexOutOfBoundsException ioobe) {
   }
 
-  //Calling this later so that our variables have the latest values:
+  // Calling this later so that our variables have the latest values:
   currentScene.keyReleased();
   for (Entity e : currentScene.entities)
     e.keyReleased();
@@ -398,18 +414,18 @@ void keyReleased() {
 
 
 // Context:
-// [https://github.com / processing / processing / blob / 8b15e4f548c1426df3a5ebe4c2106619faf7c4ba/
-// core/src/processing / core / PApplet.java#L3181]
+// [https://github.com/processing/processing/blob/8b15e4f548c1426df3a5ebe4c2106619faf7c4ba/
+// core/src/processing/core/PApplet.java#L3181]
 
 // Note: these functions cause random crashes if not used in this way.
-// As a fallback method, use this(much safer) code inside `draw()`:
+// As a fallback method, use this (much safer) code inside `draw()`:
 
 //if (focused && !pfocused) {
-//  println("Focused!");
-//  currentScene.onFocusGained();
+//println("Focused!");
+//currentScene.onFocusGained();
 //} else if (pfocused && !focused) {
-//  println("Lost focus!");
-//  currentScene.onFocusLost();
+//println("Lost focus!");
+//currentScene.onFocusLost();
 //}
 
 // The reason why I'm not using that method is because these callbacks are more accurate.
@@ -420,25 +436,25 @@ void keyReleased() {
 // PS these are available only for scenes to use. Entities probably won't need it.
 
 void focusGained() {
-  //For compatibility with newer versions of Processing, I guess:
+  // For compatibility with newer versions of Processing, I guess:
   super.focusGained();
 
   focused = true;
 
-  //I guess this works because `looping` is `false` for sometime after `handleDraw()`,
-  //which is probably when events are handled:
+  // I guess this works because `looping` is `false` for sometime after `handleDraw()`,
+  // which is probably when events are handled:
   if (!looping)
     currentScene.focusGained();
 }
 
 void focusLost() {
-  //For compatibility with newer versions of Processing, I guess:
+  // For compatibility with newer versions of Processing, I guess:
   super.focusLost();
 
   focused = false;
 
-  //I guess this works because `looping` is `false` for sometime after `handleDraw()`,
-  //which is probably when events are handled:
+  // I guess this works because `looping` is `false` for sometime after `handleDraw()`,
+  // which is probably when events are handled:
   if (!looping)
     currentScene.focusLost();
 }
