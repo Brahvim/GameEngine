@@ -1,5 +1,3 @@
- //<>//
-
 // YO! Go work on the Renderer class.
 // The `update()` method's `switch` needs stuff to draw! (For `SPHERE`!)
 // Also, get it textured! :joy: 
@@ -13,8 +11,9 @@ void settings() {
   smooth(2);
   PJOGL.setIcon("sunglass_nerd.png");
   //PJOGL.setIcon(new String[]{"sunglass_nerd.png"});
-  // For when you need to provide multiple resolution icons yourself!
+  //For when you need to provide multiple resolution icons yourself!
 }
+
 
 // This used to be an overload for `exit()`.
 void dispose() {
@@ -36,45 +35,45 @@ void dispose() {
     println("Find the log file at: " + Log.filePath);
     new ProcessBuilder("notepad", Log.logFile.getAbsolutePath()).start();
   }
-  catch (IOException ioe) {
+  catch(IOException ioe) {
   }
 
-  // With proper monitoring of window fullscreen events in `post()` now, this is superfast :D
+  //With proper monitoring of window fullscreen events in `post()` now, this is superfast :D
   //super.exit(); // This is now `dispose()` and not `exit()`.
 
-  // Fun fact: `Ctrl + G` continues to search for the text you last searched for.
+  //Fun fact: `Ctrl + G` continues to search for the text you last searched for.
 
   //window.destroy(); // Faster, but might let the application stop responding completely!
-  // No longer needed though :D
+  //No longer needed though :D
 }
 
 void setup() {
   //new TTS().speak(new File("").getAbsolutePath());
   updateRatios();
 
-  // Should load this up from a save file:
+  //Should load this up from a save file:
   //int a = 2;
   //smooth(a);
-  // `smooth()` can be called in `setup()` :D
+  //`smooth()`can be called in `setup()` :D
 
   surface.setTitle("Nerd Engine");
   //cursor(loadImage("Unnamed_RPG_cursor.png"));
 
   //g = createPrimaryGraphics(); // Super important discovery!
-  // [https://github.com/processing/processing/blob/8b15e4f548c1426df3a5ebe4c2106619faf7c4ba/
-  // core/src/processing/core/PApplet.java#L2343]
+  //[https://github.com/processing/processing/blob/8b15e4f548c1426df3a5ebe4c2106619faf7c4ba/
+  //core/src/processing/core/PApplet.java#L2343]
 
   String sketchArgsStr = System.getProperty("sun.java.command");
   sketchArgs = sketchArgsStr.split(" ");
   INSIDE_PDE = sketchArgs.length == 3 && 
     sketchArgs[1].contains("display") && sketchArgs[2].contains("sketch-path");
 
-  sketchPath = INSIDE_PDE? sketchArgs[2].substring(14, sketchArgs[2].length()) + "\\"
+  sketchPath = INSIDE_PDE ? sketchArgs[2].substring(14, sketchArgs[2].length()) + "\\"
     : sketchPath();
 
   println(new File(sketchPath("lib\\")).getAbsolutePath());
 
-  // Library initialization:
+  //Library initialization:
 
   Fisica.init(this);
   NativeLibraryLoader.loadLibbulletjme(true, 
@@ -97,7 +96,7 @@ void setup() {
   glGraphics = (PGraphicsOpenGL)g;
 
   /*
-   // Javadoc:
+    // Javadoc:
    // [C:\Users\Brahvim\Documents\PC stuff I always want with me\jogl-javadoc
    // \jogl\javadoc\com\jogamp\nativewindow\SurfaceUpdatedListener.html]
    
@@ -121,15 +120,15 @@ void setup() {
   for (int i = 0; i < javaScreens.length; i++)
     refreshRates[i] = javaScreens[i].getDisplayMode().getRefreshRate();
 
-  // [https://developer.android.com/reference/android/view/Display#getSupportedModes()]:
+  //[https://developer.android.com/reference/android/view/Display#getSupportedModes()]:
   //REFRESH_RATE = getActivity().getWindowManager().getDefaultDisplay()
   //.getSupportedDisplayModes()[0].getRefreshRate();
 
-  // Alternative:
+  //Alternative:
   //REFRESH_RATE = getActivity().getWindowManager().getDefaultDisplay().getRefreshRate();
 
   if (REFRESH_RATE == DisplayMode.REFRESH_RATE_UNKNOWN)
-    REFRESH_RATE = -1;
+    REFRESH_RATE= -1;
 
   frameRate(REFRESH_RATE);
 
@@ -148,7 +147,7 @@ void setup() {
   textAlign(CENTER, CENTER);
 
   /*
-  Method[] sketchMethods = this.getClass().getDeclaredMethods();
+    Method[] sketchMethods = this.getClass().getDeclaredMethods();
    Method engineSetupMethod = null;
    
    for (Method m : sketchMethods) {
@@ -161,7 +160,7 @@ void setup() {
    if (engineSetupMethod == null)
    if (SCENES.size() > 0)
    setScene(SCENES.get(0));
-   else try {
+   else try{
    // You have to pass an object instance if the method isn't static.
    // If the method is parameterless, pass `null`.
    // Else, pass parameters into `invoke()` - it is a `varargs` method.
@@ -196,13 +195,13 @@ void draw() {
   //gl.enable(PGL.CULL_FACE);
   //gl.cullFace(PGL.FRONT); // :(
   //gl.frontFace(PGL.CCW);
-  // Everything else works by the way :D
+  //Everything else works by the way : D
   //flush();
 
 
-  // Apply transformations first, so
-  // that entities can use methods such
-  // as `modelX()`, and check matrices.
+  //Apply transformations first, so
+  //that entities can use methods such
+  //as `modelX()`, and check matrices.
 
   lights(); //camera(); // `action();`! ";D!
 
@@ -215,9 +214,9 @@ void draw() {
     // Unproject:
     Unprojector.captureViewMatrix((PGraphics3D)g);
     // `0.9f`: at the near clipping plane.
-    // `0.9999f`: at the far clipping plane.
+    // `0.9999f`: at the farclipping plane.
     Unprojector.gluUnProject(mouseX, height - mouseY, 
-      //0.9f + map(mouseY, height, 0, 0, 0.1f),
+      //0.9f+ map(mouseY, height, 0, 0, 0.1f),
       0, mouse);
     currentCam.near = originalNear;
     currentCam.apply();
@@ -240,9 +239,9 @@ void draw() {
         r.update();
     }
 
-  // Step the Physics Engines later, because...
-  // I'd like to be at the origin of the world on my first frame...
-  // Also, the user changes Physics-related data in their updates.
+  //Step the Physics Engines later, because...
+  //I'd like to be at the origin of the world on my first frame...
+  //Also, the user changes Physics- related data in their updates.
   if (b2d != null && b2dShouldUpdate)
     b2d.step(deltaTime);
 
@@ -282,14 +281,14 @@ void post() {
 
   //if (pfullscreen != fullscreen) {
   window.setFullscreen(fullscreen);
-  while (fullscreen? !window.isFullscreen() : window.isFullscreen());
+  while (fullscreen ? !window.isFullscreen() : window.isFullscreen());
   //}
 
   window.confinePointer(cursorConfined);
-  while (cursorConfined? !window.isPointerConfined() : window.isPointerConfined());
+  while (cursorConfined ? !window.isPointerConfined() : window.isPointerConfined());
 
   window.setPointerVisible(cursorVisible);
-  while (cursorVisible? !window.isPointerVisible() : window.isPointerVisible());
+  while (cursorVisible ? !window.isPointerVisible() : window.isPointerVisible());
 }
 
 void mousePressed() {
@@ -301,12 +300,12 @@ void mousePressed() {
   case RIGHT:
     mouseRight = true;
     break;
-  case CENTER: 
+  case CENTER : 
     mouseMid = true;
     break;
   }
 
-  // Calling this later so that our variables have the latest values:
+  //Calling this later so that our variables have the latest values:
   currentScene.mousePressed();
   for (Entity e : currentScene.entities)
     e.mousePressed();
@@ -320,12 +319,12 @@ void mouseReleased() {
   case RIGHT:
     mouseRight = false;
     break;
-  case CENTER: 
+  case CENTER : 
     mouseMid = false;
     break;
   }
 
-  // Calling this later so that our variables have the latest values:
+  //Calling this later so that our variables have the latest values:
   currentScene.mouseReleased();
   for (Entity e : currentScene.entities)
     e.mouseReleased();
@@ -377,7 +376,7 @@ void keyPressed() {
 
   keysHeld.add(keyCode);
 
-  // Calling this later so that our variables have the latest values:
+  //Calling this later so that our variables have the latest values:
   currentScene.keyPressed();
 
   for (Entity e : currentScene.entities)
@@ -391,7 +390,7 @@ void keyReleased() {
   catch(IndexOutOfBoundsException ioobe) {
   }
 
-  // Calling this later so that our variables have the latest values:
+  //Calling this later so that our variables have the latest values:
   currentScene.keyReleased();
   for (Entity e : currentScene.entities)
     e.keyReleased();
@@ -399,11 +398,11 @@ void keyReleased() {
 
 
 // Context:
-// [https://github.com/processing/processing/blob/8b15e4f548c1426df3a5ebe4c2106619faf7c4ba/
-// core/src/processing/core/PApplet.java#L3181]
+// [https://github.com / processing / processing / blob / 8b15e4f548c1426df3a5ebe4c2106619faf7c4ba/
+// core/src/processing / core / PApplet.java#L3181]
 
 // Note: these functions cause random crashes if not used in this way.
-// As a fallback method, use this (much safer) code inside `draw()`:
+// As a fallback method, use this(much safer) code inside `draw()`:
 
 //if (focused && !pfocused) {
 //  println("Focused!");
@@ -421,25 +420,25 @@ void keyReleased() {
 // PS these are available only for scenes to use. Entities probably won't need it.
 
 void focusGained() {
-  // For compatibility with newer versions of Processing, I guess:
+  //For compatibility with newer versions of Processing, I guess:
   super.focusGained();
 
   focused = true;
 
-  // I guess this works because `looping` is `false` for sometime after `handleDraw()`,
-  // which is probably when events are handled:
+  //I guess this works because `looping` is `false` for sometime after `handleDraw()`,
+  //which is probably when events are handled:
   if (!looping)
     currentScene.focusGained();
 }
 
 void focusLost() {
-  // For compatibility with newer versions of Processing, I guess:
+  //For compatibility with newer versions of Processing, I guess:
   super.focusLost();
 
   focused = false;
 
-  // I guess this works because `looping` is `false` for sometime after `handleDraw()`,
-  // which is probably when events are handled:
+  //I guess this works because `looping` is `false` for sometime after `handleDraw()`,
+  //which is probably when events are handled:
   if (!looping)
     currentScene.focusLost();
 }
