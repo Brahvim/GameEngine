@@ -196,7 +196,7 @@ void draw() {
   pframeTime = frameStartTime;
   deltaTime = frameTime * 0.01f;
 
-  fxApplier.render(g);
+  fxApplier.render(posted);
 
   gl = beginPGL();
   //gl.enable(PGL.CULL_FACE);
@@ -221,7 +221,7 @@ void draw() {
     // Unproject:
     Unprojector.captureViewMatrix((PGraphics3D)g);
     // `0.9f`: at the near clipping plane.
-    // `0.9999f`: at the farclipping plane.
+    // `0.9999f`: at the far clipping plane.
     Unprojector.gluUnProject(mouseX, height - mouseY, 
       //0.9f+ map(mouseY, height, 0, 0, 0.1f),
       0, mouse);
@@ -260,8 +260,8 @@ void draw() {
   // (...get it? :rofl:)
 
   //translate(cx, cy);
-  //fxApplier.compose(g);
-  //image(posted, 0, 0);
+  fxApplier.compose(g);
+  image(posted, 0, 0);
   //translate(-cx, -cy);
 
   noLights();

@@ -128,13 +128,13 @@ public static class Unprojector {
     // Check for a valid 3D canvas.
 
     // Capture current projection matrix.
-    pMatrix.set(p_g3d.projection);
+    //pMatrix.set(p_g3d.projection);
 
     // Multiply by current modelview matrix.
-    pMatrix.apply(p_g3d.modelview);
+    //pMatrix.apply(p_g3d.modelview);
 
     // Invert the resultant matrix.
-    pMatrix.invert();
+    //pMatrix.invert();
 
     // "Couldn't we do this in today's modern world?:" 
     // - Brahvim
