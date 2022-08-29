@@ -57,6 +57,7 @@ GraphicsDevice[] javaScreens;
 
 int REFRESH_RATE = 0;
 int[] refreshRates;
+boolean doPostProcessing, doPostProcessingState;
 
 float frameStartTime, deltaTime, pframeTime, frameTime;
 

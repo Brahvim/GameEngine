@@ -201,11 +201,13 @@ void draw() {
   //gl.enable(PGL.CULL_FACE);
   //gl.cullFace(PGL.FRONT); // :(
   //gl.frontFace(PGL.CCW);
-  // Everything else works by the way : D
+  // Everything else works by the way :D
   //flush();
 
   // Start *post Processing!:*
-  fxApplier.render();
+
+  if (doPostProcessingState)
+    fxApplier.render();
   lights(); //camera(); // `action();`! ";D!
 
   // Apply transformations first, so
@@ -271,9 +273,11 @@ void post() {
   // YOU CAN RENDER HERE APPARENTLY!:
   // (Might break libraries :|)
 
-  blendMode(SCREEN);
-  image(fxApplier.getCurrentPass(), cx, cy);
-  blendMode(BLEND);
+  if (doPostProcessingState) {
+    blendMode(SCREEN);
+    image(fxApplier.getCurrentPass(), cx, cy);
+    blendMode(BLEND);
+  }
 
   noLights();
   begin2D();
@@ -281,6 +285,8 @@ void post() {
   end2D();
 
   endPGL();
+
+  doPostProcessingState = doPostProcessing;
 
   pwidth = width;
   pheight = height;

@@ -103,6 +103,7 @@ Scene testScene = new Scene() {
       public void run() {
         //((Renderer)circle.getComponent(Renderer.class)).texture = (PImage)boxTexture.loadedData;
         println("Box texture done loading!");
+        //doPostProcessing = true;
       }
     }
     ).beginAsyncLoad();
@@ -208,12 +209,13 @@ Scene testScene = new Scene() {
     };
 
     rev.doScript = false;
+    //bPass = new BloomPass(SKETCH, 0.75f, 10, 4);
 
-    fxApplier.setResolution(INIT_WIDTH, INIT_HEIGHT);
-    bPass = new BloomPass(SKETCH, 0.75f, 10, 4);
+    wave = new SineWaveDT();
+    wave.start();
   }
 
-  BloomPass bPass;
+  //BloomPass bPass;
 
   public void draw() {
     currentCam.applyMatrix();
@@ -222,7 +224,7 @@ Scene testScene = new Scene() {
       camLerpUpdate(cam, rev, (float)mouseX / (float)width);
     else camIsLerp = false;
 
-    fxApplier.pass(bPass);
+    //fxApplier.pass(bPass);
 
     //gl.enable(PGL.CULL_FACE);
     //gl.cullFace(PGL.FRONT);
@@ -230,11 +232,17 @@ Scene testScene = new Scene() {
     //flush();
   }
 
+  SineWaveDT wave = new SineWaveDT(0.001f);
+
   public void drawUI() {
     //gl.disable(PGL.CULL_FACE);
 
     fill(255, 0, 0, 60); // The alpha used to be `80`.
     circle(mouseX, mouseY, 60);
+
+
+    println(wave.get());
+    circle(cx + wave.get() * cx, mouseY, 60);
 
     translate(0.5f * textWidth(Integer.toString((int)frameRate)), 
       textAscent() - textDescent());
@@ -245,8 +253,7 @@ Scene testScene = new Scene() {
   public void mousePressed() {
     if (mouseButton == RIGHT)
       setCam(currentCam == rev? cam : rev);
-    else if (mouseButton == CENTER) {
+    else if (mouseButton == CENTER)
       light.enabled = !light.enabled;
-    }
   }
 };
