@@ -10,7 +10,6 @@
 
 void settings() {
   size(INIT_WIDTH, INIT_HEIGHT, P3D);
-  smooth(-1);
   PJOGL.setIcon("sunglass_nerd.png");
   //PJOGL.setIcon(new String[]{"sunglass_nerd.png"});
   // For when you need to provide multiple resolution icons yourself!
