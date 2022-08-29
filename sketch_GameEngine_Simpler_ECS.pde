@@ -10,7 +10,7 @@
 
 void settings() {
   size(INIT_WIDTH, INIT_HEIGHT, P3D);
-  smooth(2);
+  smooth(-1);
   PJOGL.setIcon("sunglass_nerd.png");
   //PJOGL.setIcon(new String[]{"sunglass_nerd.png"});
   // For when you need to provide multiple resolution icons yourself!
@@ -55,13 +55,13 @@ void setup() {
 
   posted = createGraphics(INIT_WIDTH, INIT_HEIGHT, P3D);
 
-  // Should load this up from a save file:
+  // Should load this up from a save file (or a `--smooth` argument from the launcher):
   //int a = 2;
   //smooth(a);
   // `smooth()`can be called in `setup()` :D
 
   surface.setTitle("Nerd Engine");
-  //cursor(loadImage("Unnamed_RPG_cursor.png"));
+  cursor(loadImage("Unnamed_RPG_cursor.png"), -4, -4);
 
   //g = createPrimaryGraphics(); // Super important discovery!
   // [https://github.com/processing/processing/blob/8b15e4f548c1426df3a5ebe4c2106619faf7c4ba/
@@ -180,10 +180,11 @@ void setup() {
 }
 
 void pre() {
-  unprojectMouse();
   mouseScrollDelta = mouseScroll - pmouseScroll;
 
   if (!(pwidth == width || pheight == height)) {
+    posted.setSize(width, height);
+    fxApplier.setResolution(width, height);
     updateRatios();
     currentScene.windowResized();
   }
@@ -196,8 +197,7 @@ void draw() {
   pframeTime = frameStartTime;
   deltaTime = frameTime * 0.01f;
 
-  fxApplier.render(posted);
-
+  // OpenGL reference:
   gl = beginPGL();
   //gl.enable(PGL.CULL_FACE);
   //gl.cullFace(PGL.FRONT); // :(
@@ -205,15 +205,17 @@ void draw() {
   // Everything else works by the way : D
   //flush();
 
+  // Start *post Processing!:*
+  fxApplier.render();
+  lights(); //camera(); // `action();`! ";D!
 
   // Apply transformations first, so
   // that entities can use methods such
   // as `modelX()`, and check matrices.
 
-  lights(); //camera(); // `action();`! ";D!
-
   push();
-  if (!camIsLerp && focused) {
+  // Unproject the mouse position:
+  if (!camIsLerp) {
     float originalNear = currentCam.near;
     currentCam.near = currentCam.mouseZ;
     currentCam.apply();
@@ -239,12 +241,12 @@ void draw() {
     if (e.enabled)
       e.update();
 
-  if (focused)
-    for (Renderer r : currentScene.renderers) {
-      r.parent.render();
-      if (r.enabled)
-        r.update();
-    }
+  //if (focused) // I applied this check EVEN to post processing as well but GPU remained unchanged.
+  for (Renderer r : currentScene.renderers) {
+    r.parent.render();
+    if (r.enabled)
+      r.update();
+  }
 
   // Step the Physics Engines later, because...
   // I'd like to be at the origin of the world on my first frame...
@@ -259,10 +261,19 @@ void draw() {
   // Post processing:
   // (...get it? :rofl:)
 
-  //translate(cx, cy);
-  fxApplier.compose(g);
-  image(posted, 0, 0);
-  //translate(-cx, -cy);
+
+
+  //endPGL();
+}
+
+// Ayo, do the post - update!:
+void post() {
+  // YOU CAN RENDER HERE APPARENTLY!:
+  // (Might break libraries :|)
+
+  blendMode(SCREEN);
+  image(fxApplier.getCurrentPass(), cx, cy);
+  blendMode(BLEND);
 
   noLights();
   begin2D();
@@ -270,10 +281,7 @@ void draw() {
   end2D();
 
   endPGL();
-}
 
-// Ayo, do the post - update!:
-void post() {
   pwidth = width;
   pheight = height;
   pfocused = focused;

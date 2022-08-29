@@ -6,6 +6,7 @@
 - `FPSCamera` wrapper class for... well, FPS cameras!
 - Some kinda' key combo utility (not `keysHeld` LOL).
 - Instanced Rendering.
+- Post Processing Renderer.
 - Texture asset loading bug.
 
 

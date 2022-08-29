@@ -197,7 +197,7 @@ public static class Unprojector {
 
   // Calculate positions on the near and far 3D frustum planes.
   public static boolean calculatePickPoints(int x, int y) { 
-    bValid = true; // Have to do both in order to reset PVector on error.
+    bValid = true; // Have to do both in order to reset `PVector` on error.
     if (!gluUnProject((float)x, (float)y, 0.0f, ptStartPos)) bValid = false;
     if (!gluUnProject((float)x, (float)y, 1.0f, ptEndPos)) bValid = false;
     return bValid;

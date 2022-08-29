@@ -23,7 +23,7 @@ boolean keyIsPressed(int p_keyCode) {
 
 void unprojectMouse() {
   //mouse.set(new float[0]);
-  //mouse.set(mouseX, mouseY);
+  mouse.set(mouseX, mouseY);
   //mouse.set((float)mouseX / (float)width, (float)mouseY / (float)height);
 
   //FloatBuffer modelview = FloatBuffer.allocate(16);
@@ -39,8 +39,8 @@ void unprojectMouse() {
   //glu.gluUnProject();
 
   // The order does not matter:
-  //mouse = glGraphics.camera.mult(mouse, null);
-  //mouse = glGraphics.modelviewInv.mult(mouse, null);
+  mouse = glGraphics.camera.mult(mouse, null);
+  mouse = glGraphics.modelviewInv.mult(mouse, null);
 
   // [https://www.gamedev.net/forums/topic/675595-math-behind-gluunproject/]
   // Multiply the resulting point by the inverse of the `(model * projection)` matrix.

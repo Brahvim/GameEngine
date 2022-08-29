@@ -210,7 +210,7 @@ Scene testScene = new Scene() {
     rev.doScript = false;
 
     fxApplier.setResolution(INIT_WIDTH, INIT_HEIGHT);
-    bPass = new BloomPass(SKETCH, 0.5f, 20, 30);
+    bPass = new BloomPass(SKETCH, 0.75f, 10, 4);
   }
 
   BloomPass bPass;
@@ -219,11 +219,10 @@ Scene testScene = new Scene() {
     currentCam.applyMatrix();
     if (mousePressed && mouseButton == LEFT)
       //camLerpUpdate(cam, rev, (float)mouse.x / (float)width, 0.05f, 0.95f);
-      camLerpUpdate(cam, rev, (float)mouseX / (float)width, 0, 1);
+      camLerpUpdate(cam, rev, (float)mouseX / (float)width);
     else camIsLerp = false;
 
     fxApplier.pass(bPass);
-
 
     //gl.enable(PGL.CULL_FACE);
     //gl.cullFace(PGL.FRONT);
