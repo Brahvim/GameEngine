@@ -14,7 +14,6 @@ class Entity extends EventReceiver {
       currentScene.addEntity(this);
   }
 
-
   // In the case I need this mess ever again:
 
   ArrayList<Component> components;
@@ -33,7 +32,6 @@ class Entity extends EventReceiver {
     return null;
   }
 
-
   public void setup() {
   }
 
@@ -42,6 +40,9 @@ class Entity extends EventReceiver {
 
   // No need to fill with instructions if unused:
   public void render() {
+  }
+
+  public void postRender() {
   }
 
   public Entity addToScene(Scene p_scene) {

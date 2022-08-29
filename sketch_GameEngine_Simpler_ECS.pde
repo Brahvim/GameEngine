@@ -245,6 +245,7 @@ void draw() {
     r.parent.render();
     if (r.enabled)
       r.update();
+    r.parent.postRender();
   }
 
   // Step the Physics Engines later, because...
