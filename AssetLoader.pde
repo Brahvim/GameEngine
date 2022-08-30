@@ -44,9 +44,8 @@ static class Assets {
     Assets.pictures = new PImage[p_images]; 
     Assets.shaders = new PShader[p_shaders];
 
-    logInfo("Initalized Assets.");
-
     Assets.isInit = true;
+    logInfo("`Assets.init()` was called.");
   }
 
   static void extendArraysTo(int p_soundFiles, int p_images, int p_shaders) {

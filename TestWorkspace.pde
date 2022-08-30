@@ -45,7 +45,6 @@ void engineSetup() {
   //.addSelection("Graphical Quality", "Fair", "Decent", "Powerful").run();
   //while (!settingsForm.isClosedByUser());
 
-  logInfo("`engineSetup()` called.");
   logWarn("Test warning!");
   logError("Fake error!");
 
@@ -78,17 +77,18 @@ void engineSetup() {
   //Log.filePath = "C:\\ProcessingSketches\\sketches\\".concat(SKETCH_NAME).concat("\\")
   //.concat(SKETCH_NAME).concat(".txt");
   //Log.logFile = new File(Log.filePath);
-
-  logInfo("Hello, World!");
-  logInfo("Another log!");
 }
 
 
-Asset globalBoxTexture;
 Scene testScene = new Scene() {
   Asset audio, boxTexture;
+  BloomPass bloomPass;
   Camera cam = new Camera(), rev = new Camera(); // A 'normal' and a 'revolving' camera.
-  Entity circle, quad, light, groundBox;
+  RGBSplitPass chromaAbPass;
+
+  @SuppressWarnings("unused")
+    Entity circle, quad, light, groundBox;
+  SineWaveDT wave = new SineWaveDT(0.001f);
 
   public void setup() {
     audio = new Asset("UnicycleGirrafe.mp3", AssetType.SOUND, new Runnable() {
@@ -102,8 +102,7 @@ Scene testScene = new Scene() {
     boxTexture = new Asset("LearnOpenGL_container2.png", AssetType.PICTURE, new Runnable() {
       public void run() {
         //((Renderer)circle.getComponent(Renderer.class)).texture = (PImage)boxTexture.loadedData;
-        println("Box texture done loading!");
-        //doPostProcessing = true;
+        //logInfo("Box texture done loading!");
       }
     }
     ).beginAsyncLoad();
@@ -119,7 +118,7 @@ Scene testScene = new Scene() {
         this.display.strokeWeight = 0.05f;
 
         this.form.scale.mult(32);
-        logInfo("Circle setup.");
+        //logInfo("Circle setup.");
       }
 
       public void update() {
@@ -136,11 +135,11 @@ Scene testScene = new Scene() {
         this.display = new Renderer(this, this.form, RendererType.QUAD, boxTexture);
         this.display.type = RendererType.QUAD;
 
-        logInfo("Quad setup.");
+        //logInfo("Quad setup.");
 
-        logInfo("Quad components:");
-        for (Component c : this.components)
-          logInfo("\t", c);
+        //logInfo("Quad components:");
+        //for (Component c : this.components)
+        //logInfo("\t", c);
 
         this.display.strokeWeight = 0.05f;
         this.form.scale.mult(15);
@@ -156,7 +155,7 @@ Scene testScene = new Scene() {
       Light light = new Light(this, this.form, POINT);
 
       public void setup() {
-        light.enabled = false;
+        //light.enabled = false;
         quadForm = quad.getComponent(Transform.class);
         this.light.col.set(255, 255, 255);
       }
@@ -185,9 +184,9 @@ Scene testScene = new Scene() {
       }
     };
 
-    println("Scene components:");
-    for (Component c : this.components)
-      println(c);
+    //println("Scene components:");
+    //for (Component c : this.components)
+    //println(c);
 
     cam.clearColor = rev.clearColor = color(30, 120, 170, 80); //15);
     setCam(rev);
@@ -209,14 +208,14 @@ Scene testScene = new Scene() {
     };
 
     rev.doScript = false;
-    bPass = new BloomPass(SKETCH, 0.75f, 10, 4);
+
+    bloomPass = new BloomPass(SKETCH, 0.75f, 10, 4);
+    chromaAbPass = new RGBSplitPass(SKETCH, 0.1f);
 
     wave.start(0);
     wave.endIn(3600);
-    //wave.extendEndBy(1000);
+    wave.extendEndBy(10000);
   }
-
-  BloomPass bPass;
 
   public void draw() {
     currentCam.applyMatrix();
@@ -225,7 +224,8 @@ Scene testScene = new Scene() {
       camLerpUpdate(cam, rev, (float)mouseX / (float)width);
     else camIsLerp = false;
 
-    applyPass(bPass);
+    applyPass(bloomPass);
+    applyPass(chromaAbPass);
     doPostProcessing = true;
 
     //gl.enable(PGL.CULL_FACE);
@@ -233,8 +233,6 @@ Scene testScene = new Scene() {
     //gl.frontFace(PGL.CCW);
     //flush();
   }
-
-  SineWaveDT wave = new SineWaveDT(0.001f);
 
   public void drawUI() {
     //gl.disable(PGL.CULL_FACE);

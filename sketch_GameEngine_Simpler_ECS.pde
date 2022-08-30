@@ -33,8 +33,8 @@ void dispose() {
 
   if (Log.openFileOnExit)
   try {
-    println("Find the log file at: " + Log.filePath);
-    new ProcessBuilder("notepad", Log.logFile.getAbsolutePath()).start();
+    println("Find the log file at:", Log.absPath);
+    new ProcessBuilder("notepad", Log.absPath).start();
   }
   catch(IOException ioe) {
   }
@@ -48,16 +48,16 @@ void dispose() {
   // No longer needed though :D
 }
 
+import guru.ttslib.*;
 void setup() {
-  //new TTS().speak(new File("").getAbsolutePath());
+  new TTS().speak(new File("").getAbsolutePath());
   updateRatios();
-
-  posted = createGraphics(INIT_WIDTH, INIT_HEIGHT, P3D);
 
   // Should load this up from a save file (or a `--smooth` argument from the launcher):
   //int a = 2;
   //smooth(a);
   // `smooth()`can be called in `setup()` :D
+  // (NOT `draw()`, THOUGH!)
 
   surface.setTitle("Nerd Engine");
   cursor(loadImage("Unnamed_RPG_cursor.png"), -4, -4);
@@ -66,18 +66,21 @@ void setup() {
   // [https://github.com/processing/processing/blob/8b15e4f548c1426df3a5ebe4c2106619faf7c4ba/
   // core/src/processing/core/PApplet.java#L2343]
 
-  String sketchArgsStr = System.getProperty("sun.java.command");
+  sketchArgsStr = System.getProperty("sun.java.command");
   sketchArgs = sketchArgsStr.split(" ");
-  INSIDE_PDE = sketchArgs.length == 3 && 
+  INSIDE_PDE = sketchArgs.length > 2 && 
     sketchArgs[1].contains("display") && sketchArgs[2].contains("sketch-path");
 
   sketchPath = INSIDE_PDE ? sketchArgs[2].substring(14, sketchArgs[2].length()) + "\\"
     : sketchPath();
 
-  println(new File(sketchPath("lib\\")).getAbsolutePath());
+  initLog();
+
+  logInfo("Will load LibBulletJME from:");
+  logInfo("\t", new File(sketchPath("lib\\")).getAbsolutePath());
+  // Where's my `logInfoIndented()`?! :rofl:
 
   // Library initialization:
-  //fx = new PostFX(this);
   fx = new PostFXSupervisor(this);
   Fisica.init(this);
   NativeLibraryLoader.loadLibbulletjme(true, 
@@ -89,10 +92,11 @@ void setup() {
   uibn = new UiBooster(UiBoosterOptions.Theme.OS_NATIVE);
   uibs = new UiBooster(UiBoosterOptions.Theme.SWING);
 
-  initLog();
-
   logInfo("Sketch arguments:");
-  logInfo(sketchArgsStr);
+  logInfo('\t', sketchArgsStr);
+
+  logInfo(INSIDE_PDE? "Yep!" : "Nope,", " the sketch ", INSIDE_PDE? "is" : "isn't", 
+    " running inside the PDE!");
 
   //NativeLibraryLoader.loadLibbulletjme(true, new File("./lib"), "Release", "Sp");
 
@@ -150,8 +154,9 @@ void setup() {
   textSize(DEFAULT_TEXT_SIZE);
   textAlign(CENTER, CENTER);
 
+  logInfo("`engineSetup()` TO BE CALLED!"); // Errors would occur... after this.
   /*
-    Method[] sketchMethods = this.getClass().getDeclaredMethods();
+  Method[] sketchMethods = this.getClass().getDeclaredMethods();
    Method engineSetupMethod = null;
    
    for (Method m : sketchMethods) {
@@ -161,10 +166,10 @@ void setup() {
    }
    }
    
-   if (engineSetupMethod == null)
+   if (engineSetupMethod == null) {
    if (SCENES.size() > 0)
    setScene(SCENES.get(0));
-   else try{
+   } else try {
    // You have to pass an object instance if the method isn't static.
    // If the method is parameterless, pass `null`.
    // Else, pass parameters into `invoke()` - it is a `varargs` method.
@@ -172,17 +177,19 @@ void setup() {
    engineSetupMethod.invoke(this);
    }  
    catch(Exception e) {
+   logError("`engineSetup()` encountered an exception!");
+   logEx(e);
    }
    */
 
   engineSetup();
+  logInfo("`engineSetup()` succeded."); // Errors would occur... after this.
 }
 
 void pre() {
   mouseScrollDelta = mouseScroll - pmouseScroll;
 
   if (!(pwidth == width || pheight == height)) {
-    posted.setSize(width, height);
     fx.setResolution(width, height);
     updateRatios();
     currentScene.windowResized();
@@ -196,7 +203,7 @@ void draw() {
   pframeTime = frameStartTime;
   deltaTime = frameTime * 0.01f;
 
-  // OpenGL reference:
+  // *OpenGL reference:*
   gl = beginPGL();
   //gl.enable(PGL.CULL_FACE);
   //gl.cullFace(PGL.FRONT); // :(

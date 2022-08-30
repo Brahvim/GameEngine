@@ -1,13 +1,13 @@
 static class Log {
   public static byte lvInfo = 0, lvWarn = 1, lvError = 2;
   public static byte logLevel = Log.lvError;
-  public static boolean logToFile = true, openFileOnExit = false, 
+  public static boolean logToFile = true, openFileOnExit = true, 
     logToConsole = true, enabled = true;
 
   public static SimpleDateFormat dateFormat
     = new SimpleDateFormat("h':'m' 'a', 'EEEEEEEE', 'd' 'MMMM', 'yyyy");
 
-  public static String filePath;
+  public static String filePath, absPath;
   public static File logFile;
   public static PrintWriter fileLogger;
 }
@@ -20,6 +20,7 @@ public void initLog() {
     sketchArgs[2].substring(14, sketchArgs[2].length()) + "\\" + SKETCH_NAME + ".log" 
     : SKETCH_NAME + ".log";
   Log.logFile = new File(Log.filePath);
+  Log.absPath = Log.logFile.getAbsolutePath();
 
   // MAKE THE PROGRAM FASTER outside the PDE by disabling console-only logging!:
   Log.logToConsole = !INSIDE_PDE;
@@ -130,7 +131,10 @@ public static void logInfo(Object... p_args) {
     Log.fileLogger.printf("[Info] [%s] ", Log.dateFormat.format(new Date()));
 
     for (int i = 0; i < p_args.length; i++)
-      Log.fileLogger.printf("%s", p_args[i] instanceof String? p_args[i] : p_args[i].toString());
+      if (p_args[i] != null)
+        Log.fileLogger.printf("%s", p_args[i] instanceof String? p_args[i] : p_args[i].toString());
+      else
+        Log.fileLogger.printf("%s", "null");
 
     Log.fileLogger.write('\n');
     Log.fileLogger.flush();
@@ -151,7 +155,10 @@ public static void logWarn(Object... p_args) {
     Log.fileLogger.printf("[Warn] [%s] ", Log.dateFormat.format(new Date()));
 
     for (int i = 0; i < p_args.length; i++)
-      Log.fileLogger.printf("%s", p_args[i] instanceof String? p_args[i] : p_args[i].toString());
+      if (p_args[i] != null)
+        Log.fileLogger.printf("%s", p_args[i] instanceof String? p_args[i] : p_args[i].toString());
+      else
+        Log.fileLogger.printf("%s", "null");
 
     Log.fileLogger.write('\n');
     Log.fileLogger.flush();
@@ -172,7 +179,10 @@ public static void logError(Object... p_args) {
     Log.fileLogger.printf("[ERROR] [%s] ", Log.dateFormat.format(new Date()));
 
     for (int i = 0; i < p_args.length; i++)
-      Log.fileLogger.printf("%s", p_args[i] instanceof String? p_args[i] : p_args[i].toString());
+      if (p_args[i] != null)
+        Log.fileLogger.printf("%s", p_args[i] instanceof String? p_args[i] : p_args[i].toString());
+      else
+        Log.fileLogger.printf("%s", "null");
 
     Log.fileLogger.write('\n');
     Log.fileLogger.flush();
@@ -189,7 +199,10 @@ void logToFile(int p_lv, Object... p_args) {
       + " [%s] ", Log.dateFormat.format(new Date()));
 
     for (int i = 0; i < p_args.length; i++)
-      Log.fileLogger.printf("%s", p_args[i] instanceof String? p_args[i] : p_args[i].toString());
+      if (p_args[i] != null)
+        Log.fileLogger.printf("%s", p_args[i] instanceof String? p_args[i] : p_args[i].toString());
+      else
+        Log.fileLogger.printf("%s", "null");
 
     Log.fileLogger.printf("\n");
     Log.fileLogger.flush();

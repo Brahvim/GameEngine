@@ -39,6 +39,18 @@ void setScene(Scene p_scene) {
 
   for (Entity e : p_scene.entities)
     e.setup();
+
+  // DO NOT USE `getFields()`! That will scan for ones from `super` classes as well!
+  String sceneName = null;
+  for (Field f : this.getClass().getDeclaredFields())
+  try {
+    if (f.get(p_scene) == currentScene)
+      sceneName = f.getName();
+  }
+  catch(Exception iae) {
+  }
+
+  logInfo("Scene", sceneName, "was set in place perfectly!");
 }
 
 class Scene extends EventReceiver {

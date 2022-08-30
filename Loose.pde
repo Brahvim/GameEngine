@@ -25,11 +25,11 @@ static GLWindow window;
 static PGraphicsOpenGL glGraphics;
 static PGL gl;
 PostFXSupervisor fx;
-PGraphics posted;
 //GLU glu;
 final PApplet SKETCH = this;
 String SKETCH_NAME = this.getClass().getSimpleName();
 static boolean INSIDE_PDE;
+static String sketchArgsStr;
 static String[] sketchArgs; // `sketchArgs.length` is only `1` when the application runs outside the PDE.
 static String sketchPath;
 static boolean fullscreen, pfullscreen;
