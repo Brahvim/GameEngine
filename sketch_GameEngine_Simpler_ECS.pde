@@ -50,7 +50,7 @@ void dispose() {
 
 import guru.ttslib.*;
 void setup() {
-  new TTS().speak(new File("").getAbsolutePath());
+  //new TTS().speak(new File("").getAbsolutePath());
   updateRatios();
 
   // Should load this up from a save file (or a `--smooth` argument from the launcher):
@@ -77,15 +77,15 @@ void setup() {
   initLog();
 
   logInfo("Will load LibBulletJME from:");
-  logInfo("\t", new File(sketchPath("lib\\")).getAbsolutePath());
+  logInfo("\t", new File(sketchPath("lib")).getAbsolutePath());
   // Where's my `logInfoIndented()`?! :rofl:
 
   // Library initialization:
   fx = new PostFXSupervisor(this);
   Fisica.init(this);
   NativeLibraryLoader.loadLibbulletjme(true, 
-    new File("C:\\ProcessingSketches\\libraries\\LibBulletJME\\library\\"), 
-    //new File("./lib\\"), 
+    //new File("C:\\ProcessingSketches\\libraries\\LibBulletJME\\library\\"), 
+    new File(sketchPath("lib")), 
     "Release", "Sp");
 
   uibd = new UiBooster(UiBoosterOptions.Theme.DARK_THEME);
@@ -95,10 +95,8 @@ void setup() {
   logInfo("Sketch arguments:");
   logInfo('\t', sketchArgsStr);
 
-  logInfo(INSIDE_PDE? "Yep!" : "Nope,", " the sketch ", INSIDE_PDE? "is" : "isn't", 
-    " running inside the PDE!");
-
-  //NativeLibraryLoader.loadLibbulletjme(true, new File("./lib"), "Release", "Sp");
+  logInfo(INSIDE_PDE? "Yep! The sketch was running inside the PDE!" 
+    : "Nope, the sketch wasn't running in the PDE.");
 
   window = (GLWindow)surface.getNative();
   glGraphics = (PGraphicsOpenGL)g;
@@ -107,6 +105,8 @@ void setup() {
     // Javadoc:
    // [C:\Users\Brahvim\Documents\PC stuff I always want with me\jogl-javadoc
    // \jogl\javadoc\com\jogamp\nativewindow\SurfaceUpdatedListener.html]
+   
+   // This has now been replaced by `PApplet.focusLost()` and `PApplet.focusGained()`.
    
    //import com.jogamp.nativewindow.SurfaceUpdatedListener;
    //import com.jogamp.nativewindow.NativeSurface;
@@ -154,7 +154,8 @@ void setup() {
   textSize(DEFAULT_TEXT_SIZE);
   textAlign(CENTER, CENTER);
 
-  logInfo("`engineSetup()` TO BE CALLED!"); // Errors would occur... after this.
+  logInfo("`engineSetup()` TO BE CALLED!"); // Errors would occur after this.
+
   /*
   Method[] sketchMethods = this.getClass().getDeclaredMethods();
    Method engineSetupMethod = null;

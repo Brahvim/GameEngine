@@ -1,7 +1,7 @@
 static class Log {
   public static byte lvInfo = 0, lvWarn = 1, lvError = 2;
   public static byte logLevel = Log.lvError;
-  public static boolean logToFile = true, openFileOnExit = true, 
+  public static boolean logToFile = true, openFileOnExit = false, 
     logToConsole = true, enabled = true;
 
   public static SimpleDateFormat dateFormat
@@ -103,6 +103,7 @@ public static void logEx(Exception p_except) {
       pw.close();
 
       Log.fileLogger.printf("[EXCEPTION] [%s]\n\t\t%s\n", 
+        // The extra `\n` at the start is actually comfortable. Do not change that. Please trust me.
         Log.dateFormat.format(new Date()), sw.toString());
 
       Log.fileLogger.flush();

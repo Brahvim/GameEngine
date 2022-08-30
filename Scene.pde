@@ -40,17 +40,22 @@ void setScene(Scene p_scene) {
   for (Entity e : p_scene.entities)
     e.setup();
 
-  // DO NOT USE `getFields()`! That will scan for ones from `super` classes as well!
-  String sceneName = null;
-  for (Field f : this.getClass().getDeclaredFields())
-  try {
-    if (f.get(p_scene) == currentScene)
-      sceneName = f.getName();
-  }
-  catch(Exception iae) {
-  }
-
-  logInfo("Scene", sceneName, "was set in place perfectly!");
+  // This was such a joke LOL:
+  /*
+  // DO NOT use `getFields()`! That will scan for ones from `super` classes as well!
+   String sceneName = null;
+   for (Field f : this.getClass().getDeclaredFields())
+   try {
+   Scene a = null;
+   if (f.get(a) == p_scene)
+   println(f.getName());
+   }
+   catch(Exception iae) {
+   //logEx(iae);
+   }
+   
+   logInfo("Scene ", sceneName, " was set in place perfectly! Yay!");
+   */
 }
 
 class Scene extends EventReceiver {
@@ -85,7 +90,8 @@ class Scene extends EventReceiver {
   }
 
   Scene addEntity(Entity p_entity) {
-    /* // *String ID bab:*
+    /* 
+     // *String ID bab:*
      Class entClass = p_entity.getClass();
      String entName = entClass.getSimpleName(); // Only a pointer, no allocations ..:D!
      int howMany = 1;
@@ -154,15 +160,18 @@ class Scene extends EventReceiver {
   void preUpdate() {
   }
 
+  // Pretty much always unused:
+  /*
   void update() {
-    // Components are updated first:
-    for (Component c : this.components)
-      if (c.enabled)
-        c.update();
-
-    for (Entity e : this.entities)
-      e.update();
-  }
+   // Components are updated first:
+   for (Component c : this.components)
+   if (c.enabled)
+   c.update();
+   
+   for (Entity e : this.entities)
+   e.update();
+   }
+   */
 
   void draw() {
     for (Entity e : this.entities)

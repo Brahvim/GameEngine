@@ -48,11 +48,8 @@ void engineSetup() {
   logWarn("Test warning!");
   logError("Fake error!");
 
-  try {
-    logEx(new Exception("Don't worry! This is a test!"));
-  }
-  catch(Exception e) {
-  }
+  logEx(new Exception("Don't worry! This is a test!"));
+
 
   // Customizeable!:
   //Log.filePath = "C:\\ProcessingSketches\\sketches\\".concat(SKETCH_NAME).concat("\\")

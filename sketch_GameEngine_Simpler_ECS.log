@@ -1,16 +1,16 @@
-[Info] [12:49 PM, Tuesday, 30 August, 2022] Will load LibBulletJME from:
-[Info] [12:49 PM, Tuesday, 30 August, 2022] 	C:\ProcessingSketches\sketches\sketch_GameEngine_Simpler_ECS\lib
-[Info] [12:49 PM, Tuesday, 30 August, 2022] Sketch arguments:
-[Info] [12:49 PM, Tuesday, 30 August, 2022] 	processing.core.PApplet --display=1 --sketch-path=C:\ProcessingSketches\sketches\sketch_GameEngine_Simpler_ECS sketch_GameEngine_Simpler_ECS
-[Info] [12:49 PM, Tuesday, 30 August, 2022] Yep! the sketch is running inside the PDE!
-[Info] [12:49 PM, Tuesday, 30 August, 2022] `engineSetup()` TO BE CALLED!
-[Info] [12:49 PM, Tuesday, 30 August, 2022] `Assets.init()` was called.
-[Warn] [12:49 PM, Tuesday, 30 August, 2022] Test warning!
-[ERROR] [12:49 PM, Tuesday, 30 August, 2022] Fake error!
-[EXCEPTION] [12:49 PM, Tuesday, 30 August, 2022]
+[Info] [1:26 PM, Tuesday, 30 August, 2022] Will load LibBulletJME from:
+[Info] [1:26 PM, Tuesday, 30 August, 2022] 	C:\ProcessingSketches\sketches\sketch_GameEngine_Simpler_ECS\lib
+[Info] [1:26 PM, Tuesday, 30 August, 2022] Sketch arguments:
+[Info] [1:26 PM, Tuesday, 30 August, 2022] 	processing.core.PApplet --display=1 --sketch-path=C:\ProcessingSketches\sketches\sketch_GameEngine_Simpler_ECS sketch_GameEngine_Simpler_ECS
+[Info] [1:26 PM, Tuesday, 30 August, 2022] Yep! The sketch was running inside the PDE!
+[Info] [1:26 PM, Tuesday, 30 August, 2022] `engineSetup()` TO BE CALLED!
+[Info] [1:26 PM, Tuesday, 30 August, 2022] `Assets.init()` was called.
+[Warn] [1:26 PM, Tuesday, 30 August, 2022] Test warning!
+[ERROR] [1:26 PM, Tuesday, 30 August, 2022] Fake error!
+[EXCEPTION] [1:26 PM, Tuesday, 30 August, 2022]
 		java.lang.Exception: Don't worry! This is a test!
-	at sketch_GameEngine_Simpler_ECS.engineSetup(sketch_GameEngine_Simpler_ECS.java:2522)
-	at sketch_GameEngine_Simpler_ECS.setup(sketch_GameEngine_Simpler_ECS.java:242)
+	at sketch_GameEngine_Simpler_ECS.engineSetup(sketch_GameEngine_Simpler_ECS.java:2533)
+	at sketch_GameEngine_Simpler_ECS.setup(sketch_GameEngine_Simpler_ECS.java:243)
 	at processing.core.PApplet.handleDraw(PApplet.java:2432)
 	at processing.opengl.PSurfaceJOGL$DrawListener.display(PSurfaceJOGL.java:866)
 	at jogamp.opengl.GLDrawableHelper.displayImpl(GLDrawableHelper.java:692)
@@ -25,6 +25,5 @@
 	at java.util.TimerThread.mainLoop(Timer.java:555)
 	at java.util.TimerThread.run(Timer.java:505)
 
-[Info] [12:49 PM, Tuesday, 30 August, 2022] Scenenullwas set in place perfectly!
-[Info] [12:49 PM, Tuesday, 30 August, 2022] `engineSetup()` succeded.
-[Info] [12:49 PM, Tuesday, 30 August, 2022] `engineExit()` called...
+[Info] [1:26 PM, Tuesday, 30 August, 2022] `engineSetup()` succeded.
+[Info] [1:26 PM, Tuesday, 30 August, 2022] `engineExit()` called...
