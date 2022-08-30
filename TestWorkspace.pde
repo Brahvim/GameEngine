@@ -81,7 +81,7 @@ Scene testScene = new Scene() {
   Asset audio, boxTexture;
   BloomPass bloomPass;
   Camera cam = new Camera(), rev = new Camera(); // A 'normal' and a 'revolving' camera.
-  RGBSplitPass chromaAbPass;
+  VignettePass vignettePass;
 
   @SuppressWarnings("unused")
     Entity circle, quad, light, groundBox;
@@ -207,7 +207,7 @@ Scene testScene = new Scene() {
     rev.doScript = false;
 
     bloomPass = new BloomPass(SKETCH, 0.75f, 10, 4);
-    chromaAbPass = new RGBSplitPass(SKETCH, 0.1f);
+    vignettePass = new VignettePass(SKETCH, 0.1f, 0.75f);
 
     wave.start(0);
     wave.endIn(3600);
@@ -221,9 +221,9 @@ Scene testScene = new Scene() {
       camLerpUpdate(cam, rev, (float)mouseX / (float)width);
     else camIsLerp = false;
 
-    applyPass(bloomPass);
-    applyPass(chromaAbPass);
-    doPostProcessing = true;
+    //applyPass(bloomPass);
+    //applyPass(vignettePass);
+    //doPostProcessing = true;
 
     //gl.enable(PGL.CULL_FACE);
     //gl.cullFace(PGL.FRONT);

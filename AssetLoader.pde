@@ -165,6 +165,7 @@ class Asset extends Thread {
         throw new RuntimeException("Cannot load an asset into its array.");
       synchronized(Assets.pictures) {
         synchronized(this.loadedData) {
+          println(System.identityHashCode(this));
           Assets.pictures[this.id] = (PImage)this.loadedData;
         }
       } 

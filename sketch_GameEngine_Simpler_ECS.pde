@@ -95,7 +95,7 @@ void setup() {
   logInfo("Sketch arguments:");
   logInfo('\t', sketchArgsStr);
 
-  logInfo(INSIDE_PDE? "Yep! The sketch was running inside the PDE!" 
+  logInfo(INSIDE_PDE? "Yep! The sketch is running inside the PDE!" 
     : "Nope, the sketch wasn't running in the PDE.");
 
   window = (GLWindow)surface.getNative();
@@ -204,6 +204,9 @@ void draw() {
   pframeTime = frameStartTime;
   deltaTime = frameTime * 0.01f;
 
+  if (!focused)
+    return;
+
   // *OpenGL reference:*
   gl = beginPGL();
   //gl.enable(PGL.CULL_FACE);
@@ -250,7 +253,7 @@ void draw() {
     if (e.enabled)
       e.update();
 
-  //if (focused) // I applied this check EVEN to post processing as well but GPU remained unchanged.
+  //if (focused) // I applied this check EVEN to post processing as well but GPU usage remained unchanged.
   for (Renderer r : currentScene.renderers) {
     r.parent.render();
     if (r.enabled)
@@ -264,24 +267,21 @@ void draw() {
   if (b2d != null && b2dShouldUpdate)
     b2d.step(deltaTime);
 
-  if (bt!= null && btShouldUpdate)
+  if (bt != null && btShouldUpdate)
     bt.update(deltaTime);
   pop();
-
-  // Post processing:
-  // (...get it? :rofl:)
-
-
-
-  //endPGL();
 }
+
 
 // Ayo, do the post - update!:
 void post() {
+  // Post processing:
+  // (...get it? :rofl:)
+
   // YOU CAN RENDER HERE APPARENTLY!:
   // (Might break libraries :|)
 
-  if (doPostProcessingState) {
+  if (doPostProcessingState && focused) {
     blendMode(SCREEN);
     image(fx.getCurrentPass(), cx, cy, width, height);
     blendMode(BLEND);
