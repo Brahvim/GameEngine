@@ -29,7 +29,7 @@ void dispose() {
 
   Log.logFile.setWritable(false);
   Log.fileLogger.flush();
-  Log.fileLogger.close();
+
 
   if (Log.openFileOnExit)
   try {
@@ -37,7 +37,16 @@ void dispose() {
     new ProcessBuilder("notepad", Log.absPath).start();
   }
   catch(IOException ioe) {
+    ioe.printStackTrace();
+    // Seriously? What do you expect me to do now? Open that stream up again and write to it?
+    // <sigh.>
+    // Fine, here we go...
+    logInfo("Hey! By the way, the log file kinda got logged out, if you will... you know, understand?");
+    logEx(ioe);
   }
+
+  Log.fileLogger.flush();
+  Log.fileLogger.close();
 
   // With proper monitoring of window fullscreen events in `post()` now, this is superfast :D
   //super.exit(); // This is now `dispose()` and not `exit()`.
@@ -60,7 +69,6 @@ void setup() {
   // (NOT `draw()`, THOUGH!)
 
   surface.setTitle("Nerd Engine");
-  cursor(loadImage("Unnamed_RPG_cursor.png"), -4, -4);
 
   //g = createPrimaryGraphics(); // Super important discovery!
   // [https://github.com/processing/processing/blob/8b15e4f548c1426df3a5ebe4c2106619faf7c4ba/
@@ -71,10 +79,12 @@ void setup() {
   INSIDE_PDE = sketchArgs.length > 2 && 
     sketchArgs[1].contains("display") && sketchArgs[2].contains("sketch-path");
 
-  sketchPath = INSIDE_PDE ? sketchArgs[2].substring(14, sketchArgs[2].length()) + "\\"
+  // It already has `File.separator` appended to it :D
+  sketchPath = INSIDE_PDE ? sketchArgs[2].substring(14, sketchArgs[2].length()) + File.separator
     : sketchPath();
 
   initLog();
+  initSaving();
 
   logInfo("Will load LibBulletJME from:");
   logInfo("\t", new File(sketchPath("lib")).getAbsolutePath());

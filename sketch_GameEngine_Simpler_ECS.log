@@ -1,16 +1,18 @@
-[Info] [8:9 PM, Tuesday, 30 August, 2022] Will load LibBulletJME from:
-[Info] [8:9 PM, Tuesday, 30 August, 2022] 	C:\ProcessingSketches\sketches\sketch_GameEngine_Simpler_ECS\lib
-[Info] [8:9 PM, Tuesday, 30 August, 2022] Sketch arguments:
-[Info] [8:9 PM, Tuesday, 30 August, 2022] 	processing.core.PApplet --display=1 --sketch-path=C:\ProcessingSketches\sketches\sketch_GameEngine_Simpler_ECS sketch_GameEngine_Simpler_ECS
-[Info] [8:9 PM, Tuesday, 30 August, 2022] Yep! The sketch is running inside the PDE!
-[Info] [8:9 PM, Tuesday, 30 August, 2022] `engineSetup()` TO BE CALLED!
-[Info] [8:9 PM, Tuesday, 30 August, 2022] `Assets.init()` was called.
-[Warn] [8:9 PM, Tuesday, 30 August, 2022] Test warning!
-[ERROR] [8:9 PM, Tuesday, 30 August, 2022] Fake error!
-[EXCEPTION] [8:9 PM, Tuesday, 30 August, 2022]
+[Info] [11:12 PM, Tuesday, 30 August, 2022] C:\ProcessingSketches\sketches\sketch_GameEngine_Simpler_ECS\saves
+[Info] [11:12 PM, Tuesday, 30 August, 2022] Save system initialized successfully!
+[Info] [11:12 PM, Tuesday, 30 August, 2022] Will load LibBulletJME from:
+[Info] [11:12 PM, Tuesday, 30 August, 2022] 	C:\ProcessingSketches\sketches\sketch_GameEngine_Simpler_ECS\lib
+[Info] [11:12 PM, Tuesday, 30 August, 2022] Sketch arguments:
+[Info] [11:12 PM, Tuesday, 30 August, 2022] 	processing.core.PApplet --display=1 --sketch-path=C:\ProcessingSketches\sketches\sketch_GameEngine_Simpler_ECS sketch_GameEngine_Simpler_ECS
+[Info] [11:12 PM, Tuesday, 30 August, 2022] Yep! The sketch is running inside the PDE!
+[Info] [11:12 PM, Tuesday, 30 August, 2022] `engineSetup()` TO BE CALLED!
+[Info] [11:12 PM, Tuesday, 30 August, 2022] `Assets.init()` was called.
+[Warn] [11:12 PM, Tuesday, 30 August, 2022] Test warning!
+[ERROR] [11:12 PM, Tuesday, 30 August, 2022] Fake error!
+[EXCEPTION] [11:12 PM, Tuesday, 30 August, 2022]
 		java.lang.Exception: Don't worry! This is a test!
-	at sketch_GameEngine_Simpler_ECS.engineSetup(sketch_GameEngine_Simpler_ECS.java:2560)
-	at sketch_GameEngine_Simpler_ECS.setup(sketch_GameEngine_Simpler_ECS.java:254)
+	at sketch_GameEngine_Simpler_ECS.engineSetup(sketch_GameEngine_Simpler_ECS.java:2639)
+	at sketch_GameEngine_Simpler_ECS.setup(sketch_GameEngine_Simpler_ECS.java:263)
 	at processing.core.PApplet.handleDraw(PApplet.java:2432)
 	at processing.opengl.PSurfaceJOGL$DrawListener.display(PSurfaceJOGL.java:866)
 	at jogamp.opengl.GLDrawableHelper.displayImpl(GLDrawableHelper.java:692)
@@ -25,5 +27,5 @@
 	at java.util.TimerThread.mainLoop(Timer.java:555)
 	at java.util.TimerThread.run(Timer.java:505)
 
-[Info] [8:9 PM, Tuesday, 30 August, 2022] `engineSetup()` succeded.
-[Info] [8:15 PM, Tuesday, 30 August, 2022] `engineExit()` called...
+[Info] [11:12 PM, Tuesday, 30 August, 2022] `engineSetup()` succeded.
+[Info] [11:12 PM, Tuesday, 30 August, 2022] `engineExit()` called...

@@ -224,7 +224,7 @@ class Renderer extends Component {
   // Texturing:
   Asset textureLoader;
   int textureWrap = CLAMP;
-  PImage texture = null;
+  PImage texture;
 
   Renderer(Entity p_entity, Transform p_parentForm) {
     super(p_entity);

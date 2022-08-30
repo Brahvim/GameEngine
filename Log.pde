@@ -1,8 +1,8 @@
 static class Log {
   public static byte lvInfo = 0, lvWarn = 1, lvError = 2;
   public static byte logLevel = Log.lvError;
-  public static boolean logToFile = true, openFileOnExit = false, 
-    logToConsole = true, enabled = true;
+  public static boolean logToFile = true, openFileOnExit = true, 
+    logToConsole = true, enabled = true, canLog = false;
 
   public static SimpleDateFormat dateFormat
     = new SimpleDateFormat("h':'m' 'a', 'EEEEEEEE', 'd' 'MMMM', 'yyyy");
@@ -17,7 +17,8 @@ static class Log {
 public void initLog() {
   Log.filePath = 
     INSIDE_PDE? 
-    sketchArgs[2].substring(14, sketchArgs[2].length()) + "\\" + SKETCH_NAME + ".log" 
+    //sketchArgs[2].substring(14, sketchArgs[2].length()) + "\\" + SKETCH_NAME + ".log" 
+    sketchPath + File.separator + SKETCH_NAME + ".log"
     : SKETCH_NAME + ".log";
   Log.logFile = new File(Log.filePath);
   Log.absPath = Log.logFile.getAbsolutePath();
@@ -29,7 +30,10 @@ public void initLog() {
   try {
     Log.logFile.createNewFile();
   }
-  catch(IOException ioe) {
+  catch (IOException ioe) {
+    // You can't call `logEx()` here!
+    ioe.printStackTrace();
+    Log.canLog = false;
   }
 
   Log.logFile.setWritable(true);
@@ -38,7 +42,9 @@ public void initLog() {
     Log.fileLogger = new PrintWriter(Log.logFile);
   }
   catch(Exception e) {
+    // ...here neither!
     e.printStackTrace();
+    Log.canLog = false;
   }
 }
 
@@ -97,7 +103,9 @@ public static void logEx(Exception p_except) {
       try {
         sw.close();
       } 
-      catch(IOException e) {
+      catch(IOException ioe) {
+        // But Sir, this is 'a' `logEx()`.
+        ioe.printStackTrace();
       }
 
       pw.close();

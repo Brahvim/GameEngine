@@ -81,7 +81,7 @@ void engineSetup() {
 
 
 Scene testScene = new Scene() {
-  Asset audio, boxTexture;
+  Asset audio, boxTexture, cursorImage;
   BloomPass bloomPass;
   Camera cam = new Camera(), rev = new Camera(); // A 'normal' and a 'revolving' camera.
   VignettePass vignettePass;
@@ -91,6 +91,13 @@ Scene testScene = new Scene() {
   SineWaveDT wave = new SineWaveDT(0.001f);
 
   public void setup() {
+    cursorImage = new Asset("Unnamed_RPG_cursor.png", AssetType.PICTURE, new Runnable() {
+      public void run() {
+        cursor(Assets.getPicture(cursorImage), -4, -4);
+      }
+    }
+    ).beginAsyncLoad();
+
     audio = new Asset("UnicycleGirrafe.mp3", AssetType.SOUND, new Runnable() {
       public void run() {
         SoundFile sound = Assets.getSound(audio);
@@ -237,10 +244,10 @@ Scene testScene = new Scene() {
   public void drawUI() {
     //gl.disable(PGL.CULL_FACE);
 
+    image(boxTexture.asPicture(), cx + wave.get() * cx, mouseY, 160, 160);
+
     fill(255, 0, 0, 60); // The alpha used to be `80`.
     circle(mouseX, mouseY, 60);
-
-    image(boxTexture.asPicture(), cx + wave.get() * cx, mouseY, 160, 160);
 
     translate(0.5f * textWidth(Integer.toString((int)frameRate)), 
       textAscent() - textDescent());

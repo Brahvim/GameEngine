@@ -27,7 +27,7 @@ static PGL gl;
 PostFXSupervisor fx;
 //GLU glu;
 final PApplet SKETCH = this;
-String SKETCH_NAME = this.getClass().getSimpleName();
+final String SKETCH_NAME = SKETCH.getClass().getSimpleName();
 static boolean INSIDE_PDE;
 static String sketchArgsStr;
 static String[] sketchArgs; // `sketchArgs.length` is only `1` when the application runs outside the PDE.
