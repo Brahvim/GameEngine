@@ -107,5 +107,42 @@ void removeSaveFile(String p_name) {
   return null;
 }
 
-void writeToSaveFile(String p_name, Object p_data) {
+void writeToSaveFile(String p_name, Serializable p_data) {
+  FileOutputStream fStream = null;
+  ObjectOutputStream oStream = null;
+
+  try {
+    fStream = new FileOutputStream(zippedSavesFile);
+  }
+  catch (FileNotFoundException fnfe) {
+    logError("Wait, what?! Failed to find `zippedSavesFile`!");
+    logEx(fnfe);
+  }
+
+  // Zipping:
+  ZipEntry zEntry = new ZipEntry(p_name + ".sav_frag");
+
+  try {
+    zStream.putNextEntry(zEntry);
+  }
+  catch(IOException ioe) {
+    logError("Could not make a `ZipEntry`");
+    logEx(ioe);
+  }
+
+  try {
+    oStream = new ObjectOutputStream(zStream);
+    oStream.writeObject(p_data); // Object is written.
+    zStream.closeEntry();
+    zStream.flush();
+
+    oStream.close();
+    fStream.close();
+  }
+  catch(IOException ioe) {
+    logError("Could not create an `ObjectOutputStream`, "
+      + "or maybe it failed to write the object, or something failed to close. "
+      + "I dunno, man. This code is HUGE, and EVERY function is throwing an `IOException`!");
+    logEx(ioe);
+  }
 }

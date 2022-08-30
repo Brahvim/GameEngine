@@ -44,6 +44,11 @@
 void engineSetup() {
   Assets.init(1, 1, 0);
 
+  class SaveTest implements Serializable {
+    // NEVER change this:
+    private final static long serialVersionUID = 78635;
+  }
+
   //Form settingsForm = uibn.createForm(SKETCH_NAME + ".exe")
   //.addSelection("Graphical Quality", "Fair", "Decent", "Powerful").run();
   //while (!settingsForm.isClosedByUser());
