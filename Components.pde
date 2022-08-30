@@ -299,7 +299,8 @@ class Renderer extends Component {
       // ^^^ This check prevents it from assigning the texture for some reason.
       //this.textureLoader.loaded && 
       frameCount == this.textureLoader.loadFrame)
-      this.texture = Assets.getPicture(this.textureLoader).copy();
+      while (this.texture == null)
+        this.texture = Assets.getPicture(this.textureLoader);
 
     // For the Bullet Physics Engine!:
     // Yes, it might be slow, but it's something we'll have to do.
