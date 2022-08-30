@@ -1,8 +1,11 @@
 /*
 // Expected workflow - now possible!:
- 
  ```java
+ 
+ // `Setup.pde`:
+ 
  void engineSetup() { // Generally called via reflection.
+ AppInfo.name = "Name!";
  functionThatLoadsAssets();
  restOfTheSetup();
  }
@@ -248,7 +251,7 @@ Scene testScene = new Scene() {
   public void mousePressed() {
     if (mouseButton == RIGHT)
       setCam(currentCam == rev? cam : rev);
-    else if (mouseButton == CENTER)
-      light.enabled = !light.enabled;
+    //else if (mouseButton == CENTER)
+    //  light.enabled = !light.enabled;
   }
 };
