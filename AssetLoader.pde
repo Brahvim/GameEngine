@@ -147,7 +147,8 @@ class Asset extends Thread {
 
     switch(this.type) {
     case SOUND:
-      this.loadedData = new SoundFile(SKETCH, this.path); 
+      while (this.loadedData == null)
+        this.loadedData = new SoundFile(SKETCH, this.path); 
       if (this.id == -1)
         throw new RuntimeException("Cannot load an asset into its array.");
       synchronized(Assets.sounds) {
@@ -159,7 +160,8 @@ class Asset extends Thread {
       break;
 
     case PICTURE:
-      this.loadedData = loadImage(this.path);
+      while (this.loadedData == null)
+        this.loadedData = loadImage(this.path);
       if (this.id == -1)
         throw new RuntimeException("Cannot load an asset into its array.");
       synchronized(Assets.pictures) {
@@ -177,12 +179,15 @@ class Asset extends Thread {
       // The next line is checking for a `\n`:
       String[] shaders = split(this.path, '\n');
 
+
       if (shaders.length == 1)
-        // If the user is trying to load two shaders, do:
-        this.loadedData = loadShader(shaders[0], shaders[1]);
+        while (this.loadedData == null)
+          // If the user is trying to load two shaders, do:
+          this.loadedData = loadShader(shaders[0], shaders[1]);
 
       // Otherwise, it's just a fragment shader. Get it. Go on! :)
-      else this.loadedData = loadShader(this.path);
+      else while (this.loadedData == null)
+        this.loadedData = loadShader(this.path);
 
       if (this.id == -1)
         throw new RuntimeException("Cannot load an asset into its array.");
