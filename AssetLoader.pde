@@ -151,8 +151,10 @@ class Asset extends Thread {
       if (this.id == -1)
         throw new RuntimeException("Cannot load an asset into its array.");
       synchronized(Assets.sounds) {
-        SoundFile snd = (Assets.sounds[this.id] = (SoundFile)this.loadedData);
-        snd.rate(1.09f);
+        synchronized(this.loadedData) {
+          SoundFile snd = (Assets.sounds[this.id] = (SoundFile)this.loadedData);
+          snd.rate(1.09f);
+        }
       }
       break;
 
@@ -161,7 +163,9 @@ class Asset extends Thread {
       if (this.id == -1)
         throw new RuntimeException("Cannot load an asset into its array.");
       synchronized(Assets.pictures) {
-        Assets.pictures[this.id] = (PImage)this.loadedData;
+        synchronized(this.loadedData) {
+          Assets.pictures[this.id] = (PImage)this.loadedData;
+        }
       } 
       break; 
 
@@ -183,7 +187,9 @@ class Asset extends Thread {
       if (this.id == -1)
         throw new RuntimeException("Cannot load an asset into its array.");
       synchronized(Assets.shaders) {
-        Assets.shaders[this.id] = (PShader)this.loadedData;
+        synchronized(this.loadedData) {
+          Assets.shaders[this.id] = (PShader)this.loadedData;
+        }
       }
       break;
       //case TEXTFILE:  break;
@@ -206,5 +212,23 @@ class Asset extends Thread {
   void runOnLoadCallback() {
     if (this.onLoad != null)
       this.onLoad.run();
+  }
+
+  PImage asPicture() {
+    // No need to check for null values!    
+    return this.type == AssetType.PICTURE? (PImage)this.loadedData : null;
+    // ...and if the type of data being loaded is different, well...
+  }
+
+  SoundFile asSound() {
+    // No need to check for null values!    
+    return this.type == AssetType.SOUND? (SoundFile)this.loadedData : null;
+    // ...and if the type of data being loaded is different, well...
+  }
+
+  PShader asShader() {
+    // No need to check for null values!    
+    return this.type == AssetType.SHADER? (PShader)this.loadedData : null;
+    // ...and if the type of data being loaded is different, well...
   }
 }

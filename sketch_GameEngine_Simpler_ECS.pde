@@ -78,7 +78,7 @@ void setup() {
 
   // Library initialization:
   //fx = new PostFX(this);
-  fxApplier = new PostFXSupervisor(this);
+  fx = new PostFXSupervisor(this);
   Fisica.init(this);
   NativeLibraryLoader.loadLibbulletjme(true, 
     new File("C:\\ProcessingSketches\\libraries\\LibBulletJME\\library\\"), 
@@ -183,7 +183,7 @@ void pre() {
 
   if (!(pwidth == width || pheight == height)) {
     posted.setSize(width, height);
-    fxApplier.setResolution(width, height);
+    fx.setResolution(width, height);
     updateRatios();
     currentScene.windowResized();
   }
@@ -207,7 +207,7 @@ void draw() {
   // Start *post Processing!:*
 
   if (doPostProcessingState)
-    fxApplier.render();
+    fx.render();
   lights(); //camera(); // `action();`! ";D!
 
   // Apply transformations first, so
@@ -275,7 +275,7 @@ void post() {
 
   if (doPostProcessingState) {
     blendMode(SCREEN);
-    image(fxApplier.getCurrentPass(), cx, cy);
+    image(fx.getCurrentPass(), cx, cy, width, height);
     blendMode(BLEND);
   }
 

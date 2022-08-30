@@ -24,7 +24,7 @@ import ch.bildspur.postfx.*;
 static GLWindow window;
 static PGraphicsOpenGL glGraphics;
 static PGL gl;
-PostFXSupervisor fxApplier;
+PostFXSupervisor fx;
 PGraphics posted;
 //GLU glu;
 final PApplet SKETCH = this;
@@ -77,6 +77,11 @@ float frameStartTime, deltaTime, pframeTime, frameTime;
 //    cosLUT[i] = (float) Math.cos(i * DEG_TO_RAD * SINCOS_PRECISION);
 //  }
 //}
+
+void applyPass(Pass p_pass) {
+  if (this.doPostProcessingState)
+    fx.pass(p_pass);
+}
 
 void updateRatios() {
   cx = width * 0.5f;

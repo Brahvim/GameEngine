@@ -207,9 +207,9 @@ public static class Unprojector {
 // ...
 
 class SineWaveDT {
-  float angleOffset, freqMult;
-  private float endTime = Float.MAX_VALUE - 1, freq, aliveTime;
-  boolean active = true;
+  float angleOffset, freqMult, freq;
+  private float endTime = Float.MAX_VALUE - 1, aliveTime;
+  boolean active = true, zeroWhenInactive;
 
   SineWaveDT() {
   }
@@ -232,23 +232,31 @@ class SineWaveDT {
     this.angleOffset = p_angleOff;
   }
 
-  void offsetAngleBy(float p_angleOff) {
+  void setAngleOffset(float p_angleOff) {
     this.angleOffset = p_angleOff;
   }
 
-  void endIn(float p_angle) {
-    this.endTime = this.aliveTime + p_angle;
+  void endIn(float p_millis) {
+    this.endTime = this.aliveTime + p_millis;
   }
 
   void endWhenAngleIs(float p_angle) {
     this.endTime = this.aliveTime + (p_angle * (p_angle * this.freqMult) - this.angleOffset);
   }
 
+  void extendEndBy(float p_millis) {
+    this.endTime += p_millis;
+  }
+
+  void extendEndByAngle(float p_angle) {
+    this.endTime += (p_angle * (p_angle * this.freqMult) - this.angleOffset);
+  }
+
   float getStartTime() {
     return millis() - this.aliveTime;
   }
 
-  float getAliveTime() {
+  float getTimeSinceStart() {
     return this.aliveTime;
   }
 
@@ -256,18 +264,16 @@ class SineWaveDT {
     return this.endTime;
   }
 
-  float getFrequency() {
-    return this.freq;
-  }
-
   float get() {
-    this.aliveTime += frameTime; // `frameTime` comes from the Engine by the way.
     this.active = this.aliveTime <= this.endTime;
 
-    if (!this.active)
+    if (this.active)
+      this.aliveTime += frameTime; // `frameTime` comes from the Engine by the way.
+    else if (this.zeroWhenInactive)
       return 0;
 
     this.freq = this.aliveTime * this.freqMult + this.angleOffset;
     return sin(this.freq);
+    // That looked like a matrix calculation LOL.
   }
 }

@@ -209,13 +209,14 @@ Scene testScene = new Scene() {
     };
 
     rev.doScript = false;
-    //bPass = new BloomPass(SKETCH, 0.75f, 10, 4);
+    bPass = new BloomPass(SKETCH, 0.75f, 10, 4);
 
-    wave = new SineWaveDT();
-    wave.start();
+    wave.start(0);
+    wave.endIn(3600);
+    //wave.extendEndBy(1000);
   }
 
-  //BloomPass bPass;
+  BloomPass bPass;
 
   public void draw() {
     currentCam.applyMatrix();
@@ -224,7 +225,8 @@ Scene testScene = new Scene() {
       camLerpUpdate(cam, rev, (float)mouseX / (float)width);
     else camIsLerp = false;
 
-    //fxApplier.pass(bPass);
+    applyPass(bPass);
+    doPostProcessing = true;
 
     //gl.enable(PGL.CULL_FACE);
     //gl.cullFace(PGL.FRONT);
@@ -240,9 +242,7 @@ Scene testScene = new Scene() {
     fill(255, 0, 0, 60); // The alpha used to be `80`.
     circle(mouseX, mouseY, 60);
 
-
-    println(wave.get());
-    circle(cx + wave.get() * cx, mouseY, 60);
+    image(boxTexture.asPicture(), cx + wave.get() * cx, mouseY, 160, 160);
 
     translate(0.5f * textWidth(Integer.toString((int)frameRate)), 
       textAscent() - textDescent());
