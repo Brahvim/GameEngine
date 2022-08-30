@@ -16,6 +16,8 @@ HashMap<String, ZipEntry> saveMap = new HashMap<String, ZipEntry>();
 ArrayList<String> saveFileNames = new ArrayList<String>();
 boolean canSave;
 
+String saveFolderPath;
+
 File saveFolder;
 File zippedSavesFile;
 ZipFile zippedSaves;
@@ -30,6 +32,7 @@ void initSaving() {
   saveFolder = new File(sketchPath + "saves");
   if (!saveFolder.exists())
     saveFolder.mkdir();
+  saveFolderPath = saveFolder.getAbsolutePath();
 
   // DON'T YOU DARE CALL THAT CONCATENATED STRING MICRO-SOFTY:
   zippedSavesFile = new File(saveFolder, SKETCH_NAME + "_Save.zip");
@@ -39,6 +42,7 @@ void initSaving() {
   } 
   catch (IOException ioe) {
     canSave = false;
+    logError("Save system initialization failed! `zippedSavesFile` could not be created.");
     logEx(ioe);
   }
 
@@ -64,9 +68,44 @@ void removeSaveFile(String p_name) {
   saveFileNames.remove(p_name);
 }
 
-void writeToSaveFile(String p_name, byte[] p_data) {
+<T> T readFromSaveFile(String p_name) {
   ZipEntry entry = saveMap.get(p_name);
+  InputStream entryStream = null;
+  ObjectInputStream oStream = null;
 
-  if (entry == null)
-    throw new NullPointerException();
+  if (entry == null) {
+    logError("No save file called `" + p_name + "` exists.");
+    logEx(new NullPointerException());
+  }
+
+  try {
+    entryStream = zippedSaves.getInputStream(entry);
+  }
+  catch (IOException ioe) {
+    logError("The saving system Could not get an input stream to some `ZipEntry`.");
+    logEx(ioe);
+  }
+
+  try {
+    oStream = new ObjectInputStream(entryStream);
+  }
+  catch(IOException ioe) {
+    logError("Failed to create an `ObjectInputStream`...");
+    logEx(ioe);
+  }
+
+  try {
+    return (T)oStream.readObject();
+  }
+  catch(IOException ioe) {
+    logError("");
+    logEx(ioe);
+  }
+  catch(ClassNotFoundException ioe) {
+  }
+
+  return null;
+}
+
+void writeToSaveFile(String p_name, Object p_data) {
 }
