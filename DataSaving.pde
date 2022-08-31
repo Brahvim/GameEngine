@@ -54,7 +54,8 @@ void initSaving() {
     // `IOException`, meaning that it can be handled here as well.
   }
 
-  logInfo(saveFolder.getAbsolutePath());
+  logInfo("Save location:");
+  logInfo('\t', saveFolder.getAbsolutePath());
   logInfo("Save system ", canSave? "initialized successfully!" : "failed to initialize ; - ;)");
 }
 
@@ -137,7 +138,8 @@ void writeToSaveFile(String p_name, Serializable p_data) {
     zStream.flush();
 
     oStream.close();
-    fStream.close();
+    if (fStream != null)
+      fStream.close();
   }
   catch(IOException ioe) {
     logError("Could not create an `ObjectOutputStream`, "

@@ -77,10 +77,10 @@ class Transform extends Component {
   //public void applyMatrix4f(Matrix4f p_mat) {
   //  // Hope that the user called `this.refreshMatrix()` beforehand...
   //  //this.refreshMatrix();
-  //  this.mat.apply(p_mat.m00, p_mat.m01, p_mat.m02, p_mat.m03, 
-  //    p_mat.m10, p_mat.m11, p_mat.m12, p_mat.m13, 
-  //    p_mat.m20, p_mat.m21, p_mat.m22, p_mat.m23, 
-  //    p_mat.m30, p_mat.m31, p_mat.m32, p_mat.m33);
+  //this.mat.apply(p_mat.m00, p_mat.m01, p_mat.m02, p_mat.m03, 
+  //p_mat.m10, p_mat.m11, p_mat.m12, p_mat.m13, 
+  //p_mat.m20, p_mat.m21, p_mat.m22, p_mat.m23, 
+  //p_mat.m30, p_mat.m31, p_mat.m32, p_mat.m33);
   //}
 }
 
@@ -127,6 +127,9 @@ class Light extends Component {
     this.pos = PVector.add(this.form.pos, this.off);
 
     //println("Lighting...");
+
+    if (!this.enabled)
+      return;
 
     switch(this.type) {
     case AMBIENT:
@@ -286,7 +289,10 @@ class Renderer extends Component {
       return;
     textureMode(NORMAL);
     textureWrap(this.textureWrap);
-    texture(this.texture);
+
+    // `texture()` does this already, but I'll do it anyway:
+    if (this.texture != null)
+      texture(this.texture);
   }
 
   public void update() {
@@ -294,16 +300,17 @@ class Renderer extends Component {
     pushStyle();
 
     // Do this only once:
-    if (this.textureLoader != null && 
-      !this.textureLoader.ploaded &&
-      this.textureLoader.loaded) {
-      synchronized(this.textureLoader) {
-        synchronized(Assets.pictures) {
-          synchronized(this) {
-            this.texture = Assets.getPicture(this.textureLoader).copy();
-          }
-        }
-      }
+    if (this.textureLoader != null) { //&& 
+      //!this.textureLoader.ploaded &&
+      //this.textureLoader.loaded) {
+      //synchronized(this.textureLoader) {
+      //synchronized(Assets.pictures) {
+      //synchronized(this) {
+      //this.texture = Assets.getPicture(this.textureLoader).copy();
+      this.texture = this.textureLoader.asPicture().copy();
+      //}
+      //}
+      //}
     }
 
     // For the Bullet Physics Engine!:

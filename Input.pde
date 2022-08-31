@@ -4,6 +4,9 @@ boolean cursorVisible = true, cursorConfined;
 
 char pkey, pframekey; 
 boolean pkeyPressed, pmousePressed;
+boolean mouseLeft, mouseMid, mouseRight;
+boolean pmouseLeft, pmouseMid, pmouseRight;
+int pmouseButton;
 int pkeyCode, pframekeyCode;
 int lastMousePressTime, lastKeyPressTime;
 
@@ -68,9 +71,6 @@ void unprojectMouse() {
 // ----------------------
 //  `keyPressed`,
 //  `keyCode`, `key`.
-
-boolean mouseLeft, mouseMid, mouseRight;
-boolean pmouseLeft, pmouseMid, pmouseRight;
 
 final char[] VALID_SYMBOLS = {
   '\'', '\"', '-', '=', '`', '~', '!', '@', '#', '$', 
@@ -166,6 +166,6 @@ boolean isNotSpecialKey(int p_keyCode) {
     p_keyCode == 147 || // Both `Delete` keys,
     p_keyCode == 148 || // `Pause`/`Break` and also `NumLock`,
     p_keyCode == 153 || // `Menu`/`Application` AKA "RightClick" key.
-    p_keyCode == 157    // "Meta", AKA the "OS key",
+    p_keyCode == 157    // "Meta", AKA the "OS key".
     );
 }

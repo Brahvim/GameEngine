@@ -42,7 +42,8 @@
  */
 
 void engineSetup() {
-  Assets.init(1, 1, 0);
+  // `Assets.init(soundfiles, pictures, shaders)`:
+  Assets.init(1, 2, 0);
 
   class SaveTest implements Serializable {
     // NEVER change this:
@@ -86,7 +87,7 @@ void engineSetup() {
 
 
 Scene testScene = new Scene() {
-  Asset audio, boxTexture, cursorImage;
+  Asset audio, boxTexture, circleTexture, cursorImage;
   BloomPass bloomPass;
   Camera cam = new Camera(), rev = new Camera(); // A 'normal' and a 'revolving' camera.
   VignettePass vignettePass;
@@ -119,12 +120,14 @@ Scene testScene = new Scene() {
     }
     ).beginAsyncLoad();
 
+    circleTexture = new Asset("PFP.jpg", AssetType.PICTURE).beginAsyncLoad();
+
     circle = new Entity() {
       Transform form = new Transform(this);
       Renderer display;
 
       public void setup() {
-        this.display = new Renderer(this, this.form, RendererType.ELLIPSE, boxTexture);
+        this.display = new Renderer(this, this.form, RendererType.ELLIPSE, circleTexture);
         this.display.fill = color(230);
         this.display.stroke = color(0);
         this.display.strokeWeight = 0.05f;
@@ -144,7 +147,7 @@ Scene testScene = new Scene() {
 
       public void setup() {
         this.form = new Transform(this);
-        this.display = new Renderer(this, this.form, RendererType.QUAD, boxTexture);
+        this.display = new Renderer(this, this.form, RendererType.QUAD, boxTexture.asPicture());
         this.display.type = RendererType.QUAD;
 
         //logInfo("Quad setup.");
@@ -183,7 +186,7 @@ Scene testScene = new Scene() {
       Renderer display;
 
       public void setup() {
-        this.display = new Renderer(this, this.form, RendererType.BOX, boxTexture);
+        this.display = new Renderer(this, this.form, RendererType.BOX, boxTexture.asPicture());
         this.display.fill = color(255);
         this.display.strokeWeight = 0.1f;
         //this.form.scale.set(150, 50, 150); // *On* the box.
@@ -227,11 +230,12 @@ Scene testScene = new Scene() {
     wave.start(0);
     wave.endIn(3600);
     wave.extendEndBy(10000);
+    //frameRate(24);
   }
 
   public void draw() {
     currentCam.applyMatrix();
-    if (mousePressed && mouseButton == LEFT)
+    if (mouseLeft)
       //camLerpUpdate(cam, rev, (float)mouse.x / (float)width, 0.05f, 0.95f);
       camLerpUpdate(cam, rev, (float)mouseX / (float)width);
     else camIsLerp = false;
@@ -263,7 +267,7 @@ Scene testScene = new Scene() {
   public void mousePressed() {
     if (mouseButton == RIGHT)
       setCam(currentCam == rev? cam : rev);
-    //else if (mouseButton == CENTER)
-    //  light.enabled = !light.enabled;
+    else if (mouseButton == CENTER)
+      light.enabled = !light.enabled;
   }
 };

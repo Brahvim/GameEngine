@@ -5,8 +5,10 @@ import processing.sound.*;
 public <T> T getAsset(Asset p_asset) { 
  switch(p_asset.type)
  case PICTURE:
- return (T)Assets.pictures[p_asset.id];
+ return (T)Assets.pictures.get(p_asset.id);
  */
+
+PImage NULL_IMAGE = new PImage();
 
 // We're only loading a few types, so there is no use of generics:
 static enum AssetType {
@@ -18,11 +20,11 @@ static enum AssetType {
 
     switch (p_type) {
     case SOUND:
-      return Assets.sounds.length - 1;
+      return Assets.sounds.size();
     case PICTURE:
-      return Assets.pictures.length - 1;
+      return Assets.pictures.size();
     case SHADER:
-      return Assets.shaders.length - 1;
+      return Assets.shaders.size();
       //case TEXTFILE: return Assets.textFiles.length - 1;
     default:
       throw new RuntimeException("Unknown `AssetType`. How did this error even occur?!");
@@ -31,27 +33,31 @@ static enum AssetType {
 }
 
 static class Assets {
-  static SoundFile[] sounds = null; 
-  static PImage[] pictures = null; 
-  static PShader[] shaders = null;
+  static ArrayList<SoundFile> sounds = null; 
+  static ArrayList<PImage> pictures = null; 
+  static ArrayList<PShader> shaders = null;
   // Strings are immutable, COME ON!:
   //final static StringBuilder[] textFiles = new StringBuilder[0];
 
   static boolean isInit = false;
 
-  static void init(int p_soundFiles, int p_images, int p_shaders) {
-    Assets.sounds = new SoundFile[p_soundFiles]; 
-    Assets.pictures = new PImage[p_images]; 
-    Assets.shaders = new PShader[p_shaders];
+  static void init() {
+    Assets.pictures = new ArrayList<PImage>();
+    Assets.sounds = new ArrayList<SoundFile>();
+    Assets.shaders = new ArrayList<PShader>();
 
     Assets.isInit = true;
     logInfo("`Assets.init()` was called.");
   }
 
-  static void extendArraysTo(int p_soundFiles, int p_images, int p_shaders) {
-    Assets.sounds = (SoundFile[]) expand(Assets.sounds, p_soundFiles); 
-    Assets.pictures = (PImage[]) expand(Assets.pictures, p_images); 
-    Assets.shaders = (PShader[]) expand(Assets.shaders, p_shaders);
+  static void init(int p_soundFiles, int p_pictures, int p_shaders) {
+    Assets.pictures = new ArrayList<PImage>(p_pictures);
+    Assets.sounds = new ArrayList<SoundFile>(p_soundFiles);
+    Assets.shaders = new ArrayList<PShader>(p_shaders);
+
+    Assets.isInit = true;
+    logInfo("`Assets.init()` was called with arguments: [SND]", 
+      p_soundFiles, "[IMG]", p_pictures, "[SHD]", p_shaders);
   }
 
   // Just a note: Method overloading is faster than `instanceof` checks (which are done at runtime).
@@ -59,27 +65,27 @@ static class Assets {
   // why-is-overloading-methods-recommended-over-using-the-instanceof-operator-in-java].
 
   static SoundFile getSound(Asset p_asset) {
-    return Assets.sounds[p_asset.id];
+    return Assets.sounds.get(p_asset.id);
   }
 
   static PImage getPicture(Asset p_asset) {
-    return Assets.pictures[p_asset.id];
+    return Assets.pictures.get(p_asset.id);
   }
 
   static PShader getShader(Asset p_asset) {
-    return Assets.shaders[p_asset.id];
+    return Assets.shaders.get(p_asset.id);
   }
 
   static SoundFile getSound(int p_id) {
-    return Assets.sounds[p_id];
+    return Assets.sounds.get(p_id);
   }
 
   static PImage getPicture(int p_id) {
-    return Assets.pictures[p_id];
+    return Assets.pictures.get(p_id);
   }
 
   static PShader getShader(int p_id) {
-    return Assets.shaders[p_id];
+    return Assets.shaders.get(p_id);
   }
 }
 
@@ -148,27 +154,25 @@ class Asset extends Thread {
     case SOUND:
       while (this.loadedData == null)
         this.loadedData = new SoundFile(SKETCH, this.path); 
-      if (this.id == -1)
-        throw new RuntimeException("Cannot load an asset into its array.");
+
       synchronized(Assets.sounds) {
-        synchronized(this.loadedData) {
-          SoundFile snd = (Assets.sounds[this.id] = (SoundFile)this.loadedData);
-          snd.rate(1.09f);
-        }
+        this.id = Assets.sounds.size();
+        Assets.sounds.add((SoundFile)this.loadedData);
+        ((SoundFile)this.loadedData).rate(1.09f);
       }
+
       break;
 
     case PICTURE:
       while (this.loadedData == null)
         this.loadedData = loadImage(this.path);
-      if (this.id == -1)
-        throw new RuntimeException("Cannot load an asset into its array.");
+
       synchronized(Assets.pictures) {
-        synchronized(this.loadedData) {
-          //println(System.identityHashCode(this));
-          Assets.pictures[this.id] = (PImage)this.loadedData;
-        }
-      } 
+        this.id = Assets.pictures.size();
+        //println(System.identityHashCode(this));
+        Assets.pictures.add((PImage)this.loadedData);
+      }
+
       break; 
 
     case SHADER:
@@ -189,13 +193,11 @@ class Asset extends Thread {
       else while (this.loadedData == null)
         this.loadedData = loadShader(this.path);
 
-      if (this.id == -1)
-        throw new RuntimeException("Cannot load an asset into its array.");
       synchronized(Assets.shaders) {
-        synchronized(this.loadedData) {
-          Assets.shaders[this.id] = (PShader)this.loadedData;
-        }
+        this.id = Assets.shaders.size();
+        Assets.shaders.add((PShader)this.loadedData);
       }
+
       break;
       //case TEXTFILE:  break;
     }
@@ -220,20 +222,22 @@ class Asset extends Thread {
   }
 
   PImage asPicture() {
-    // No need to check for null values!    
-    return this.type == AssetType.PICTURE? (PImage)this.loadedData : null;
+    if (this.loadedData == null)
+      return NULL_IMAGE;
+    // No need to check for null values!
+    return (PImage)this.loadedData;
     // ...and if the type of data being loaded is different, well...
   }
 
   SoundFile asSound() {
     // No need to check for null values!    
-    return this.type == AssetType.SOUND? (SoundFile)this.loadedData : null;
+    return (SoundFile)this.loadedData;
     // ...and if the type of data being loaded is different, well...
   }
 
   PShader asShader() {
     // No need to check for null values!    
-    return this.type == AssetType.SHADER? (PShader)this.loadedData : null;
+    return (PShader)this.loadedData;
     // ...and if the type of data being loaded is different, well...
   }
 }

@@ -229,6 +229,8 @@ void draw() {
 
   if (doPostProcessingState)
     fx.render();
+
+  noLights();
   lights(); //camera(); // `action();`! ";D!
 
   // Apply transformations first, so
@@ -314,6 +316,7 @@ void post() {
   pmouseLeft = mouseLeft;
   pmouseMid = mouseMid;
   pmouseRight = mouseRight;
+  pmouseButton = mouseButton;
   pmouseScroll = mouseScroll;
 
   pkey = key;
