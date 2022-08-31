@@ -5,6 +5,7 @@ engine.js
 sketch_GameEngine_Simpler_ECS.log
 
 # Directories:
+application.windows64saves
 application.windows64saves/sketch_GameEngine_Simpler_ECS_Save.zip
 application.windows64
 application.windows32
