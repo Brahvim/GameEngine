@@ -254,7 +254,7 @@ Scene testScene = new Scene() {
   public void drawUI() {
     //gl.disable(PGL.CULL_FACE);
 
-    image(boxTexture.asPicture(), cx + wave.get() * cx, mouseY, 160, 160);
+    image(boxTexture, cx + wave.get() * cx, mouseY, 160, 160);
 
     fill(255, 0, 0, 60); // The alpha used to be `80`.
     circle(mouseX, mouseY, 60);

@@ -101,16 +101,6 @@ void updateRatios() {
 //  scale(p_scale.x, p_scale.y, p_scale.z);
 //}
 
-void push() {
-  pushMatrix();
-  pushStyle();
-}
-
-void pop() {
-  popStyle();
-  popMatrix();
-}
-
 void begin2D() {
   hint(DISABLE_DEPTH_TEST);
   pushMatrix();
@@ -123,9 +113,38 @@ void end2D() {
   popMatrix();
 }
 
-// Processing Modifications:
+// Processing Modifications (inherited from `PApplet`):
 void translate(PVector _v) {
   translate(_v.x, _v.y, _v.z);
+}
+
+void push() {
+  pushMatrix();
+  pushStyle();
+}
+
+void pop() {
+  popStyle();
+  popMatrix();
+}
+
+void image(PImage p_image) {
+  super.image(p_image, 0, 0);
+}
+
+void image(Asset p_imageAsset) {
+  if (p_imageAsset.loaded)
+    super.image(p_imageAsset.asPicture(), 0, 0);
+}
+
+void image(Asset p_imageAsset, float p_x, float p_y) {
+  if (p_imageAsset.loaded)
+    super.image(p_imageAsset.asPicture(), p_x, p_y);
+}
+
+void image(Asset p_imageAsset, float p_x, float p_y, float p_width, float p_height) {
+  if (p_imageAsset.loaded)
+    super.image(p_imageAsset.asPicture(), p_x, p_y, p_width, p_height);
 }
 
 

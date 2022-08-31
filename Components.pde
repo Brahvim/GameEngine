@@ -291,8 +291,8 @@ class Renderer extends Component {
     textureWrap(this.textureWrap);
 
     // `texture()` does this already, but I'll do it anyway:
-    if (this.texture != null)
-      texture(this.texture);
+    //if (this.texture != null)
+    texture(this.texture);
   }
 
   public void update() {
