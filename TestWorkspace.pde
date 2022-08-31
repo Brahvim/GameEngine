@@ -5,7 +5,6 @@
  // `Setup.pde`:
  
  void engineSetup() { // Generally called via reflection.
- AppInfo.name = "Name!";
  functionThatLoadsAssets();
  restOfTheSetup();
  }
@@ -44,6 +43,8 @@
 void engineSetup() {
   // `Assets.init(soundfiles, pictures, shaders)`:
   Assets.init(1, 2, 0);
+
+
 
   class SaveTest implements Serializable {
     // NEVER change this:
@@ -99,7 +100,7 @@ Scene testScene = new Scene() {
   public void setup() {
     cursorImage = new Asset("Unnamed_RPG_cursor.png", AssetType.PICTURE, new Runnable() {
       public void run() {
-        cursor(Assets.getPicture(cursorImage), -4, -4);
+        cursor(cursorImage.asPicture(), -4, -4);
       }
     }
     ).beginAsyncLoad();
@@ -147,7 +148,7 @@ Scene testScene = new Scene() {
 
       public void setup() {
         this.form = new Transform(this);
-        this.display = new Renderer(this, this.form, RendererType.QUAD, boxTexture.asPicture());
+        this.display = new Renderer(this, this.form, RendererType.QUAD, boxTexture);
         this.display.type = RendererType.QUAD;
 
         //logInfo("Quad setup.");
@@ -186,7 +187,7 @@ Scene testScene = new Scene() {
       Renderer display;
 
       public void setup() {
-        this.display = new Renderer(this, this.form, RendererType.BOX, boxTexture.asPicture());
+        this.display = new Renderer(this, this.form, RendererType.BOX, boxTexture);
         this.display.fill = color(255);
         this.display.strokeWeight = 0.1f;
         //this.form.scale.set(150, 50, 150); // *On* the box.

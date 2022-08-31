@@ -8,8 +8,6 @@ public <T> T getAsset(Asset p_asset) {
  return (T)Assets.pictures.get(p_asset.id);
  */
 
-PImage NULL_IMAGE = new PImage();
-
 // We're only loading a few types, so there is no use of generics:
 static enum AssetType {
   SOUND, PICTURE, SHADER; //, TEXTFILE, SAVEFILE;
@@ -222,8 +220,6 @@ class Asset extends Thread {
   }
 
   PImage asPicture() {
-    if (this.loadedData == null)
-      return NULL_IMAGE;
     // No need to check for null values!
     return (PImage)this.loadedData;
     // ...and if the type of data being loaded is different, well...

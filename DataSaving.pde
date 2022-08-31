@@ -16,9 +16,8 @@ HashMap<String, ZipEntry> saveMap = new HashMap<String, ZipEntry>();
 ArrayList<String> saveFileNames = new ArrayList<String>();
 boolean canSave;
 
-String saveFolderPath;
+String saveFilePath;
 
-File saveFolder;
 File zippedSavesFile;
 ZipFile zippedSaves;
 
@@ -27,19 +26,21 @@ ZipOutputStream zStream;
 // Every part of this should be very scalable.
 
 void initSaving() {
-  canSave = true;
+  canSave = true; // This is to tell if caught exceptions occur and disallow saving!
 
-  saveFolder = new File(sketchPath + "saves");
-  if (!saveFolder.exists())
-    saveFolder.mkdir();
-  saveFolderPath = saveFolder.getAbsolutePath();
+  // The plan of action:
+  // First, we create our zip file.
+  // Then, we load all of its entries.
+  // The user should load data from each entry themselves.
 
   // DON'T YOU DARE CALL THAT CONCATENATED STRING MICRO-SOFTY:
-  zippedSavesFile = new File(saveFolder, SKETCH_NAME + "_Save.zip");
+  zippedSavesFile = new File(sketchPath + SKETCH_NAME + "_Save.sav");
+  saveFilePath = zippedSavesFile.getAbsolutePath();
+
   if (!zippedSavesFile.exists())
   try {
     zippedSavesFile.createNewFile();
-  } 
+  }
   catch (IOException ioe) {
     canSave = false;
     logError("Save system initialization failed! `zippedSavesFile` could not be created.");
@@ -50,12 +51,27 @@ void initSaving() {
     zippedSaves = new ZipFile(zippedSavesFile);
   }
   catch (IOException e) {
+    canSave = false;
+    logError("Save system initialization failed! `zippedSaves` could not be created.");
     // A "`ZipException`" is also thrown, but apparently extends
     // `IOException`, meaning that it can be handled here as well.
   }
 
+  Enumeration<? extends ZipEntry> zipEntries = zippedSaves.entries();
+
+  saveMap.clear();
+  while (zipEntries.hasMoreElements()) {
+    ZipEntry e = zipEntries.nextElement();
+
+    String name = e.getName();
+    // Notice the usage of the `name` variable. You can't 'optimize' this:
+    name = name.substring(0, name.lastIndexOf("."));
+
+    saveMap.put(name, e);
+  }
+
   logInfo("Save location:");
-  logInfo('\t', saveFolder.getAbsolutePath());
+  logInfo('\t', zippedSavesFile.getAbsolutePath());
   logInfo("Save system ", canSave? "initialized successfully!" : "failed to initialize ; - ;)");
 }
 
