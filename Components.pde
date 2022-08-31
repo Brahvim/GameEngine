@@ -298,8 +298,10 @@ class Renderer extends Component {
       !this.textureLoader.ploaded &&
       this.textureLoader.loaded) {
       synchronized(this.textureLoader) {
-        synchronized(this) {
-          this.texture = Assets.getPicture(this.textureLoader).copy();
+        synchronized(Assets.pictures) {
+          synchronized(this) {
+            this.texture = Assets.getPicture(this.textureLoader).copy();
+          }
         }
       }
     }

@@ -1,10 +1,11 @@
 # Files:
 engine.js
+
 # Just IGNORE it already!:
 sketch_GameEngine_Simpler_ECS.log
 
-
 # Directories:
+application.windows64saves/sketch_GameEngine_Simpler_ECS_Save.zip
 application.windows64
 application.windows32
 build/builds
