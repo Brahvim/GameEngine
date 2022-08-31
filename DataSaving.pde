@@ -53,21 +53,27 @@ void initSaving() {
   catch (IOException e) {
     canSave = false;
     logError("Save system initialization failed! `zippedSaves` could not be created.");
+    logEx(e);
     // A "`ZipException`" is also thrown, but apparently extends
     // `IOException`, meaning that it can be handled here as well.
   }
 
-  Enumeration<? extends ZipEntry> zipEntries = zippedSaves.entries();
+  Enumeration<? extends ZipEntry> zipEntries = null;
 
-  saveMap.clear();
-  while (zipEntries.hasMoreElements()) {
-    ZipEntry e = zipEntries.nextElement();
+  if (zippedSaves != null)
+    zipEntries = zippedSaves.entries();
 
-    String name = e.getName();
-    // Notice the usage of the `name` variable. You can't 'optimize' this:
-    name = name.substring(0, name.lastIndexOf("."));
+  if (zipEntries != null) {
+    saveMap.clear();
+    while (zipEntries.hasMoreElements()) {
+      ZipEntry e = zipEntries.nextElement();
 
-    saveMap.put(name, e);
+      String name = e.getName();
+      // Notice the usage of the `name` variable. You can't 'optimize' this:
+      name = name.substring(0, name.lastIndexOf("."));
+
+      saveMap.put(name, e);
+    }
   }
 
   logInfo("Save location:");
@@ -93,6 +99,7 @@ void removeSaveFile(String p_name) {
   if (entry == null) {
     logError("No save file called `" + p_name + "` exists.");
     logEx(new NullPointerException());
+    return null;
   }
 
   try {

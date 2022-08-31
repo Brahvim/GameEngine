@@ -54,8 +54,8 @@ static class Assets {
     Assets.shaders = new ArrayList<PShader>(p_shaders);
 
     Assets.isInit = true;
-    logInfo("`Assets.init()` was called with arguments: [SND]", 
-      p_soundFiles, "[IMG]", p_pictures, "[SHD]", p_shaders);
+    logInfo("`Assets.init()` was called with arguments: [SND] ", 
+      p_soundFiles, " [IMG] ", p_pictures, " [SHD] ", p_shaders);
   }
 
   // Just a note: Method overloading is faster than `instanceof` checks (which are done at runtime).

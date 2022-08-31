@@ -300,13 +300,14 @@ class Renderer extends Component {
     pushStyle();
 
     // Do this only once:
-    if (this.textureLoader != null && 
-      !this.textureLoader.ploaded &&
-      this.textureLoader.loaded) {
+    if (this.textureLoader != null 
+      //&& !this.textureLoader.ploaded &&
+      //this.textureLoader.loaded
+      ) {
       //synchronized(this.textureLoader) {
       //synchronized(Assets.pictures) {
       //synchronized(this) {
-      this.texture = this.textureLoader.asPicture().copy();
+      this.texture = this.textureLoader.asPicture();//.copy();
       //}
       //}
       //}
