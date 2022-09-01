@@ -35,13 +35,13 @@ void dispose() {
     println("Find the log file at:", Log.absPath);
     new ProcessBuilder("notepad", Log.absPath).start();
   }
-  catch(IOException ioe) {
-    ioe.printStackTrace();
+  catch (IOException e) {
+    e.printStackTrace();
     // Seriously? What do you expect me to do now? Open that stream up again and write to it?
     // <sigh.>
     // Fine, here we go...
     logInfo("Hey! By the way, the log file kinda got logged out, if you will... you know, understand?");
-    logEx(ioe);
+    logEx(e);
   }
 
   Log.fileLogger.flush();
@@ -85,6 +85,11 @@ void setup() {
   initLog();
   initSaving();
 
+  logInfo("`PApplet.sketchPath()`: ", sketchPath());
+  logInfo("Our `sketchPath` variable: ", sketchPath);
+  logInfo(
+    "(Perhaps the only difference is that it ends in a `File.separator`, but `sketchPath()` DOES that!)");
+
   //soundDevices = Sound.list();
   //logToFile(Log.lvInfo, "Audio devices:");
   //for (String s : soundDevices)
@@ -97,9 +102,10 @@ void setup() {
   // Library initialization:
   fx = new PostFXSupervisor(this);
   Fisica.init(this);
+
+  logInfo("Loading LibBulletJME...");
   NativeLibraryLoader.loadLibbulletjme(true, 
-    //new File("C:\\ProcessingSketches\\libraries\\LibBulletJME\\library\\"), 
-    new File(sketchPath + "lib"), 
+    new File(sketchPath("lib")), // Do NOT use `sketchPath + "lib"`! That failed. 
     "Release", "Sp");
 
   uibd = new UiBooster(UiBoosterOptions.Theme.DARK_THEME);
@@ -191,7 +197,7 @@ void setup() {
    // The return value of the method called, is what `invoke` returns, as well.
    engineSetupMethod.invoke(this);
    }  
-   catch(Exception e) {
+   catch (Exception e) {
    logError("`engineSetup()` encountered an exception!");
    logEx(e);
    }
@@ -442,7 +448,7 @@ void keyReleased() {
   try {
     keysHeld.remove(keysHeld.indexOf(keyCode));
   }
-  catch(IndexOutOfBoundsException ioobe) {
+  catch (IndexOutOfBoundsException e) {
   }
 
   // Calling this later so that our variables have the latest values:

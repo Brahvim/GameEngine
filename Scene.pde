@@ -50,8 +50,8 @@ void setScene(Scene p_scene) {
    if (f.get(a) == p_scene)
    println(f.getName());
    }
-   catch(Exception iae) {
-   //logEx(iae);
+   catch (Exception e) {
+   //logEx(e);
    }
    
    logInfo("Scene ", sceneName, " was set in place perfectly! Yay!");

@@ -41,25 +41,25 @@ void initSaving() {
   try {
     zippedSavesFile.createNewFile();
   }
-  catch (IOException ioe) {
+  catch (IOException e) {
     canSave = false;
     logError("Save system initialization failed! `zippedSavesFile` could not be created.");
-    logEx(ioe);
+    logEx(e);
   }
 
   try {
     zippedSaves = new ZipFile(zippedSavesFile);
   }
-  catch (IOException ioe) {
+  catch (IOException e) {
     canSave = false;
     logError("Save system initialization failed! `zippedSaves` could not be created.");
-    logEx(ioe);
+    logEx(e);
     // A "`ZipException`" is also thrown, but apparently extends
     // `IOException`, meaning that it can be handled here as well.
   }
-  catch (NullPointerException npe) {
+  catch (NullPointerException e) {
     logWarn("`zippedSaves` was `null`! Does it exist?");
-    logEx(npe);
+    logEx(e);
   }
 
   Enumeration<? extends ZipEntry> zipEntries = null;
@@ -109,27 +109,27 @@ void removeSaveFile(String p_name) {
   try {
     entryStream = zippedSaves.getInputStream(entry);
   }
-  catch (IOException ioe) {
+  catch (IOException e) {
     logError("The saving system Could not get an input stream to some `ZipEntry`.");
-    logEx(ioe);
+    logEx(e);
   }
 
   try {
     oStream = new ObjectInputStream(entryStream);
   }
-  catch(IOException ioe) {
+  catch (IOException e) {
     logError("Failed to create an `ObjectInputStream`...");
-    logEx(ioe);
+    logEx(e);
   }
 
   try {
     return (T)oStream.readObject();
   }
-  catch(IOException ioe) {
+  catch (IOException e) {
     logError("");
-    logEx(ioe);
+    logEx(e);
   }
-  catch(ClassNotFoundException ioe) {
+  catch (ClassNotFoundException e) {
   }
 
   return null;
@@ -142,9 +142,9 @@ void writeToSaveFile(String p_name, Serializable p_data) {
   try {
     fStream = new FileOutputStream(zippedSavesFile);
   }
-  catch (FileNotFoundException fnfe) {
+  catch (FileNotFoundException e) {
     logError("Wait, what?! Failed to find `zippedSavesFile`!");
-    logEx(fnfe);
+    logEx(e);
   }
 
   // Zipping:
@@ -153,9 +153,9 @@ void writeToSaveFile(String p_name, Serializable p_data) {
   try {
     zStream.putNextEntry(zEntry);
   }
-  catch(IOException ioe) {
+  catch (IOException e) {
     logError("Could not make a `ZipEntry`");
-    logEx(ioe);
+    logEx(e);
   }
 
   try {
@@ -168,10 +168,10 @@ void writeToSaveFile(String p_name, Serializable p_data) {
     if (fStream != null)
       fStream.close();
   }
-  catch(IOException ioe) {
+  catch (IOException e) {
     logError("Could not create an `ObjectOutputStream`, "
       + "or maybe it failed to write the object, or something failed to close. "
       + "I dunno, man. This code is HUGE, and EVERY function is throwing an `IOException`!");
-    logEx(ioe);
+    logEx(e);
   }
 }

@@ -30,9 +30,9 @@ public void initLog() {
   try {
     Log.logFile.createNewFile();
   }
-  catch (IOException ioe) {
+  catch (IOException e) {
     // You can't call `logEx()` here!
-    ioe.printStackTrace();
+    e.printStackTrace();
     Log.canLog = false;
   }
 
@@ -41,7 +41,7 @@ public void initLog() {
   try {
     Log.fileLogger = new PrintWriter(Log.logFile);
   }
-  catch(Exception e) {
+  catch (Exception e) {
     // ...here neither!
     e.printStackTrace();
     Log.canLog = false;
@@ -103,9 +103,9 @@ public static void logEx(Exception p_except) {
       try {
         sw.close();
       } 
-      catch(IOException ioe) {
+      catch (IOException e) {
         // But Sir, this is 'a' `logEx()`.
-        ioe.printStackTrace();
+        e.printStackTrace();
       }
 
       pw.close();

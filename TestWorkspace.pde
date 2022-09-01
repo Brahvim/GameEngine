@@ -55,10 +55,10 @@ void engineSetup() {
   //.addSelection("Graphical Quality", "Fair", "Decent", "Powerful").run();
   //while (!settingsForm.isClosedByUser());
 
-  logWarn("Test warning!");
-  logError("Fake error!");
-
-  logEx(new Exception("Don't worry! This is a test!"));
+  // I know the Log system works -_-
+  //logWarn("Test warning!");
+  //logError("Fake error!");
+  //logEx(new Exception("Don't worry! This is a test!"));
 
 
   // Customizeable!:
