@@ -1,4 +1,3 @@
-
 //ArrayList<EventReceiver> eventReceivers = new ArrayList<EventReceiver>();
 class EventReceiver {
   // Input Events:

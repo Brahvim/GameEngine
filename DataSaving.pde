@@ -10,11 +10,10 @@ import java.util.Scanner;
 
 import java.util.zip.*;
 
-HashMap<String, ZipEntry> saveMap = new HashMap<String, ZipEntry>();
 ArrayList<String> saveFileNames = new ArrayList<String>();
 boolean canSave;
 
-String saveFilePath;
+String saveFilePath = null;
 
 File zippedSavesFile;
 ZipFile zippedSaves;
@@ -23,92 +22,118 @@ ZipOutputStream zStream;
 
 // Every part of this should be very scalable.
 
+// The plan of action:
+// Just create a system that allows one to save and load objects.
+//
+// Put them into a folder, `saves`, at runtime, (which also has a README file alerting
+// users to NOT mess around with the files).
+//
+// When the program 'should exit', **a function** should zip the files into one!
+// (...rather than making a parsing system to build a single one.)
+// Delete the `saves` folder now!
+// PS `saves` could be put in `temp` on Windows (`C:\\Windows\\Temp`).
+// (On GNU/Linux, `/tmp` or `/var/tmp`. ...and who'd like to read the Apple T&Cs daily?)
+//
+// *Very* easy, and efficient enough (e.g. if the user wants to load a specific object,
+// you will have to traverse through the entire file to find it, then ever parse its
+// 'header' to know how many bytes it is with your custom parser an so on.
+// How else would you design a parser?
+//
+// ...zipping handles that much faster than we ever could.)
+
+
 void initSaving() {
   canSave = true; // This is to tell if caught exceptions occur and disallow saving!
 
-  // The plan of action:
-  // First, we create our zip file.
-  // Then, we load all of its entries.
-  // The user should load data from each entry themselves.
-
-  // DON'T YOU DARE CALL THAT CONCATENATED STRING MICRO-SOFTY:
+  // DON'T YOU DARE CALL PART OF THAT CONCATENATED STRING MICRO-SOFTY:
   zippedSavesFile = new File(sketchPath + SKETCH_NAME + "_Save.sav");
   saveFilePath = zippedSavesFile.getAbsolutePath();
+
+  boolean didExist =  zippedSavesFile.exists();
 
   if (!zippedSavesFile.exists())
   try {
     zippedSavesFile.createNewFile();
+  } 
+  catch(IOException e) {
+    canSave = false;
+    logError("Could not create `zippedSavesFile`.");
+    logEx(e);
+  } else try {
+    //if (!didExist) {
+    ////ZipEntry dummy = new ZipEntry("dummy");
+    //zStream.putNextEntry(new ZipEntry("dummy"));
+    //zStream.closeEntry();
+    //zStream.flush();
+    //}
+  }
+  catch (FileNotFoundException e) {
+    logError("Could not create a `ZipOutputStream`!");
+    logEx(e);
   }
   catch (IOException e) {
-    canSave = false;
-    logError("Save system initialization failed! `zippedSavesFile` could not be created.");
-    logEx(e);
   }
 
   try {
     zippedSaves = new ZipFile(zippedSavesFile);
   }
+  catch (ZipException e) {
+    logError("cOuLd nOt cR3ATe `zIpfILE`.");
+    logEx(e);
+  }
   catch (IOException e) {
-    canSave = false;
-    logError("Save system initialization failed! `zippedSaves` could not be created.");
-    logEx(e);
-    // A "`ZipException`" is also thrown, but apparently extends
-    // `IOException`, meaning that it can be handled here as well.
-  }
-  catch (NullPointerException e) {
-    logWarn("`zippedSaves` was `null`! Does it exist?");
+    logError("cOuLd nOt cR3ATe `zIpfILE`.");
     logEx(e);
   }
 
-  Enumeration<? extends ZipEntry> zipEntries = null;
+  if (canSave) {
+    logInfo("Save location:");
+    logInfo('\t', zippedSavesFile.getAbsolutePath());
+  }
+  logInfo("Save system ", canSave? "initialized successfully!" : "failed to initialize ; - ;)");
 
-  if (zippedSaves != null)
-    zipEntries = zippedSaves.entries();
+  class TestClass implements Serializable {
+    String name = "null";
 
-  if (zipEntries != null) {
-    saveMap.clear();
-    while (zipEntries.hasMoreElements()) {
-      ZipEntry e = zipEntries.nextElement();
-
-      String name = e.getName();
-      // Notice the usage of the `name` variable. You can't 'optimize' this:
-      name = name.substring(0, name.lastIndexOf("."));
-
-      saveMap.put(name, e);
+    TestClass(String p_name) {
+      this.name = p_name;
     }
   }
 
-  logInfo("Save location:");
-  logInfo('\t', zippedSavesFile.getAbsolutePath());
-  logInfo("Save system ", canSave? "initialized successfully!" : "failed to initialize ; - ;)");
+  //writeFile("test", new TestClass("Brahvim"));
+  //TestClass read = readFile("test");
+  //println("Read name:", read.name);
 }
 
-void createNewSaveFile(String p_name) {
-  saveMap.putIfAbsent(p_name, new ZipEntry(p_name));
-  saveFileNames.add(p_name);
-}
+// JIT for the win!:
+// Also, ease of use for users - scaleable code! :D
+ZipEntry getEntry(String p_name) {
+  Enumeration<? extends ZipEntry> saveFiles = zippedSaves.entries();
 
-void removeSaveFile(String p_name) {
-  saveMap.remove(p_name);
-  saveFileNames.remove(p_name);
-}
+  while (saveFiles.hasMoreElements()) {
+    ZipEntry e = saveFiles.nextElement();
+    String name = e.getName();
+    if (name.substring(0, name.length() - 8).equals(p_name))
+      return e;
+  }
 
-<T> T readFromSaveFile(String p_name) {
-  ZipEntry entry = saveMap.get(p_name);
+  logError("No save file called `", p_name, "` exists.");
+  return null;
+} 
+
+<T> T readFile(String p_name) {
+  ZipEntry entry = getEntry(p_name);
   InputStream entryStream = null;
   ObjectInputStream oStream = null;
 
-  if (entry == null) {
-    logError("No save file called `" + p_name + "` exists.");
-    logEx(new NullPointerException());
+  if (entry == null)
     return null;
-  }
 
   try {
     entryStream = zippedSaves.getInputStream(entry);
   }
   catch (IOException e) {
-    logError("The saving system Could not get an input stream to some `ZipEntry`.");
+    logError("The saving system could not get an input stream to some `ZipEntry`.");
     logEx(e);
   }
 
@@ -121,10 +146,12 @@ void removeSaveFile(String p_name) {
   }
 
   try {
+    if (oStream == null)
+      throw new IOException();
     return (T)oStream.readObject();
   }
   catch (IOException e) {
-    logError("");
+    logError("`ObjectInputStream` was `null` :|");
     logEx(e);
   }
   catch (ClassNotFoundException e) {
@@ -133,7 +160,7 @@ void removeSaveFile(String p_name) {
   return null;
 }
 
-void writeToSaveFile(String p_name, Serializable p_data) {
+void writeFile(String p_name, Serializable p_data) {
   FileOutputStream fStream = null;
   ObjectOutputStream oStream = null;
 

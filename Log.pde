@@ -91,7 +91,7 @@ public static void logError(String p_message) {
 
 public static void logEx(Exception p_except) {
   if (Log.enabled) {
-    if (Log.logToConsole && Log.logLevel == Log.lvError)
+    if (Log.logToConsole && Log.logLevel >= Log.lvError)
       p_except.printStackTrace(); // To the console it goes!
 
     // I learnt this on Stackoverflow, too. Didn't mention the source ; - ;)

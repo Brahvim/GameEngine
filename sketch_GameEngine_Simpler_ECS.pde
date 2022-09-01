@@ -29,6 +29,14 @@ void dispose() {
   Log.logFile.setWritable(false);
   Log.fileLogger.flush();
 
+  try {
+    zStream.close();
+  }
+  catch (IOException e) {
+    logError("The unthinkable occured. `zStream` failed to close.");
+    logEx(e);
+  }
+
 
   if (Log.openFileOnExit)
   try {
