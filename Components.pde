@@ -107,17 +107,20 @@ class Light extends Component {
 
   int type;
 
-  Light(Entity p_entity, Transform p_parentForm) {
+  Light(Entity p_entity) {
     super(p_entity);
-    this.form = p_parentForm;
+    this.form = p_entity.getComponent(Transform.class);
+
+    if (this.form == null)
+      throw new NullPointerException("A `Light` needs a `Transform`!");
+
     this.type = POINT;
     this.col = new PVector(255, 255, 255);
     this.off = new PVector();
   }
 
-  Light(Entity p_entity, Transform p_parentForm, int p_lightType) {
-    super(p_entity);
-    this.form = p_parentForm;
+  Light(Entity p_entity, int p_lightType) {
+    this(p_entity);
     this.type = p_lightType;
     this.col = new PVector(255, 255, 255);
     this.off = new PVector();
@@ -157,8 +160,8 @@ class SpotLight extends Light {
   PVector dir;
   float angle, conc;
 
-  SpotLight(Entity p_entity, Transform p_parentForm) {
-    super(p_entity, p_parentForm);
+  SpotLight(Entity p_entity) {
+    super(p_entity);
   }
 
   public void update() {
@@ -229,59 +232,32 @@ class Renderer extends Component {
   int textureWrap = CLAMP;
   PImage texture;
 
-  Renderer(Entity p_entity, Transform p_parentForm) {
+  Renderer(Entity p_entity) {
     super(p_entity);
-    this.form = p_parentForm;
+    this.form = p_entity.getComponent(Transform.class);
+
+    if (this.form == null)
+      logEx(new NullPointerException("A `Renderer` needs a `Transform`!"));
 
     if (currentScene != null)
       currentScene.renderers.add(this);
   }
 
-  Renderer(Entity p_entity, Transform p_parentForm, RendererType p_type) {
-    super(p_entity);
-    this.form = p_parentForm;
+  Renderer(Entity p_entity, RendererType p_type) {
+    this(p_entity);
     this.type = p_type;
-
-    if (currentScene != null)
-      currentScene.renderers.add(this);
   }
 
-  Renderer(Entity p_entity, Transform p_parentForm, Asset p_textureLoader) {
-    super(p_entity);
-    this.form = p_parentForm;
-    this.textureLoader = p_textureLoader;
-
-    if (currentScene != null)
-      currentScene.renderers.add(this);
-  }
-
-  Renderer(Entity p_entity, Transform p_parentForm, RendererType p_type, Asset p_textureLoader) {
-    super(p_entity);
+  Renderer(Entity p_entity, RendererType p_type, Asset p_assetLoader) {
+    this(p_entity);
     this.type = p_type;
-    this.form = p_parentForm;
-    this.textureLoader = p_textureLoader;
-
-    if (currentScene != null)
-      currentScene.renderers.add(this);
+    this.textureLoader = p_assetLoader;
   }
 
-  Renderer(Entity p_entity, Transform p_parentForm, PImage p_texture) {
-    super(p_entity);
-    this.form = p_parentForm;
+  Renderer(Entity p_entity, RendererType p_type, PImage p_texture) {
+    this(p_entity);
+    this.type = p_type;
     this.texture = p_texture.copy();
-
-    if (currentScene != null)
-      currentScene.renderers.add(this);
-  }
-
-  Renderer(Entity p_entity, Transform p_parentForm, RendererType p_type, PImage p_texture) {
-    super(p_entity);
-    this.type = p_type;
-    this.form = p_parentForm;
-    this.texture = p_texture;
-
-    if (currentScene != null)
-      currentScene.renderers.add(this);
   }
 
   public void applyTexture() {

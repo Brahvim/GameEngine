@@ -89,9 +89,8 @@ void engineSetup() {
 
 Scene testScene = new Scene() {
   Asset audio, boxTexture, circleTexture, cursorImage;
-  BloomPass bloomPass;
+  Pass bloomPass, vignettePass;
   Camera cam = new Camera(), rev = new Camera(); // A 'normal' and a 'revolving' camera.
-  VignettePass vignettePass;
 
   @SuppressWarnings("unused")
     Entity circle, quad, light, groundBox;
@@ -130,7 +129,7 @@ Scene testScene = new Scene() {
       Renderer display;
 
       public void setup() {
-        this.display = new Renderer(this, this.form, RendererType.ELLIPSE, circleTexture);
+        this.display = new Renderer(this, RendererType.ELLIPSE, circleTexture);
         this.display.fill = color(230);
         this.display.stroke = color(0);
         this.display.strokeWeight = 0.05f;
@@ -150,8 +149,7 @@ Scene testScene = new Scene() {
 
       public void setup() {
         this.form = new Transform(this);
-        this.display = new Renderer(this, this.form, RendererType.QUAD, boxTexture);
-        this.display.type = RendererType.QUAD;
+        this.display = new Renderer(this, RendererType.QUAD, boxTexture);
 
         //logInfo("Quad setup.");
 
@@ -170,7 +168,7 @@ Scene testScene = new Scene() {
 
     light = new Entity() {
       Transform form = new Transform(this), quadForm;
-      Light light = new Light(this, this.form, POINT);
+      Light light = new Light(this);
 
       public void setup() {
         //light.enabled = false;
@@ -186,10 +184,9 @@ Scene testScene = new Scene() {
 
     groundBox = new Entity() {
       Transform form = new Transform(this);
-      Renderer display;
+      Renderer display = new Renderer(this, RendererType.BOX, boxTexture);
 
       public void setup() {
-        this.display = new Renderer(this, this.form, RendererType.BOX, boxTexture);
         this.display.fill = color(255);
         this.display.strokeWeight = 0.1f;
         //this.form.scale.set(150, 50, 150); // *On* the box.
@@ -206,7 +203,8 @@ Scene testScene = new Scene() {
     //for (Component c : this.components)
     //println(c);
 
-    cam.clearColor = rev.clearColor = color(30, 120, 170, 80); //15);
+    cam.clearColor = color(0); 
+    rev.clearColor = color(30, 120, 170, 80); //15);
     setCam(rev);
 
     cam.script = new CamScript() {
@@ -243,8 +241,8 @@ Scene testScene = new Scene() {
       camLerpUpdate(cam, rev, (float)mouseX / (float)width);
     else camIsLerp = false;
 
-    //applyPass(bloomPass);
-    //applyPass(vignettePass);
+    applyPass(bloomPass);
+    applyPass(vignettePass);
     //doPostProcessing = true;
 
     //gl.enable(PGL.CULL_FACE);
