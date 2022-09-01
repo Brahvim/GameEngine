@@ -27,6 +27,8 @@ static PGL gl;
 PostFXSupervisor fx;
 //GLU glu;
 final PApplet SKETCH = this;
+final Sound SOUND = new Sound(this);
+static String[] soundDevices;
 final String SKETCH_NAME = SKETCH.getClass().getSimpleName();
 static boolean INSIDE_PDE;
 static String sketchArgsStr;

@@ -107,15 +107,17 @@ Scene testScene = new Scene() {
 
     audio = new Asset("UnicycleGirrafe.mp3", AssetType.SOUND, new Runnable() {
       public void run() {
-        SoundFile sound = Assets.getSound(audio);
-        sound.loop();
+        //audio.asSound().loop();
+
+        // Ye old methode!:
+        //SoundFile sound = Assets.getSound(audio);
+        //sound.loop();
       }
     }
-    );//.beginAsyncLoad();
+    ).beginAsyncLoad();
 
     boxTexture = new Asset("LearnOpenGL_container2.png", AssetType.PICTURE, new Runnable() {
       public void run() {
-        //((Renderer)circle.getComponent(Renderer.class)).texture = (PImage)boxTexture.loadedData;
         //logInfo("Box texture done loading!");
       }
     }

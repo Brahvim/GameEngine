@@ -7,7 +7,6 @@
 // It's in the "Components" tab.
 // Go, go, go! ":D!
 
-
 void settings() {
   size(INIT_WIDTH, INIT_HEIGHT, P3D);
   PJOGL.setIcon("sunglass_nerd.png");
@@ -86,6 +85,11 @@ void setup() {
   initLog();
   initSaving();
 
+  //soundDevices = Sound.list();
+  //logToFile(Log.lvInfo, "Audio devices:");
+  //for (String s : soundDevices)
+  //logToFile(Log.lvInfo, '\t', s);
+
   logInfo("Will load LibBulletJME from:");
   logInfo("\t", new File(sketchPath("lib")).getAbsolutePath());
   // Where's my `logInfoIndented()`?! :rofl:
@@ -95,7 +99,7 @@ void setup() {
   Fisica.init(this);
   NativeLibraryLoader.loadLibbulletjme(true, 
     //new File("C:\\ProcessingSketches\\libraries\\LibBulletJME\\library\\"), 
-    new File(sketchPath("lib")), 
+    new File(sketchPath + "lib"), 
     "Release", "Sp");
 
   uibd = new UiBooster(UiBoosterOptions.Theme.DARK_THEME);

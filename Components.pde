@@ -304,13 +304,7 @@ class Renderer extends Component {
       //&& !this.textureLoader.ploaded &&
       //this.textureLoader.loaded
       ) {
-      //synchronized(this.textureLoader) {
-      //synchronized(Assets.pictures) {
-      //synchronized(this) {
-      this.texture = this.textureLoader.asPicture();//.copy();
-      //}
-      //}
-      //}
+      this.texture = this.textureLoader.asPicture(); //.copy();
     }
 
     // For the Bullet Physics Engine!:

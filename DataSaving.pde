@@ -50,12 +50,16 @@ void initSaving() {
   try {
     zippedSaves = new ZipFile(zippedSavesFile);
   }
-  catch (IOException e) {
+  catch (IOException ioe) {
     canSave = false;
     logError("Save system initialization failed! `zippedSaves` could not be created.");
-    logEx(e);
+    logEx(ioe);
     // A "`ZipException`" is also thrown, but apparently extends
     // `IOException`, meaning that it can be handled here as well.
+  }
+  catch (NullPointerException npe) {
+    logWarn("`zippedSaves` was `null`! Does it exist?");
+    logEx(npe);
   }
 
   Enumeration<? extends ZipEntry> zipEntries = null;
