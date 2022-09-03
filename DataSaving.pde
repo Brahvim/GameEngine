@@ -43,17 +43,17 @@ void initSaving() {
   if (!savesFolder.exists())
     savesFolder.mkdir();
 
-  class TestData implements Serializable {
-    private final static long serialVersionUID = 390743L;
-    int word = 5;
-  }
-
-  writeObject(new TestData(), "cake");
-
-  TestData t = readObject("cake");
-  println(t.word);
+  TestData t;
+  writeObject(t = new TestData(), "cake");
+  t = readObject("cake");
+  if (t != null)
+    println(t.word);
 }
 
+static class TestData implements Serializable {
+  private final static long serialVersionUID = 390743L;
+  String word = "Caaaaaake!";
+}
 
 void writeObject(Serializable p_object, String p_fname) {
   File objFile = new File(savesFolder, p_fname.concat(".sav_frag"));
@@ -74,19 +74,23 @@ void writeObject(Serializable p_object, String p_fname) {
 
     oStream.close();
     fout.close();
-  } 
+  }
   catch (FileNotFoundException e) {
+    logEx(e);
   }
   catch (IOException e) {
+    logEx(e);
   }
 }
 
-<T> T readObject(String p_fileName) {
+<T> T readObject(String p_fname) {
   T ret = null;
-  p_fileName = p_fileName.concat(".sav_frag");
+
+  File objFile = new File(savesFolder, p_fname.concat(".sav_frag"));
+  logInfo(objFile.getAbsolutePath());
 
   try {
-    FileInputStream fin = new FileInputStream(new File(savesFolder, p_fileName));
+    FileInputStream fin = new FileInputStream(objFile);
     ObjectInputStream oStream = new ObjectInputStream(fin);
 
     try { 
