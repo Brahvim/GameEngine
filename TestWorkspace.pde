@@ -44,13 +44,6 @@ void engineSetup() {
   // `Assets.init(soundfiles, pictures, shaders)`:
   Assets.init(1, 2, 0);
 
-
-
-  class SaveTest implements Serializable {
-    // NEVER change this:
-    private final static long serialVersionUID = 78635;
-  }
-
   //Form settingsForm = uibn.createForm(SKETCH_NAME + ".exe")
   //.addSelection("Graphical Quality", "Fair", "Decent", "Powerful").run();
   //while (!settingsForm.isClosedByUser());
@@ -134,12 +127,37 @@ Scene testScene = new Scene() {
         this.display.stroke = color(0);
         this.display.strokeWeight = 0.05f;
 
+        this.form.pos.set(cx, cy);
+
+        // A try-catch would be better here...?
+        Transform savedForm = readTransform("circle_transform");
+        if (savedForm != null)
+          this.form.pos = savedForm.pos;
+
         this.form.scale.mult(32);
         //logInfo("Circle setup.");
       }
 
       public void update() {
-        this.form.pos.set(cx, cy);
+        if (keyIsPressed(87))
+          this.form.pos.y--;
+        if (keyIsPressed(83))
+          this.form.pos.y++;
+        if (keyIsPressed(65))
+          this.form.pos.x--;
+        if (keyIsPressed(68))
+          this.form.pos.x++;
+      }
+
+      public void keyPressed() {
+        // Saving a state :D
+        if (keyIsPressed(32))
+          writeTransform((Transform)circle.getComponent(Transform.class), "circle_transform");
+        // ^^^ This works in `update()` without any problems (O_O")
+
+        // Works in both `update()` and this method!
+        //if (keysPressed(65, 68))
+        //println("YOLO!", frameCount);
       }
     };
 
@@ -204,6 +222,7 @@ Scene testScene = new Scene() {
     //println(c);
 
     cam.clearColor = color(0); 
+    cam.projectionType = ORTHOGRAPHIC;
     rev.clearColor = color(30, 120, 170, 80); //15);
     setCam(rev);
 

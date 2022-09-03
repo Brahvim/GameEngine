@@ -1,7 +1,7 @@
 final ArrayList<Camera> CAMERAS = new ArrayList<Camera>();
 Camera currentCam, 
   lerpeable; // `lerpeable` is allocated all the time during lerps, don't do that right now.
-boolean camIsLerp = false;
+boolean camLerpRequest, pcamLerpRequest, camIsLerp = false, camLerpMouse = false;
 float camLerpAmt;
 Camera camToLerpFrom, camToLerpTo;
 SineWave camLerpWave;
@@ -77,6 +77,10 @@ void camLerpUpdate(Camera p_from, Camera p_to, float p_lerpAmt, float p_start, f
   lerpeable.pos.y = p_from.pos.y + (p_to.pos.y - p_from.pos.y) * p_lerpAmt;
   lerpeable.pos.z = p_from.pos.z + (p_to.pos.z - p_from.pos.z) * p_lerpAmt;
 
+  // ...let's not lerp that..?
+  if (camLerpMouse)
+    lerpeable.mouseZ = p_from.mouseZ + (p_to.mouseZ - p_from.mouseZ) * p_lerpAmt;
+
   // Remember: if your FOV changes, the `z` position of the camera must, as well.
   lerpeable.fov = p_from.fov + (p_to.fov - p_from.fov) * p_lerpAmt;
   lerpeable.far = p_from.far + (p_to.far - p_from.far) * p_lerpAmt;
@@ -102,7 +106,7 @@ class Camera extends Entity {
   CamScript script;
   color clearColor = color(0);
   boolean doScript = true;
-  //int projectionType = PERSPECTIVE;
+  int projectionType = PERSPECTIVE;
 
   Camera() {
     this.up = new PVector(0, 1, 0);
@@ -146,7 +150,13 @@ class Camera extends Entity {
     if (this.script != null)
       this.script.run(this);
 
-    perspective(this.fov, (float)width / (float)height, this.near, this.far);
+    switch (this.projectionType) {
+    case PERSPECTIVE:
+      perspective(this.fov, (float)width / (float)height, this.near, this.far);
+      break;
+    case ORTHOGRAPHIC:
+      ortho(-cx, cx, -cy, cy, this.near, this.far);
+    }
     camera(this.pos.x, this.pos.y, this.pos.z, 
       this.center.z, this.center.y, this.center.z, 
       this.up.x, this.up.y, this.up.z);
@@ -171,7 +181,13 @@ class Camera extends Entity {
   }
 
   void applyMatrix() {
-    perspective(this.fov, (float)width / (float)height, this.near, this.far);
+    switch (this.projectionType) {
+    case PERSPECTIVE:
+      perspective(this.fov, (float)width / (float)height, this.near, this.far);
+      break;
+    case ORTHOGRAPHIC:
+      ortho(-cx, cx, -cy, cy, this.near, this.far);
+    }
     camera(this.pos.x, this.pos.y, this.pos.z, 
       this.center.z, this.center.y, this.center.z, 
       this.up.x, this.up.y, this.up.z);

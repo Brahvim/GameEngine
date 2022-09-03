@@ -13,7 +13,6 @@ static class Log {
 }
 
 // Initialize the logger:
-
 public void initLog() {
   Log.filePath = sketchPath(SKETCH_NAME.concat(".log"));
   Log.logFile = new File(Log.filePath);

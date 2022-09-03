@@ -23,7 +23,7 @@ class Entity extends EventReceiver {
   }
 
   // Remember: ONLY call `getComponent()` in `setup()`!
-  public <T extends Component> T getComponent(Class p_class) {
+  public <T /*extends Component*/> T getComponent(Class p_class) {
     for (Component c : this.components) {
       //println("Found component", c, "in Entity", this.name);
       if (c.getClass() == p_class)

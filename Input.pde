@@ -24,6 +24,15 @@ boolean keyIsPressed(int p_keyCode) {
   return keysHeld.contains(p_keyCode);
 }
 
+boolean keysPressed(int... p_keyCodes) {
+  boolean flag = true;
+
+  for (int i : p_keyCodes)
+    flag &= keysHeld.contains(i); // ...yeah, `|=` and not `&=`...
+
+  return flag;
+}
+
 void unprojectMouse() {
   //mouse.set(new float[0]);
   mouse.set(mouseX, mouseY);
