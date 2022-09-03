@@ -223,6 +223,27 @@ class ShapeRenderer extends Component {
 //  RendererType type;
 //}
 
+class ParticleSystem extends Component {
+  Transform startPos;
+  PShape shape;
+  float lifetime = -1, startTime;
+
+  ParticleSystem(Entity p_entity) {
+    super(p_entity);
+    this.startPos = p_entity.getComponent(Transform.class);
+  }
+
+  void start() {
+    this.startTime = millis();
+  }
+
+  void update() {
+    if (this.lifetime != -1)
+      if (millis() - this.startTime > this.lifetime)
+        return;
+  }
+}
+
 class Renderer extends Component {
   Transform form;
   RendererType type;

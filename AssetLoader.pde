@@ -13,9 +13,6 @@ static enum AssetType {
   SOUND, PICTURE, SHADER, SHAPE; //, TEXTFILE, SAVEFILE;
 
   static int getMaxEntriesForType(AssetType p_type) {
-    if (!Assets.isInit)
-      throw new RuntimeException("Please call `Assets.init()`!");
-
     switch (p_type) {
     case SOUND:
       return Assets.sounds.size();
@@ -33,24 +30,13 @@ static enum AssetType {
 }
 
 static class Assets {
-  static ArrayList<SoundFile> sounds = null; 
-  static ArrayList<PImage> pictures = null; 
-  static ArrayList<PShader> shaders = null;
-  static ArrayList<PShape> shapes = null;
+  static ArrayList<SoundFile> sounds = new ArrayList<SoundFile>();
+  static ArrayList<PImage> pictures = new ArrayList<PImage>();
+  static ArrayList<PShader> shaders = new ArrayList<PShader>();
+  static ArrayList<PShape> shapes = new ArrayList<PShape>();
   // Strings are immutable, COME ON!:
   //final static StringBuilder[] textFiles = new StringBuilder[0];
 
-  static boolean isInit = false;
-
-  static void init() {
-    Assets.pictures = new ArrayList<PImage>();
-    Assets.sounds = new ArrayList<SoundFile>();
-    Assets.shaders = new ArrayList<PShader>();
-    Assets.shapes = new ArrayList<PShape>();
-
-    Assets.isInit = true;
-    logInfo("`Assets.init()` was called.");
-  }
 
   // Dis gunna get @Deprecated sh-oon:
   //static void init(int p_soundFiles, int p_pictures, int p_shaders, int p_shapes) {

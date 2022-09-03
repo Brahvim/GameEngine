@@ -77,6 +77,10 @@ final int TEXT_TEXTURE_SIZE = 72,
 
 // Timing:
 float frameStartTime, deltaTime, pframeTime, frameTime;
+//long millisBegin; // `PApplet.millisOffset` is not visible, so I made this!.
+// `PApplet.millis()` starts counting from when the class is instantiated, and returns an `int`.
+// Bad, bad, bad!
+// The overload in this class returns a long, and starts at the end of `setup()`.
 
 
 // Failed to get these via reflection, copy-pasted them. I hope I use these at some point!:

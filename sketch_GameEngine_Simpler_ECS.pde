@@ -86,7 +86,6 @@ void setup() {
 
   initLog();
   initSaving();
-  Assets.init();
 
   logInfo("Executable directory: ");
   logInfo("\t", sketchPath());
