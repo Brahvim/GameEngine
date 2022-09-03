@@ -44,44 +44,22 @@ void engineSetup() {
   // `Assets.init(soundfiles, pictures, shaders)`:
   Assets.init(1, 2, 0);
 
-  //Form settingsForm = uibn.createForm(SKETCH_NAME + ".exe")
-  //.addSelection("Graphical Quality", "Fair", "Decent", "Powerful").run();
-  //while (!settingsForm.isClosedByUser());
-
-  // I know the Log system works -_-
-  //logWarn("Test warning!");
-  //logError("Fake error!");
-  //logEx(new Exception("Don't worry! This is a test!"));
-
-
-  // Customizeable!:
-  //Log.filePath = "C:\\ProcessingSketches\\sketches\\".concat(SKETCH_NAME).concat("\\")
-  //.concat(SKETCH_NAME).concat(".txt");
-  //Log.logFile = new File(Log.filePath);
-
-  b2d = createB2DWorld(500, 500);
-  bt = createBTWorld();
-
-  //PhysicsRigidBody a = null;
-  //a.activate(false);
+  // Bullet `PhysicsRigidBody`s have a `.activate()` method.
 
   //com.jme3.math.Transform f = new com.jme3.math.Transform();
-  //a.getTransform(f);
+  //body.getTransform(f);
 
-  //Matrix4f b = new Matrix4f();
+  // Get a `Matrix4f` out of a `com.jme3.math.Transform`:
   //f.toTransformMatrix(b);
 
   // The Engine won't load any scenes automatically to avoid allocating too much memory:
   setScene(testScene);
-
-  //Log.filePath = "C:\\ProcessingSketches\\sketches\\".concat(SKETCH_NAME).concat("\\")
-  //.concat(SKETCH_NAME).concat(".txt");
-  //Log.logFile = new File(Log.filePath);
 }
 
 
 Scene testScene = new Scene() {
-  Asset audio, boxTexture, circleTexture, cursorImage;
+  @SuppressWarnings("unused")
+    Asset audio, boxTexture, circleTexture, cursorImage;
   Pass bloomPass, vignettePass;
   Camera cam = new Camera(), rev = new Camera(); // A 'normal' and a 'revolving' camera.
 
@@ -100,10 +78,6 @@ Scene testScene = new Scene() {
     audio = new Asset("UnicycleGirrafe.mp3", AssetType.SOUND, new Runnable() {
       public void run() {
         //audio.asSound().loop();
-
-        // Ye old methode!:
-        //SoundFile sound = Assets.getSound(audio);
-        //sound.loop();
       }
     }
     ).beginAsyncLoad();
@@ -132,10 +106,7 @@ Scene testScene = new Scene() {
         if (savedForm != null)
           this.form.pos = savedForm.pos;
 
-        //this.form.pos.z = 150;
-
         this.form.scale.mult(32);
-        //logInfo("Circle setup.");
       }
 
       public void update() {
@@ -170,16 +141,9 @@ Scene testScene = new Scene() {
 
       public void setup() {
         this.form = new Transform(this);
-        this.display = new Renderer(this, RendererType.QUAD, boxTexture);
-
-        //logInfo("Quad setup.");
-
-        //logInfo("Quad components:");
-        //for (Component c : this.components)
-        //logInfo("\t", c);
-
-        this.display.strokeWeight = 0.05f;
         this.form.scale.mult(15);
+        this.display = new Renderer(this, RendererType.QUAD, boxTexture);
+        this.display.strokeWeight = 0.05f;
       }
 
       public void update() {
@@ -208,39 +172,26 @@ Scene testScene = new Scene() {
       public void setup() {
         this.display.fill = color(255);
         this.display.strokeWeight = 0.1f;
-        //this.form.scale.set(150, 50, 150); // *On* the box.
+        this.form.pos.set(0, 50);
         this.form.scale.set(255, 255, 255); // In the box we go!
       }
-
-      public void update() {
-        //println(boxTexture.ploaded);
-        this.form.pos.set(0, 50);
-      }
     };
-
-    //println("Scene components:");
-    //for (Component c : this.components)
-    //println(c);
 
     cam.clearColor = color(0); 
     rev.clearColor = color(30, 120, 170, 80); //15);
     setCam(rev);
 
-    //this.cam.pos.z = 0;
-    //this.rev.pos.z = 0;
 
     cam.script = new CamScript() {
       public void run(Camera p_cam) {
         p_cam.pos.x = 0;
-        //p_cam.pos.x = noise(millis() * 0.001f) * 5;
-        p_cam.pos.y = 0; //p_cam.pos.x;
+        p_cam.pos.y = 0;
       }
     };
 
     rev.script = new CamScript() {
       public void run(Camera p_cam) {
         p_cam.pos.x = cos(millis() * 0.001f) * 100;
-        //p_cam.pos.y = -50;
         p_cam.pos.z = sin(millis() * 0.001f) * 100;
       }
     };
@@ -251,14 +202,11 @@ Scene testScene = new Scene() {
     wave.start(0);
     wave.endIn(3600);
     wave.extendEndBy(10000);
-    //frameRate(24);
   }
 
   public void draw() {
     if (mouseLeft)
-      //camLerpUpdate(cam, rev, (float)mouse.x / (float)width, 0.05f, 0.95f);
       camLerpUpdate(cam, rev, (float)mouseX / (float)width);
-    //else camIsLerp = false;
 
     applyPass(bloomPass);
     applyPass(vignettePass);

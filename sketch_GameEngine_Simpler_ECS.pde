@@ -161,7 +161,7 @@ void setup() {
   if (REFRESH_RATE == DisplayMode.REFRESH_RATE_UNKNOWN)
     REFRESH_RATE= -1;
 
-  frameRate(REFRESH_RATE);
+  //frameRate(REFRESH_RATE);
 
   surface.setResizable(true);
   surface.setSize(INIT_WIDTH, INIT_HEIGHT);
@@ -274,7 +274,8 @@ void draw() {
     if (e.enabled)
       e.update();
 
-  if (doAnyDrawing && doRendering) // I applied this check EVEN to post processing as well but GPU usage remained unchanged.
+  if (doAnyDrawing && doRendering) 
+    // I applied ^^^ that check EVEN to post processing as well but GPU usage remained unchanged.
     for (Renderer r : currentScene.renderers) {
       r.parent.render();
       if (r.enabled)
