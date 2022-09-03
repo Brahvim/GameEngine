@@ -13,7 +13,6 @@ import java.lang.reflect.*;
 import java.util.Map;
 import java.util.Date;
 import java.text.SimpleDateFormat;
-import java.io.*;
 
 // "PostFX for Processing":
 import ch.bildspur.postfx.builder.*;

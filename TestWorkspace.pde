@@ -87,7 +87,7 @@ Scene testScene = new Scene() {
 
   @SuppressWarnings("unused")
     Entity circle, quad, light, groundBox;
-  SineWaveDT wave = new SineWaveDT(0.001f);
+  SineWave wave = new SineWave(0.001f);
 
   public void setup() {
     cursorImage = new Asset("Unnamed_RPG_cursor.png", AssetType.PICTURE, new Runnable() {
@@ -240,7 +240,7 @@ Scene testScene = new Scene() {
     rev.script = new CamScript() {
       public void run(Camera p_cam) {
         p_cam.pos.x = cos(millis() * 0.001f) * 100;
-        p_cam.pos.y = -50;
+        //p_cam.pos.y = -50;
         p_cam.pos.z = sin(millis() * 0.001f) * 100;
       }
     };

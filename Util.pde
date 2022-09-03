@@ -1,91 +1,3 @@
-// My `SineWave` utility! Written on mobile!
-class SineWave {
-  private float angleOffset, 
-    beginOffset, freqMult;
-  private int endFrame, endFrameMinusOne;
-  private boolean useFrames;
-
-  // Right here! Public stuff!:
-  boolean active = true;
-  float freq;
-
-  SineWave() {
-  }
-
-  SineWave(float p_freqMult) {
-    this.freqMult = p_freqMult;
-  }
-
-  SineWave(float p_freqMult, 
-    float p_angleOffset) {
-    this.freqMult = p_freqMult;
-    this.angleOffset
-      = radians(p_angleOffset);
-  }
-
-  void useFrames(boolean p_b) {
-    this.useFrames = p_b;
-  }
-
-  void endIn(int p_frame) {
-    this.useFrames = true;
-
-    this.endFrame 
-      = frameCount + p_frame;
-  }
-
-  void endWhenAngleAccumulatesTo(float p_angle) {
-    this.useFrames = true;
-
-    this.endFrame
-      = frameCount
-      + (int)(p_angle * 
-      (p_angle * this.freqMult)
-      - this.angleOffset);
-
-    this.endFrameMinusOne
-      = this.endFrame - 1;
-  }
-
-  void set() {
-    this.beginOffset = this.useFrames?
-      frameCount : millis();
-  }
-
-  void set(float p_angleOffset) {
-    this.angleOffset
-      = radians(p_angleOffset);
-    this.beginOffset = this.useFrames?
-      frameCount : millis();
-  }
-
-  void setFreqMult(
-    float p_freqMult) {
-    this.freqMult = p_freqMult;
-  }
-
-  float get() {
-    if (frameCount == this.endFrameMinusOne)
-      this.active = false;
-
-    // No options for optimization
-    // here, but hey, it's awesome!:
-    if (frameCount < this.endFrame)
-      return sin(this.freq
-        = (((this.useFrames? 
-        frameCount : millis())
-        - this.beginOffset)
-        * this.freqMult
-        + this.angleOffset));
-
-    return 0;
-  }
-}
-
-
-
-
-
 // Dr. Andrew Marsh's `gluUnProject()` code! ":D!~
 // [http://andrewmarsh.com/blog/2011/12/04/gluunproject-p3d-and-opengl-sketches/]
 
@@ -203,22 +115,23 @@ public static class Unprojector {
   }
 }
 
-// Next Utility:
-// ...
 
-class SineWaveDT {
+
+
+
+class SineWave {
   float angleOffset, freqMult, freq;
   private float endTime = Float.MAX_VALUE - 1, aliveTime;
   boolean active = true, zeroWhenInactive;
 
-  SineWaveDT() {
+  SineWave() {
   }
 
-  SineWaveDT(float p_freqMult) {
+  SineWave(float p_freqMult) {
     this.freqMult = p_freqMult;
   }
 
-  SineWaveDT(float p_freqMult, float p_angleOffset) {
+  SineWave(float p_freqMult, float p_angleOffset) {
     this.freqMult = p_freqMult;
     this.angleOffset = /*radians(*/p_angleOffset;//);
   }
