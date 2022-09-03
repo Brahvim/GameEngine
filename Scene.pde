@@ -6,56 +6,39 @@ void addScene(Scene p_scene) {
 }
 
 void setScene(Scene p_scene) {
+  if (p_scene == null)
+    logEx(new NullPointerException("`setScene(null);` won't work."));
+
+  // Delete everything!:
   if (currentScene != null && currentScene.deleteOnUnload)
     currentScene.deleteScene();
+
+  System.gc(); // We just removed a bunch'a stuff, y'know?
+
+  currentScene = null; // This is for the code below, LOL.
+
+  String sceneName = null; // It'll definitely have something in it, right..?
+  for (Field f : SKETCH_FIELDS)
+  try {
+    if (f.get(SKETCH) == p_scene) {
+      sceneName = f.getName();
+    }
+  }
+  catch (IllegalAccessException e) {
+    logEx(e); // Shouldn't occur unless `p_scene` is `null`, ...which won't work!
+  }
 
   p_scene.timesReloaded++;
   currentScene = p_scene;
 
-  // Reset Physics Engines:
-  // TODO: reset gravity?
-  if (bt != null) {
-    for (PhysicsRigidBody b : bt.getRigidBodyList())
-      bt.remove(b);
-
-    for (PhysicsJoint j : bt.getJointList())
-      bt.remove(j);
-
-    for (PhysicsVehicle v : bt.getVehicleList())
-      bt.remove(v);
-
-    for (PhysicsCharacter c : bt.getCharacterList())
-      bt.remove(c);
-
-    for (PhysicsGhostObject o : bt.getGhostObjectList())
-      bt.remove(o); // Is this one even necessary...?
-  }
-
-  if (b2d != null)
-    b2d.clear();
 
   p_scene.setup(); // Calling this later so that entities inside the scene
-  // ...can add themselves into the scene's `ArrayList<Entity> entities`.
+  // ...can add themselves into `currentScene`'s `ArrayList<Entity> entities`.
 
   for (Entity e : p_scene.entities)
     e.setup();
 
-  // This was such a joke LOL:
-  /*
-  // DO NOT use `getFields()`! That will scan for ones from `super` classes as well!
-   String sceneName = null;
-   for (Field f : this.getClass().getDeclaredFields())
-   try {
-   Scene a = null;
-   if (f.get(a) == p_scene)
-   println(f.getName());
-   }
-   catch (Exception e) {
-   //logEx(e);
-   }
-   
-   logInfo("Scene ", sceneName, " was set in place perfectly! Yay!");
-   */
+  logInfo("Scene `", sceneName, "` was set in place perfectly! Yay!");
 }
 
 class Scene extends EventReceiver {
@@ -197,7 +180,28 @@ class Scene extends EventReceiver {
     this.renderers.clear();
     this.B2D_BODIES.clear();
     this.BT_BODIES.clear();
-    System.gc();
+
+    // Reset Physics Engines:
+    // TODO: reset gravity?
+    if (bt != null) {
+      for (PhysicsRigidBody b : bt.getRigidBodyList())
+        bt.remove(b);
+
+      for (PhysicsJoint j : bt.getJointList())
+        bt.remove(j);
+
+      for (PhysicsVehicle v : bt.getVehicleList())
+        bt.remove(v);
+
+      for (PhysicsCharacter c : bt.getCharacterList())
+        bt.remove(c);
+
+      for (PhysicsGhostObject o : bt.getGhostObjectList())
+        bt.remove(o); // Is this one even necessary...?
+    }
+
+    if (b2d != null)
+      b2d.clear();
   }
 
   // ...useless! The Scene will still run `.setup()` and load new objects.

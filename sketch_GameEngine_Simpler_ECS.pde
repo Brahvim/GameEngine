@@ -17,10 +17,9 @@ void settings() {
 
 // This used to be an overload for `exit()`.
 void dispose() {
-  //window.setVisible(false);
-  //while (window.isVisible());
+  window.setVisible(false);
+  while (window.isVisible());
 
-  super.dispose();
   logInfo("`engineExit()` called...");
 
   if (onExit != null)
@@ -28,15 +27,6 @@ void dispose() {
 
   Log.logFile.setWritable(false);
   Log.fileLogger.flush();
-
-  try {
-    zStream.close();
-  }
-  catch (IOException e) {
-    logError("The unthinkable occured. `zStream` failed to close.");
-    logEx(e);
-  }
-
 
   if (Log.openFileOnExit)
   try {
@@ -54,6 +44,8 @@ void dispose() {
 
   Log.fileLogger.flush();
   Log.fileLogger.close();
+
+  super.dispose();
 
   // With proper monitoring of window fullscreen events in `post()` now, this is superfast :D
   //super.exit(); // This is now `dispose()` and not `exit()`.
@@ -86,17 +78,19 @@ void setup() {
   INSIDE_PDE = sketchArgs.length > 2 && 
     sketchArgs[1].contains("display") && sketchArgs[2].contains("sketch-path");
 
+  // This was one of the ways to get the sketch's path:
   // It already has `File.separator` appended to it :D
-  sketchPath = INSIDE_PDE ? sketchArgs[2].substring(14, sketchArgs[2].length()) + File.separator
-    : sketchPath();
+  //sketchPath = INSIDE_PDE ? sketchArgs[2].substring(14, sketchArgs[2].length()) + File.separator
+  //  : sketchPath();
+  // ...back when I thought `sketchPath()` was inaccurate. Hmph.
 
   initLog();
   initSaving();
 
-  logInfo("`PApplet.sketchPath()`: ", sketchPath());
-  logInfo("Our `sketchPath` variable: ", sketchPath);
-  logInfo(
-    "(Perhaps the only difference is that it ends in a `File.separator`, but `sketchPath()` DOES that!)");
+  logInfo("Executable directory: ");
+  logInfo("\t", sketchPath());
+  //logInfo(
+  //"(Perhaps the only difference is that it ends in a `File.separator`, but `sketchPath()` DOES that!)");
 
   //soundDevices = Sound.list();
   //logToFile(Log.lvInfo, "Audio devices:");
@@ -121,7 +115,8 @@ void setup() {
   uibs = new UiBooster(UiBoosterOptions.Theme.SWING);
 
   logInfo("Sketch arguments:");
-  logInfo('\t', sketchArgsStr);
+  for (String s : sketchArgs)
+    logInfo('\t', s);
 
   logInfo(INSIDE_PDE? "Yep! The sketch is running inside the PDE!" 
     : "Nope, the sketch wasn't running in the PDE.");

@@ -4,7 +4,7 @@ import com.jogamp.newt.opengl.GLWindow;
 // `PJOGL` holds references to `gl` and `glu`! (...and even the OpenGL `context`!)
 // [file:///C:/Projects/ProcessingAll_JavaDocs/core/index.html]
 //import com.jogamp.opengl.glu.GLU;
-//import java.nio.FloatBuffer;
+//import java.nio.*; //FloatBuffer;
 
 import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
@@ -20,32 +20,50 @@ import ch.bildspur.postfx.builder.*;
 import ch.bildspur.postfx.pass.*;
 import ch.bildspur.postfx.*;
 
-// Deeper access into Processing's inner workings:
-static GLWindow window;
-static PGraphicsOpenGL glGraphics;
-static PGL gl;
-PostFXSupervisor fx;
-//GLU glu;
-final PApplet SKETCH = this;
-final Sound SOUND = new Sound(this);
-static String[] soundDevices;
-final String SKETCH_NAME = SKETCH.getClass().getSimpleName();
-static boolean INSIDE_PDE;
-static String sketchArgsStr;
-static String[] sketchArgs; // `sketchArgs.length` is only `1` when the application runs outside the PDE.
-static String sketchPath;
-static boolean fullscreen, pfullscreen;
-static boolean pfocused;
 
+// The one. The only one:
+final PApplet SKETCH = this;
+
+// DO NOT use `getFields()`! That will scan for ones from `super` classes as well!:
+final Field[] SKETCH_FIELDS = SKETCH.getClass().getDeclaredFields();
+
+// Deeper access into Processing's inner workings:
+GLWindow window;
+PGraphicsOpenGL glGraphics;
+PGL gl;
+
+//GLU glu; // Don't need a reference to GL-Utilities now that we have the `Unprojector` class :D
+// These are best retrieved from Processing, by the way.
+// `PJOGL` has them, as stated in a comment on line 4 of this `.pde` file.
+
+final Sound SOUND = new Sound(this);
+String[] soundDevices;
 Runnable onExit = null;
+
+// Environment identification:
+final String SKETCH_NAME = SKETCH.getClass().getSimpleName();
+boolean INSIDE_PDE;
+String sketchArgsStr;
+String[] sketchArgs; // `sketchArgs.length` is only `1` when the application runs outside the PDE.
+String sketchPath; // Do I actually need this?
+
+// Windowing and co-ordinates:
+boolean fullscreen, pfullscreen;
+boolean pfocused;
 
 //final int INIT_WIDTH = 800, INIT_HEIGHT = 600;
 final int INIT_WIDTH = 1280, INIT_HEIGHT = 720;
 final float INIT_DEPTH = INIT_WIDTH + INIT_HEIGHT; // Super simple! No `sqrt()`.
 float pwidth, pheight;
 
+// Getting the refresh rate and number of display, etcetera:
+GraphicsEnvironment javaGraphicsEnvironment;
+GraphicsDevice[] javaScreens;
+int REFRESH_RATE = 0;
+int[] refreshRates;
+
 // Suggestion: use `SNAKE_CASE` for these?
-// People won't always use `p_` or `m_` conventions like me and end up re-using these names...
+// People won't always use the `p_` convention like me for parameters and end up re-using these names...
 float cx, cy;
 float qx, qy;
 float q3x, q3y;
@@ -54,17 +72,11 @@ final int TEXT_TEXTURE_SIZE = 72,
   TEXT_TEXTURE_SIZE_2 = 2 * TEXT_TEXTURE_SIZE, 
   DEFAULT_TEXT_SIZE = 40;
 
-GraphicsEnvironment javaGraphicsEnvironment;
-GraphicsDevice[] javaScreens;
-
-int REFRESH_RATE = 0;
-int[] refreshRates;
-boolean doPostProcessing, doPostProcessingState;
-
+// Timing:
 float frameStartTime, deltaTime, pframeTime, frameTime;
 
 
-// Failed to get these via reflection, copy-pasted them:
+// Failed to get these via reflection, copy-pasted them. I hope I use these at some point!:
 // [https://github.com/processing/processing/blob/master/core/src/processing/core/PGraphics.java]
 //static float[] sinLUT;
 //static float[] cosLUT;
@@ -79,6 +91,10 @@ float frameStartTime, deltaTime, pframeTime, frameTime;
 //    cosLUT[i] = (float) Math.cos(i * DEG_TO_RAD * SINCOS_PRECISION);
 //  }
 //}
+
+// The `PostFX` library:
+PostFXSupervisor fx;
+boolean doPostProcessing, doPostProcessingState;
 
 void applyPass(Pass p_pass) {
   if (this.doPostProcessingState)

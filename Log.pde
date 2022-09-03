@@ -15,11 +15,7 @@ static class Log {
 // Initialize the logger:
 
 public void initLog() {
-  Log.filePath = 
-    INSIDE_PDE? 
-    //sketchArgs[2].substring(14, sketchArgs[2].length()) + "\\" + SKETCH_NAME + ".log" 
-    sketchPath + File.separator + SKETCH_NAME + ".log"
-    : SKETCH_NAME + ".log";
+  Log.filePath = sketchPath(SKETCH_NAME.concat(".log"));
   Log.logFile = new File(Log.filePath);
   Log.absPath = Log.logFile.getAbsolutePath();
 
