@@ -83,7 +83,6 @@ void writeObject(Serializable p_object, String p_fname) {
   T ret = null;
 
   File objFile = new File(savesFolder, p_fname.concat(".sav_frag"));
-  logInfo(objFile.getAbsolutePath());
 
   try {
     FileInputStream fin = new FileInputStream(objFile);

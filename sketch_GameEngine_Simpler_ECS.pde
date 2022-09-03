@@ -172,6 +172,7 @@ void setup() {
 
   rectMode(CENTER);
   imageMode(CENTER);
+  //hint(ENABLE_STROKE_P);
 
   textFont(createFont("SansSerif", TEXT_TEXTURE_SIZE));
   textSize(DEFAULT_TEXT_SIZE);
@@ -253,21 +254,23 @@ void draw() {
   push();
   // Unproject the mouse position:
 
-  //if (!camIsLerp) { // Why was this a thing? // `focused` would made sense...
-  float originalNear = currentCam.near;
-  currentCam.near = currentCam.mouseZ;
-  currentCam.apply();
+  if (currentCam == null)
+    camera();
+  else {
+    float originalNear = currentCam.near;
+    currentCam.near = currentCam.mouseZ;
+    currentCam.applyMatrix();
 
-  // Unproject:
-  Unprojector.captureViewMatrix((PGraphics3D)g);
-  // `0.9f`: at the near clipping plane.
-  // `0.9999f`: at the far clipping plane.
-  Unprojector.gluUnProject(mouseX, height - mouseY, 
-    //0.9f+ map(mouseY, height, 0, 0, 0.1f),
-    0, mouse);
-  currentCam.near = originalNear;
-  currentCam.apply();
-  //}
+    // Unproject:
+    Unprojector.captureViewMatrix((PGraphics3D)g);
+    // `0.9f`: at the near clipping plane.
+    // `0.9999f`: at the far clipping plane.
+    Unprojector.gluUnProject(mouseX, height - mouseY, 
+      //0.9f+ map(mouseY, height, 0, 0, 0.1f),
+      0, mouse);
+    currentCam.near = originalNear;
+    currentCam.apply();
+  }
 
   for (Component c : currentScene.components)
     if (!(c instanceof Renderer))

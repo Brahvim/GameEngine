@@ -1,7 +1,7 @@
 final ArrayList<Camera> CAMERAS = new ArrayList<Camera>();
 Camera currentCam, 
   lerpeable; // `lerpeable` is allocated all the time during lerps, don't do that right now.
-boolean camLerpRequest, pcamLerpRequest, camIsLerp = false, camLerpMouse = false;
+boolean camLerpRequest, pcamLerpRequest, camIsLerp = false, camLerpMouse = true;
 float camLerpAmt;
 Camera camToLerpFrom, camToLerpTo;
 SineWave camLerpWave;
@@ -106,12 +106,12 @@ class Camera extends Entity {
   CamScript script;
   color clearColor = color(0);
   boolean doScript = true;
-  int projectionType = PERSPECTIVE;
+  int projection = PERSPECTIVE;
 
   Camera() {
     this.up = new PVector(0, 1, 0);
     this.center = new PVector(0, 0, 0);
-    this.pos = new PVector(0, 0, 300);
+    this.pos = new PVector(0, 0, 0);
   }
 
   Camera(float p_fov, float p_near, float p_far) {
@@ -138,30 +138,10 @@ class Camera extends Entity {
   }
 
   void apply() {
-    begin2D();
-    camera(); // Removing this will not display the previous camera's view, but still show clipping.
-    rectMode(CORNER);
-    fill(this.clearColor);
-    noStroke();
-    //rect(-width * 2.5f, -height * 2.5f, width * 7.5f, height * 7.5f);
-    rect(0, 0, width, height);
-    end2D();
-
-    if (this.script != null)
-      this.script.run(this);
-
-    switch (this.projectionType) {
-    case PERSPECTIVE:
-      perspective(this.fov, (float)width / (float)height, this.near, this.far);
-      break;
-    case ORTHOGRAPHIC:
-      ortho(-cx, cx, -cy, cy, this.near, this.far);
-    }
-    camera(this.pos.x, this.pos.y, this.pos.z, 
-      this.center.z, this.center.y, this.center.z, 
-      this.up.x, this.up.y, this.up.z);
-
-    translate(-cx, -cy);
+    // #JIT_FTW!:
+    this.clear();
+    this.runScript();
+    this.applyMatrix();
   }
 
   void runScript() {
@@ -181,23 +161,25 @@ class Camera extends Entity {
   }
 
   void applyMatrix() {
-    switch (this.projectionType) {
+    switch (this.projection) {
     case PERSPECTIVE:
       perspective(this.fov, (float)width / (float)height, this.near, this.far);
       break;
     case ORTHOGRAPHIC:
       ortho(-cx, cx, -cy, cy, this.near, this.far);
     }
+
     camera(this.pos.x, this.pos.y, this.pos.z, 
       this.center.z, this.center.y, this.center.z, 
       this.up.x, this.up.y, this.up.z);
-    translate(-cx, -cy);
+
+    //translate(-cx, -cy);
   }
 
   void reset() {
     this.up = new PVector(0, 1, 0);
     this.center = new PVector(cx, cy, 0);
-    this.pos = new PVector(cx, cy, 300);
+    this.pos = new PVector(cx, cy, 0);
     this.fov = radians(60);
     this.near = 0.1f; 
     this.far = 10000;

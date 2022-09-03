@@ -53,7 +53,7 @@ class PC_Button {
       this.hoverMethod.run();
 
     this.pressed = this.hovered;
-    this.pressed &= mousePressed;
+    this.pressed &= mouseLeft;
 
     if (!this.pressed && 
       (this.hovered && 
@@ -411,7 +411,7 @@ class PC_Button {
  // screen, so, 
  
  // ..do I actually need this?!:
- this.pressed &= mousePressed;
+ this.pressed &= mouseLeft;
  
  // Answer? Yes.
  // Apparently I needed to do 

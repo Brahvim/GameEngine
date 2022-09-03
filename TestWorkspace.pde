@@ -127,32 +127,35 @@ Scene testScene = new Scene() {
         this.display.stroke = color(0);
         this.display.strokeWeight = 0.05f;
 
-        this.form.pos.set(cx, cy);
-
         // A try-catch would be better here...?
         Transform savedForm = readTransform("circle_transform");
         if (savedForm != null)
           this.form.pos = savedForm.pos;
+
+        //this.form.pos.z = 150;
 
         this.form.scale.mult(32);
         //logInfo("Circle setup.");
       }
 
       public void update() {
-        if (keyIsPressed(87))
+        if (keyIsPressed(87)) // `W`.
           this.form.pos.y--;
-        if (keyIsPressed(83))
-          this.form.pos.y++;
-        if (keyIsPressed(65))
-          this.form.pos.x--;
-        if (keyIsPressed(68))
+        if (keyIsPressed(65)) // `A`.
           this.form.pos.x++;
+        if (keyIsPressed(83)) // `S`.
+          this.form.pos.y++;
+        if (keyIsPressed(68)) // `D`.
+          this.form.pos.x--;
       }
 
       public void keyPressed() {
         // Saving a state :D
-        if (keyIsPressed(32))
+        if (keyIsPressed(32)) {
           writeTransform((Transform)circle.getComponent(Transform.class), "circle_transform");
+          println(currentCam == rev);
+          println(currentCam == cam);
+        }
         // ^^^ This works in `update()` without any problems (O_O")
 
         // Works in both `update()` and this method!
@@ -189,14 +192,12 @@ Scene testScene = new Scene() {
       Light light = new Light(this);
 
       public void setup() {
-        //light.enabled = false;
-        quadForm = quad.getComponent(Transform.class);
+        this.quadForm = quad.getComponent(Transform.class);
         this.light.col.set(255, 255, 255);
       }
 
       public void update() {
-        this.form.set((Transform)quadForm);
-        //this.form.pos.z += 50;
+        this.form.set(quadForm);
       }
     };
 
@@ -213,7 +214,7 @@ Scene testScene = new Scene() {
 
       public void update() {
         //println(boxTexture.ploaded);
-        this.form.pos.set(cx, cy + 50, 0);
+        this.form.pos.set(0, 50);
       }
     };
 
@@ -222,9 +223,11 @@ Scene testScene = new Scene() {
     //println(c);
 
     cam.clearColor = color(0); 
-    cam.projectionType = ORTHOGRAPHIC;
     rev.clearColor = color(30, 120, 170, 80); //15);
     setCam(rev);
+
+    //this.cam.pos.z = 0;
+    //this.rev.pos.z = 0;
 
     cam.script = new CamScript() {
       public void run(Camera p_cam) {
@@ -236,13 +239,12 @@ Scene testScene = new Scene() {
 
     rev.script = new CamScript() {
       public void run(Camera p_cam) {
+        println("Yep, I'm running.", frameCount);
         p_cam.pos.x = cos(millis() * 0.001f) * 100;
         p_cam.pos.y = -50;
         p_cam.pos.z = sin(millis() * 0.001f) * 100;
       }
     };
-
-    rev.doScript = false;
 
     bloomPass = new BloomPass(SKETCH, 0.75f, 10, 4);
     vignettePass = new VignettePass(SKETCH, 0.1f, 0.75f);
@@ -254,11 +256,10 @@ Scene testScene = new Scene() {
   }
 
   public void draw() {
-    currentCam.applyMatrix();
     if (mouseLeft)
       //camLerpUpdate(cam, rev, (float)mouse.x / (float)width, 0.05f, 0.95f);
       camLerpUpdate(cam, rev, (float)mouseX / (float)width);
-    else camIsLerp = false;
+    //else camIsLerp = false;
 
     applyPass(bloomPass);
     applyPass(vignettePass);
