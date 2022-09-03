@@ -228,9 +228,6 @@ void draw() {
   pframeTime = frameStartTime;
   deltaTime = frameTime * 0.01f;
 
-  if (!focused)
-    return;
-
   // *OpenGL reference:*
   gl = beginPGL();
   //gl.enable(PGL.CULL_FACE);
@@ -244,7 +241,6 @@ void draw() {
   if (doPostProcessingState)
     fx.render();
 
-  noLights();
   lights(); //camera(); // `action();`! ";D!
 
   // Apply transformations first, so
@@ -254,23 +250,19 @@ void draw() {
   push();
   // Unproject the mouse position:
 
-  if (currentCam == null)
-    camera();
-  else {
-    float originalNear = currentCam.near;
-    currentCam.near = currentCam.mouseZ;
-    currentCam.applyMatrix();
+  float originalNear = currentCam.near;
+  currentCam.near = currentCam.mouseZ;
+  currentCam.applyMatrix();
 
-    // Unproject:
-    Unprojector.captureViewMatrix((PGraphics3D)g);
-    // `0.9f`: at the near clipping plane.
-    // `0.9999f`: at the far clipping plane.
-    Unprojector.gluUnProject(mouseX, height - mouseY, 
-      //0.9f+ map(mouseY, height, 0, 0, 0.1f),
-      0, mouse);
-    currentCam.near = originalNear;
-    currentCam.apply();
-  }
+  // Unproject:
+  Unprojector.captureViewMatrix((PGraphics3D)g);
+  // `0.9f`: at the near clipping plane.
+  // `0.9999f`: at the far clipping plane.
+  Unprojector.gluUnProject(mouseX, height - mouseY, 
+    //0.9f+ map(mouseY, height, 0, 0, 0.1f),
+    0, mouse);
+  currentCam.near = originalNear;
+  currentCam.apply();
 
   for (Component c : currentScene.components)
     if (!(c instanceof Renderer))
@@ -282,13 +274,13 @@ void draw() {
     if (e.enabled)
       e.update();
 
-  //if (focused) // I applied this check EVEN to post processing as well but GPU usage remained unchanged.
-  for (Renderer r : currentScene.renderers) {
-    r.parent.render();
-    if (r.enabled)
-      r.update();
-    r.parent.postRender();
-  }
+  if (doAnyDrawing && doRendering) // I applied this check EVEN to post processing as well but GPU usage remained unchanged.
+    for (Renderer r : currentScene.renderers) {
+      r.parent.render();
+      if (r.enabled)
+        r.update();
+      r.parent.postRender();
+    }
 
   // Step the Physics Engines later, because...
   // I'd like to be at the origin of the world on my first frame...
@@ -316,10 +308,12 @@ void post() {
     blendMode(BLEND);
   }
 
-  noLights();
-  begin2D();
-  currentScene.drawUI();
-  end2D();
+  if (doAnyDrawing && doUIRendering) {
+    noLights();
+    begin2D();
+    currentScene.drawUI();
+    end2D();
+  }
 
   endPGL();
 

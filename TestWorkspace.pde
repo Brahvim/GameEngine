@@ -239,7 +239,6 @@ Scene testScene = new Scene() {
 
     rev.script = new CamScript() {
       public void run(Camera p_cam) {
-        println("Yep, I'm running.", frameCount);
         p_cam.pos.x = cos(millis() * 0.001f) * 100;
         p_cam.pos.y = -50;
         p_cam.pos.z = sin(millis() * 0.001f) * 100;

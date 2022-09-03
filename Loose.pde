@@ -51,6 +51,10 @@ String sketchPath; // Do I actually need this?
 boolean fullscreen, pfullscreen;
 boolean pfocused;
 
+// `doAnyDrawing` refers to both UI and world rendering.
+boolean doUpdates = true, doAnyDrawing = true, 
+  doRendering = true, doUIRendering = true;
+
 //final int INIT_WIDTH = 800, INIT_HEIGHT = 600;
 final int INIT_WIDTH = 1280, INIT_HEIGHT = 720;
 final float INIT_DEPTH = INIT_WIDTH + INIT_HEIGHT; // Super simple! No `sqrt()`.
