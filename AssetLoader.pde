@@ -10,7 +10,7 @@ public <T> T getAsset(Asset p_asset) {
 
 // We're only loading a few types, so there is no use of generics:
 static enum AssetType {
-  SOUND, PICTURE, SHADER; //, TEXTFILE, SAVEFILE;
+  SOUND, PICTURE, SHADER, SHAPE; //, TEXTFILE, SAVEFILE;
 
   static int getMaxEntriesForType(AssetType p_type) {
     if (!Assets.isInit)
@@ -23,6 +23,8 @@ static enum AssetType {
       return Assets.pictures.size();
     case SHADER:
       return Assets.shaders.size();
+    case SHAPE:
+      return Assets.shaders.size();
       //case TEXTFILE: return Assets.textFiles.length - 1;
     default:
       throw new RuntimeException("Unknown `AssetType`. How did this error even occur?!");
@@ -34,6 +36,7 @@ static class Assets {
   static ArrayList<SoundFile> sounds = null; 
   static ArrayList<PImage> pictures = null; 
   static ArrayList<PShader> shaders = null;
+  static ArrayList<PShape> shapes = null;
   // Strings are immutable, COME ON!:
   //final static StringBuilder[] textFiles = new StringBuilder[0];
 
@@ -43,20 +46,27 @@ static class Assets {
     Assets.pictures = new ArrayList<PImage>();
     Assets.sounds = new ArrayList<SoundFile>();
     Assets.shaders = new ArrayList<PShader>();
+    Assets.shapes = new ArrayList<PShape>();
 
     Assets.isInit = true;
     logInfo("`Assets.init()` was called.");
   }
 
-  static void init(int p_soundFiles, int p_pictures, int p_shaders) {
-    Assets.pictures = new ArrayList<PImage>(p_pictures);
-    Assets.sounds = new ArrayList<SoundFile>(p_soundFiles);
-    Assets.shaders = new ArrayList<PShader>(p_shaders);
+  // Dis gunna get @Deprecated sh-oon:
+  //static void init(int p_soundFiles, int p_pictures, int p_shaders, int p_shapes) {
+  //Assets.pictures = new ArrayList<PImage>(p_pictures);
+  //Assets.sounds = new ArrayList<SoundFile>(p_soundFiles);
+  //Assets.shaders = new ArrayList<PShader>(p_shaders);
+  //Assets.shapes = new ArrayList<PShape>(p_shapes);
 
-    Assets.isInit = true;
-    logInfo("`Assets.init()` was called with arguments: [SND] ", 
-      p_soundFiles, " [IMG] ", p_pictures, " [SHD] ", p_shaders);
-  }
+  //Assets.isInit = true;
+
+  //logInfo("`Assets.init()` was called with arguments:");
+  //logInfo('\t', p_soundFiles, " [Sounds]");
+  //logInfo('\t', p_pictures, " [Pictures]");
+  //logInfo('\t', p_shaders, " [Shaders]");
+  //logInfo('\t', p_shapes, " [Shapes]");
+  //}
 
   // Just a note: Method overloading is faster than `instanceof` checks (which are done at runtime).
   // [https://stackoverflow.com/questions/19394815/
@@ -72,6 +82,14 @@ static class Assets {
 
   static PShader getShader(Asset p_asset) {
     return Assets.shaders.get(p_asset.id);
+  }
+
+  static PShape getShape(Asset p_asset) {
+    return Assets.shapes.get(p_asset.id);
+  }
+
+  static PShape getShape(int p_id) {
+    return Assets.shapes.get(p_id);
   }
 
   static SoundFile getSound(int p_id) {
@@ -197,6 +215,17 @@ class Asset extends Thread {
       }
 
       break;
+
+    case SHAPE:
+      while (this.loadedData == null)
+        this.loadedData = loadShape(this.path);
+
+      synchronized(Assets.shapes) {
+        this.id = Assets.shapes.size();
+        Assets.shapes.add((PShape)this.loadedData);
+      }
+      break;
+
       //case TEXTFILE:  break;
     }
 
@@ -234,6 +263,12 @@ class Asset extends Thread {
   PShader asShader() {
     // No need to check for null values!    
     return (PShader)this.loadedData;
+    // ...and if the type of data being loaded is different, well...
+  }
+
+  PShape asShape() {
+    // No need to check for null values!    
+    return (PShape)this.loadedData;
     // ...and if the type of data being loaded is different, well...
   }
 }

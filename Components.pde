@@ -193,6 +193,7 @@ class ShapeRenderer extends Component {
   PShape shape;
   Transform form;
   Asset shapeLoader;
+  boolean doStyle = true;
 
   ShapeRenderer(Entity p_entity) {
     super(p_entity);
@@ -209,6 +210,9 @@ class ShapeRenderer extends Component {
   }
 
   void update() {
+    if (this.doStyle)
+      this.shape.enableStyle();
+    else this.shape.disableStyle();
     shape(this.shape);
   }
 }

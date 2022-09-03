@@ -41,9 +41,6 @@
  */
 
 void engineSetup() {
-  // `Assets.init(soundfiles, pictures, shaders)`:
-  Assets.init(1, 2, 0);
-
   // Bullet `PhysicsRigidBody`s have a `.activate()` method.
 
   //com.jme3.math.Transform f = new com.jme3.math.Transform();
