@@ -270,62 +270,58 @@ public enum RendererType {
 
 // DO NOT INHERIT FROM THIS.
 // ...I guess :P
-class SvgRenderer extends RendereringComponent {
-  // I could've declared `shape` as `private` and used a pair of
-  // getter and setter / accessor and modifier methods, but I
-  // went with this approach instead for performance!
 
-  // In a setter, you'd be rendering the SVG to a texture.
-  // With this approach, you render in the update loop itself
-  // when an update is needed.
-
-  PShape shape;
-  protected PShape pshape;
-  // ^^^ That's the magic of this approach!
-  // `if (this.pshape != this.shape) reRender();`!
-
-  protected PVector pscale;
-  boolean doStyle = true;
-
-  SvgRenderer(Entity p_entity) {
-    super(p_entity);
-    this.pscale = new PVector();
-  }
-
-  SvgRenderer(Entity p_entity, int p_type) {
-    super(p_entity, p_type);
-    this.pscale = new PVector();
-  }
-
-  SvgRenderer(Entity p_entity, int p_type, Asset p_assetLoader) {
-    super(p_entity, p_type, p_assetLoader);
-    this.pscale = new PVector();
-  }
-
-  SvgRenderer(Entity p_entity, int p_type, PShape p_shape) {
-    super(p_entity);
-    this.pscale = new PVector();
-    this.type = p_type;
-    this.shape = p_shape;
-  }
-
-  public void applyTexture() {
-    // Re-render :D
-    if (this.shape != this.pshape || !this.form.scale.equals(this.pscale))
-      this.texture = svgToImage(this.shape, this.form.scale.x, this.form.scale.y);
-    // I guess not accessing the `z` helps CPU cache.
-
-    if (!this.doTexture)
-      return;
-    textureMode(NORMAL);
-    textureWrap(this.textureWrap);
-
-    // `texture()` does this already, but I'll do it anyway:
-    //if (this.texture != null)
-    texture(this.texture);
-  }
-}
-
+/*
+class SvgRenderer extends RenderingComponent {
+ // I could've declared `shape` as `private` and used a pair of
+ // getter and setter / accessor and modifier methods, but I
+ // went with this approach instead for performance!
+ 
+ // In a setter, you'd be rendering the SVG to a texture.
+ // With this approach, you render in the update loop itself
+ // when an update is needed.
+ 
+ PShape svg;
+ protected PShape psvg;
+ Asset svgLoader;
+ // ^^^ That's the magic of this approach!
+ // `if (this.pshape != this.shape) reRender();`!
+ 
+ protected PVector pscale;
+ boolean doStyle = true;
+ 
+ SvgRenderer(Entity p_entity) {
+ super(p_entity);
+ this.pscale = new PVector();
+ }
+ 
+ SvgRenderer(Entity p_entity, Asset p_assetLoader) {
+ this(p_entity);
+ this.svgLoader = p_assetLoader;
+ }
+ 
+ SvgRenderer(Entity p_entity, PShape p_shape) {
+ this(p_entity);
+ this.svg = p_shape;
+ }
+ 
+ public void applyTexture() {
+ // Re-render :D
+ if (this.svg != this.psvg || !this.form.scale.equals(this.pscale))
+ this.texture = svgToImage(this.svg, this.form.scale.x, this.form.scale.y);
+ // I guess not accessing the `z` helps CPU cache.
+ 
+ if (!this.doTexture)
+ return;
+ textureMode(NORMAL);
+ textureWrap(this.textureWrap);
+ 
+ // `texture()` does this already, but I'll do it anyway:
+ //if (this.texture != null)
+ texture(this.texture);
+ }
+ }
+ */
 
 // Dream.
 //class InstancedRenderer {
@@ -356,9 +352,15 @@ class ParticleSystem extends Component {
 
 // Simply a marker, hehe:
 class RenderingComponent extends Component {
+  // NO. Do NOT add a `Transform` reference here.
+  // Who knows what might come our way?!
+
+  // This is more of an interface than a class.
+
   RenderingComponent(Entity p_entity) {
     super(p_entity);
 
+    // Welp, there's some ease of use right here:
     if (currentScene != null)
       currentScene.renderers.add(this);
   }

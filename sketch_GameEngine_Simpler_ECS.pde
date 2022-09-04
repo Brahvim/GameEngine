@@ -286,7 +286,7 @@ void draw() {
 
   if (doAnyDrawing && doRendering) 
     // I applied ^^^ that check EVEN to post processing as well but GPU usage remained unchanged.
-    for (Renderer r : currentScene.renderers) {
+    for (RenderingComponent r : currentScene.renderers) {
       r.parent.render();
       if (r.enabled)
         r.update();
