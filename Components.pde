@@ -1,6 +1,6 @@
 class Transformation extends SerializableComponent {
   PVector pos, rot, scale;
-  private PMatrix3D mat;
+  protected PMatrix3D mat;
 
   /*
   // Wish this worked <Sniffle>:
@@ -187,7 +187,7 @@ class Material extends SerializableComponent {
 }
 
 class Light extends Component {
-  private Transformation form; // There's NO reason to call it `parentForm`.
+  protected Transformation form; // There's NO reason to call it `parentForm`.
   protected PVector pos;
   PVector off, col;
   int type;
@@ -270,13 +270,21 @@ public enum RendererType {
 
 // DO NOT INHERIT FROM THIS.
 // ...I guess :P
-class SvgRenderer extends Renderer {
+class SvgRenderer extends RendereringComponent {
   // I could've declared `shape` as `private` and used a pair of
   // getter and setter / accessor and modifier methods, but I
-  // went with this approach instead becausefor performance reasons!
+  // went with this approach instead for performance!
+
+  // In a setter, you'd be rendering the SVG to a texture.
+  // With this approach, you render in the update loop itself
+  // when an update is needed.
+
   PShape shape;
   protected PShape pshape;
-  private PVector pscale;
+  // ^^^ That's the magic of this approach!
+  // `if (this.pshape != this.shape) reRender();`!
+
+  protected PVector pscale;
   boolean doStyle = true;
 
   SvgRenderer(Entity p_entity) {
@@ -302,6 +310,11 @@ class SvgRenderer extends Renderer {
   }
 
   public void applyTexture() {
+    // Re-render :D
+    if (this.shape != this.pshape || !this.form.scale.equals(this.pscale))
+      this.texture = svgToImage(this.shape, this.form.scale.x, this.form.scale.y);
+    // I guess not accessing the `z` helps CPU cache.
+
     if (!this.doTexture)
       return;
     textureMode(NORMAL);
@@ -345,11 +358,15 @@ class ParticleSystem extends Component {
 class RenderingComponent extends Component {
   RenderingComponent(Entity p_entity) {
     super(p_entity);
+
+    if (currentScene != null)
+      currentScene.renderers.add(this);
   }
 
   // Format:
   // There is no format!
 
+  // You can have this, I guess:
   public void update() {
   }
 };
@@ -375,9 +392,6 @@ class Renderer extends RenderingComponent {
 
     if (this.form == null)
       logEx(new NullPointerException("A `Renderer` needs a `Transform`!"));
-
-    if (currentScene != null)
-      currentScene.renderers.add(this);
   }
 
   Renderer(Entity p_entity, int p_type) {

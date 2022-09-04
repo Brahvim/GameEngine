@@ -75,7 +75,7 @@ class Scene extends EventReceiver {
   HashMap<Integer, Entity> namedEntities;
   ArrayList<Entity> entities;
   ArrayList<Component> components;
-  ArrayList<Renderer> renderers;
+  ArrayList<RenderingComponent> renderers;
   ArrayList<FBody> B2D_BODIES;
   ArrayList<PhysicsBody> BT_BODIES;
 
