@@ -98,11 +98,11 @@ Scene testScene = new Scene() {
         this.display.stroke = color(0);
         this.display.strokeWeight = 0.05f;
 
-        //A try-catch would be better here...?
+        // A try-catch would be better here...?
         try {
           this.form.read("circle_transform");
-        } 
-        catch (NullPointerException e) {
+        }
+        catch (FileNotFoundException e) {
         }
 
         this.form.scale.set(32, 32, 32);

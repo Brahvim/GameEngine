@@ -1,4 +1,6 @@
 
+// "Nerd Engine! - Not an Engine!"
+// "Nerd - The Game Framework"
 
 // YO! Go work on the Renderer class.
 // The `update()` method's `switch` needs stuff to draw! (For `SPHERE`!)

@@ -92,7 +92,8 @@ void camLerpUpdate(Camera p_from, Camera p_to, float p_lerpAmt, float p_start, f
   lerpeable.applyMatrix();
 }
 
-interface CamScript {
+@FunctionalInterface
+  interface CamScript {
   // Every camera object willing to update itself with
   // a specified script will have to pass itself into this function:
   public void run(Camera p_cam);

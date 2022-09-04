@@ -74,7 +74,7 @@ void writeObject(Serializable p_object, String p_fname) {
   }
 }
 
-<T> T readObject(String p_fname) {
+<T> T readObject(String p_fname) throws FileNotFoundException {
   T ret = null;
   File objFile = new File(savesFolder, p_fname.concat(".sav_frag"));
 
@@ -95,8 +95,9 @@ void writeObject(Serializable p_object, String p_fname) {
     return ret;
   } 
   catch (FileNotFoundException e) {
-    logEx(e);
-    return null;
+    throw e;
+    //logEx(e);
+    //return null;
   }
   catch (IOException e) {
     logEx(e);
@@ -137,3 +138,41 @@ class ColorSerializer implements Serializable {
  }
  }
  */
+
+static class TransformationSerializer implements Serializable {
+  float[] data = new float[9];
+
+  TransformationSerializer(Transformation p_form) {
+    this.data[0] = p_form.pos.x;
+    this.data[1] = p_form.pos.y;
+    this.data[2] = p_form.pos.z;
+
+    this.data[3] = p_form.rot.x;
+    this.data[4] = p_form.rot.y;
+    this.data[5] = p_form.rot.z;
+
+    this.data[6] = p_form.scale.x;
+    this.data[7] = p_form.scale.y;
+    this.data[8] = p_form.scale.z;
+  }
+}
+
+static class MaterialSerializer implements Serializable {
+  float[] data = new float[10];
+
+  MaterialSerializer(Material p_mat) {
+    this.data[0] = p_mat.amb.x;
+    this.data[1] = p_mat.amb.y;
+    this.data[2] = p_mat.amb.z;
+
+    this.data[3] = p_mat.emm.x;
+    this.data[4] = p_mat.emm.y;
+    this.data[5] = p_mat.emm.z;
+
+    this.data[6] = p_mat.spec.x;
+    this.data[7] = p_mat.spec.y;
+    this.data[8] = p_mat.spec.z;
+
+    this.data[9] = p_mat.shine;
+  }
+}

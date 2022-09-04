@@ -108,6 +108,16 @@ void applyPass(Pass p_pass) {
     fx.pass(p_pass);
 }
 
+@FunctionalInterface
+  interface AnonFxn {
+  public void run(Object... p_args);
+}
+
+@FunctionalInterface
+  interface OnCatch {
+  public void run(Exception p_except);
+}
+
 void updateRatios() {
   cx = width * 0.5f;
   cy = height * 0.5f;

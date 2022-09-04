@@ -1,22 +1,4 @@
-static class TransformationSerializer implements Serializable {
-  float[] data = new float[9];
-
-  TransformationSerializer(Transformation p_form) {
-    this.data[0] = p_form.pos.x;
-    this.data[1] = p_form.pos.y;
-    this.data[2] = p_form.pos.z;
-
-    this.data[3] = p_form.rot.x;
-    this.data[4] = p_form.rot.y;
-    this.data[5] = p_form.rot.z;
-
-    this.data[6] = p_form.scale.x;
-    this.data[7] = p_form.scale.y;
-    this.data[8] = p_form.scale.z;
-  }
-}
-
-class Transformation extends Component {
+class Transformation extends SerializableComponent {
   PVector pos, rot, scale;
   private PMatrix3D mat;
 
@@ -41,21 +23,6 @@ class Transformation extends Component {
    }
    }
    */
-
-  void write(String p_fname) {
-    writeObject(new TransformationSerializer(this), p_fname);
-  }
-
-  void read(String p_fname) throws NullPointerException {
-    TransformationSerializer ser = readObject(p_fname);
-
-    if (ser == null)
-      throw new NullPointerException("Failed to load `" + p_fname + "`.");
-
-    this.pos.set(ser.data[0], ser.data[1], ser.data[2]);
-    this.rot.set(ser.data[3], ser.data[4], ser.data[5]);
-    this.scale.set(ser.data[6], ser.data[7], ser.data[8]);
-  }
 
   Transformation(Entity p_entity) {
     super(p_entity);
@@ -137,10 +104,41 @@ class Transformation extends Component {
   //p_mat.m20, p_mat.m21, p_mat.m22, p_mat.m23, 
   //p_mat.m30, p_mat.m31, p_mat.m32, p_mat.m33);
   //}
+
+  // ...and finally,
+
+  void write(String p_fname) {
+    writeObject(new TransformationSerializer(this), p_fname);
+  }
+
+  void read(String p_fname, OnCatch p_catcher) {
+    try {
+      this.read(p_fname);
+    }
+    catch (FileNotFoundException e) {
+      p_catcher.run(e);
+    }
+  }
+
+  void read(String p_fname) throws FileNotFoundException {
+    TransformationSerializer ser = null;
+
+    try {
+      ser = readObject(p_fname);
+    }
+    catch (FileNotFoundException e) {
+      logError("Failed to load `" + p_fname + "`.");
+      return;
+    }
+
+    this.pos.set(ser.data[0], ser.data[1], ser.data[2]);
+    this.rot.set(ser.data[3], ser.data[4], ser.data[5]);
+    this.scale.set(ser.data[6], ser.data[7], ser.data[8]);
+  }
 }
 
-class Material extends Component {
-  PVector cAmb, cEmm, cSpec; // Colors for lights.
+class Material extends SerializableComponent {
+  PVector amb, emm, spec; // Colors for lights.
   float shine;
 
   Material(Entity p_entity) {
@@ -148,18 +146,38 @@ class Material extends Component {
   }
 
   public void update() {
-    ambient(this.cAmb.x, this.cAmb.y, this.cAmb.z);
-    emissive(this.cEmm.x, this.cEmm.y, this.cEmm.z);
-    specular(this.cSpec.x, this.cSpec.y, this.cSpec.z);
+    ambient(this.amb.x, this.amb.y, this.amb.z);
+    emissive(this.emm.x, this.emm.y, this.emm.z);
+    specular(this.spec.x, this.spec.y, this.spec.z);
     shininess(this.shine);
+  }
+
+  void write(String p_fname) {
+    writeObject(new MaterialSerializer(this), p_fname);
+  }
+
+  void read(String p_fname) throws FileNotFoundException {
+    MaterialSerializer ser = null;
+
+    try {
+      ser = readObject(p_fname);
+    }
+    catch (FileNotFoundException e) {
+      logError("Failed to load `" + p_fname + "`.");
+      throw e;
+    }
+
+    this.shine = ser.data[9]; // :P-lease!
+    this.amb.set(ser.data[0], ser.data[1], ser.data[2]);
+    this.emm.set(ser.data[3], ser.data[4], ser.data[5]);
+    this.spec.set(ser.data[6], ser.data[7], ser.data[8]);
   }
 }
 
 class Light extends Component {
   private Transformation form; // There's NO reason to call it `parentForm`.
-  private PVector pos;
+  protected PVector pos;
   PVector off, col;
-
   int type;
 
   Light(Entity p_entity) {
@@ -167,7 +185,7 @@ class Light extends Component {
     this.form = p_entity.getComponent(Transformation.class);
 
     if (this.form == null)
-      throw new NullPointerException("A `Light` needs a `Transform`!");
+      throw new NullPointerException("A `Light` needs a `Transform` in the submitted `Entity`!");
 
     this.type = POINT;
     this.col = new PVector(255, 255, 255);
@@ -183,8 +201,6 @@ class Light extends Component {
 
   public void update() {
     this.pos = PVector.add(this.form.pos, this.off);
-
-    //println("Lighting...");
 
     if (!this.enabled)
       return;
@@ -204,7 +220,7 @@ class Light extends Component {
       break;
     case SPOT:
       throw new RuntimeException("Please use the `SpotLight` class instead of assigning " 
-        + "`SPOT` to the `lightType` of a `Light`!");
+        + "`SPOT` to the `p_lightType` of a `Light`!");
     default:
       throw new RuntimeException("Unavailable light type!");
     }
@@ -265,9 +281,13 @@ class ShapeRenderer extends Component {
   }
 
   void update() {
+    if (this.shapeLoader != null)
+      this.shape = this.shapeLoader.asShape();
+
     if (this.doStyle)
       this.shape.enableStyle();
     else this.shape.disableStyle();
+
     shape(this.shape);
   }
 }
@@ -299,6 +319,7 @@ class ParticleSystem extends Component {
   }
 }
 
+// What to name this now that we have the need for so many renderers? `ImmediateShapeRenderer`?
 class Renderer extends Component {
   Transformation form;
   RendererType type;
@@ -356,12 +377,8 @@ class Renderer extends Component {
     pushStyle();
 
     // Do this only once:
-    if (this.textureLoader != null 
-      //&& !this.textureLoader.ploaded &&
-      //this.textureLoader.loaded
-      ) {
-      this.texture = this.textureLoader.asPicture(); //.copy();
-    }
+    if (this.textureLoader != null)
+      this.texture = this.textureLoader.asPicture();
 
     // For the Bullet Physics Engine!:
     // Yes, it might be slow, but it's something we'll have to do.
