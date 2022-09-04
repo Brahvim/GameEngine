@@ -256,10 +256,6 @@ class SpotLight extends Light {
   }
 }
 
-public enum RendererType {
-  QUAD, BOX, ELLIPSE, SPHERE;
-}
-
 /*
 public enum RendererType {
  QUAD(4), BOX(24), SPHERE(32);
@@ -272,37 +268,51 @@ public enum RendererType {
  }
  */
 
-class ShapeRenderer extends Component {
+// DO NOT INHERIT FROM THIS.
+// ...I guess :P
+class SvgRenderer extends Renderer {
+  // I could've declared `shape` as `private` and used a pair of
+  // getter and setter / accessor and modifier methods, but I
+  // went with this approach instead becausefor performance reasons!
   PShape shape;
-  Transformation form;
-  Asset shapeLoader;
+  protected PShape pshape;
+  private PVector pscale;
   boolean doStyle = true;
 
-  ShapeRenderer(Entity p_entity) {
+  SvgRenderer(Entity p_entity) {
     super(p_entity);
+    this.pscale = new PVector();
   }
 
-  ShapeRenderer(Entity p_entity, Asset p_shapeLoader) {
-    super(p_entity);
-    this.shapeLoader = p_shapeLoader;
+  SvgRenderer(Entity p_entity, int p_type) {
+    super(p_entity, p_type);
+    this.pscale = new PVector();
   }
 
-  ShapeRenderer(Entity p_entity, PShape p_shape) {
+  SvgRenderer(Entity p_entity, int p_type, Asset p_assetLoader) {
+    super(p_entity, p_type, p_assetLoader);
+    this.pscale = new PVector();
+  }
+
+  SvgRenderer(Entity p_entity, int p_type, PShape p_shape) {
     super(p_entity);
+    this.pscale = new PVector();
+    this.type = p_type;
     this.shape = p_shape;
   }
 
-  void update() {
-    if (this.shapeLoader != null)
-      this.shape = this.shapeLoader.asShape();
+  public void applyTexture() {
+    if (!this.doTexture)
+      return;
+    textureMode(NORMAL);
+    textureWrap(this.textureWrap);
 
-    if (this.doStyle)
-      this.shape.enableStyle();
-    else this.shape.disableStyle();
-
-    shape(this.shape);
+    // `texture()` does this already, but I'll do it anyway:
+    //if (this.texture != null)
+    texture(this.texture);
   }
 }
+
 
 // Dream.
 //class InstancedRenderer {
@@ -331,10 +341,24 @@ class ParticleSystem extends Component {
   }
 }
 
+// Simply a marker, hehe:
+class RenderingComponent extends Component {
+  RenderingComponent(Entity p_entity) {
+    super(p_entity);
+  }
+
+  // Format:
+  // There is not format.
+
+  public void update() {
+  }
+};
+
+
 // What to name this now that we have the need for so many renderers? `ImmediateShapeRenderer`?
-class Renderer extends Component {
+class Renderer extends RenderingComponent {
   Transformation form;
-  RendererType type;
+  int type;
   color fill, stroke; // Tinting should be done by the user themselves.
   float strokeWeight = 1;
   int strokeCap = MITER, strokeJoin = ROUND;
@@ -356,18 +380,18 @@ class Renderer extends Component {
       currentScene.renderers.add(this);
   }
 
-  Renderer(Entity p_entity, RendererType p_type) {
+  Renderer(Entity p_entity, int p_type) {
     this(p_entity);
     this.type = p_type;
   }
 
-  Renderer(Entity p_entity, RendererType p_type, Asset p_assetLoader) {
+  Renderer(Entity p_entity, int p_type, Asset p_assetLoader) {
     this(p_entity);
     this.type = p_type;
     this.textureLoader = p_assetLoader;
   }
 
-  Renderer(Entity p_entity, RendererType p_type, PImage p_texture) {
+  Renderer(Entity p_entity, int p_type, PImage p_texture) {
     this(p_entity);
     this.type = p_type;
     this.texture = p_texture.copy();
@@ -384,13 +408,20 @@ class Renderer extends Component {
     texture(this.texture);
   }
 
-  public void update() {
-    pushMatrix();
-    pushStyle();
-
+  // This exists so SvgRenderer can extend this class ._.
+  // I don't want `ArrayLists` everywhere, ..alright?!
+  // ...how about a `RenderingComponent` interface, though..? :thinking:
+  public void textureCheck() {
     // Do this only once:
     if (this.textureLoader != null)
       this.texture = this.textureLoader.asPicture();
+  }
+
+  public void update() {
+    this.textureCheck();
+
+    pushMatrix();
+    pushStyle();
 
     // For the Bullet Physics Engine!:
     // Yes, it might be slow, but it's something we'll have to do.

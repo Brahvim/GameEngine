@@ -93,7 +93,7 @@ Scene testScene = new Scene() {
       Renderer display;
 
       public void setup() {
-        this.display = new Renderer(this, RendererType.ELLIPSE, circleTexture);
+        this.display = new Renderer(this, ELLIPSE, circleTexture);
         this.display.fill = color(230);
         this.display.stroke = color(0);
         this.display.strokeWeight = 0.05f;
@@ -144,7 +144,7 @@ Scene testScene = new Scene() {
       public void setup() {
         this.form = new Transformation(this);
         this.form.scale.mult(15);
-        this.display = new Renderer(this, RendererType.QUAD, boxTexture);
+        this.display = new Renderer(this, QUAD, boxTexture);
         this.display.strokeWeight = 0.05f;
       }
 
@@ -169,7 +169,7 @@ Scene testScene = new Scene() {
 
     groundBox = new Entity() {
       Transformation form = new Transformation(this);
-      Renderer display = new Renderer(this, RendererType.BOX, boxTexture);
+      Renderer display = new Renderer(this, BOX, boxTexture);
 
       public void setup() {
         this.display.fill = color(255);

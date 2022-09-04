@@ -6,6 +6,12 @@ import com.jogamp.newt.opengl.GLWindow;
 //import com.jogamp.opengl.glu.GLU;
 //import java.nio.*; //FloatBuffer;
 
+// These are also interesting:
+//println(PJOGL.WIKI);
+//println(PJOGL.VERSION);
+//println(PJOGL.profile);
+//println(PJOGL.SAMPLES);
+
 import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -149,10 +155,11 @@ void end2D() {
 }
 
 // Processing Modifications (inherited from `PApplet`):
-void translate(PVector _v) {
-  translate(_v.x, _v.y, _v.z);
+void translate(PVector p_v) {
+  translate(p_v.x, p_v.y, p_v.z);
 }
 
+// These simply don't work LOL:
 void push() {
   pushMatrix();
   pushStyle();
@@ -161,6 +168,22 @@ void push() {
 void pop() {
   popStyle();
   popMatrix();
+}
+
+PImage svgToImage(PShape p_shape, float p_width, float p_height) {
+  PGraphics buffer = createGraphics((int)ceil(p_width), (int)ceil(p_height));
+  buffer.beginDraw();
+  buffer.shape(p_shape, 0, 0, p_width, p_height);
+  buffer.endDraw();
+  return buffer;
+}
+
+PImage svgToImage(Asset p_shapeLoader, float p_width, float p_height) {
+  PGraphics buffer = createGraphics((int)ceil(p_width), (int)ceil(p_height));
+  buffer.beginDraw();
+  buffer.shape(p_shapeLoader.asShape(), 0, 0, p_width, p_height);
+  buffer.endDraw();
+  return buffer;
 }
 
 void image(PImage p_image) {
@@ -181,6 +204,10 @@ void image(Asset p_imageAsset, float p_x, float p_y, float p_width, float p_heig
   if (p_imageAsset.loaded)
     super.image(p_imageAsset.asPicture(), p_x, p_y, p_width, p_height);
 }
+
+
+// ..I'll let the underscores remain. Nostalgia...
+// I feel cold inside when I see these functions...
 
 
 // Using these where `static` 
@@ -215,7 +242,7 @@ PVector vecLerp(PVector p_from, PVector p_to, float p_lerpAmt) {
 }
 
 void vecLerp(PVector p_from, PVector p_to, float p_lerpAmt, PVector p_out) {
-  //if (p_out == null) p_out = new PVector(); // skipping for 'oPtImZiATion'.
+  //if (p_out == null) p_out = new PVector(); // Skipping for 'oPtImZiATion'.
   // ...this method remains unused in the engine. It's for users! :sparkles:
 
   p_out.set(p_from.x + (p_to.x - p_from.x) * p_lerpAmt, 

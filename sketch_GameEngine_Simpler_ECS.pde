@@ -112,9 +112,7 @@ void setup() {
     new File(sketchPath("lib")), // Do NOT use `sketchPath + "lib"`! That failed. 
     "Release", "Sp");
 
-  uibd = new UiBooster(UiBoosterOptions.Theme.DARK_THEME);
-  uibn = new UiBooster(UiBoosterOptions.Theme.OS_NATIVE);
-  uibs = new UiBooster(UiBoosterOptions.Theme.SWING);
+  initUiBooster();
 
   logInfo("Sketch arguments:");
   for (String s : sketchArgs)
@@ -225,42 +223,39 @@ void pre() {
 
 // Trying to ONLY keep things, that need rendering, here:
 void draw() {
+  // ...ahahaha! Do this first!:
   frameStartTime = millis(); // Timestamp.
   frameTime = frameStartTime - pframeTime;
   pframeTime = frameStartTime;
   deltaTime = frameTime * 0.01f;
 
-  // *OpenGL reference:*
+  // Ah... the tradition of using `background()` first :)
+  currentCam.clear();
+
+  // *OpenGL reference.*
+  // *Every video game reference:*
   gl = beginPGL();
-  //gl.enable(PGL.CULL_FACE);
-  //gl.cullFace(PGL.FRONT); // :(
-  //gl.frontFace(PGL.CCW);
-  // Everything else works by the way :D
-  //flush();
 
-  // Start *post Processing!:*
-
+  // Start *post* Processing!:
   if (doPostProcessingState)
     fx.render();
 
-  lights(); //camera(); // `action();`! ";D!
+  lights(); //, `camera()`, // `action()`! ";D!
 
-  // Apply transformations first, so
-  // that entities can use methods such
-  // as `modelX()`, and check matrices.
+  // Apply camera transformations first, so
+  // that entities and Rendering components
+  // can use methods such as `modelX()`, and check matrices.
 
   push();
-  // Unproject the mouse position:
-
-  currentCam.clear();
   currentCam.runScript();
   // ^^^ Running the script here does not cause Z-fighting issues :O
   // [https://stackoverflow.com/questions/55185184/objects-shake-when-rotating]
   // [https://en.wikipedia.org/wiki/Z-fighting]
 
-  // (If you run the script later, for example, right before the next call to `cam.applyMatrix()` 
-  // after this `if`, the camera rotation causes mouse-ray objects to shake.)
+  // (If you run the script later, for example, right before the next call to `cam.applyMatrix()`,
+  // **after this `if`**, the camera rotation causes mouse-ray objects to shake.)
 
+  // Unproject the mouse position:
   if (focused) {
     float originalNear = currentCam.near;
     currentCam.near = currentCam.mouseZ;
@@ -312,7 +307,7 @@ void draw() {
 
 // Ayo, do the post - update!:
 void post() {
-  // Post processing:
+  // "Post Processing":
   // (...get it? :rofl:)
 
   // YOU CAN RENDER HERE APPARENTLY!:
