@@ -258,7 +258,8 @@ void draw() {
   // [https://stackoverflow.com/questions/55185184/objects-shake-when-rotating]
   // [https://en.wikipedia.org/wiki/Z-fighting]
 
-  // (If you run the script later, the camera rotation causes mouse-ray objects to shake.)
+  // (If you run the script later, for example, right before the next call to `cam.applyMatrix()` 
+  // after this `if`, the camera rotation causes mouse-ray objects to shake.)
 
   if (focused) {
     float originalNear = currentCam.near;
@@ -275,6 +276,7 @@ void draw() {
     currentCam.near = originalNear;
   }
 
+  // (Yep! This place! Running the script here? Get popcorn for some Z-fighting action!)
   currentCam.applyMatrix();
 
   for (Component c : currentScene.components)
