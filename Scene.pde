@@ -5,9 +5,9 @@ void addScene(Scene p_scene) {
   SCENES.add(p_scene);
 }
 
-void setScene(Scene p_scene) {
+void switchScene(Scene p_scene) {
   if (p_scene == null)
-    logEx(new NullPointerException("`setScene(null);` won't work."));
+    throw new NullPointerException("`switchScene(null);` won't work.");
 
   // Delete everything!:
   if (currentScene != null && currentScene.deleteOnUnload)
@@ -31,14 +31,44 @@ void setScene(Scene p_scene) {
   p_scene.timesReloaded++;
   currentScene = p_scene;
 
+  logInfo("Switched to scene `", sceneName, "` just in time. Yay!");
+}
+
+void setScene(Scene p_scene) {
+  if (p_scene == null)
+    throw new NullPointerException("`setScene(null);` won't work.");
+
+  // Delete everything!:
+  if (currentScene != null && currentScene.deleteOnUnload)
+    currentScene.deleteScene();
+
+  System.gc(); // We just removed a bunch'a stuff, y'know?
+
+  currentScene = null; // This is for the code below, LOL.
+
+  String sceneName = null; // It'll definitely have something in it, right..?
+  for (Field f : SKETCH_FIELDS)
+  try {
+    if (f.get(SKETCH) == p_scene) {
+      sceneName = f.getName();
+    }
+  }
+  catch (IllegalAccessException e) {
+    logEx(e); // Shouldn't occur unless `p_scene` is `null`, ...which won't work!
+  }
+
+  int startt = millis();
+  p_scene.timesReloaded++;
+  currentScene = p_scene;
 
   p_scene.setup(); // Calling this later so that entities inside the scene
   // ...can add themselves into `currentScene`'s `ArrayList<Entity> entities`.
 
   for (Entity e : p_scene.entities)
     e.setup();
+  int time = millis() - startt;
 
-  logInfo("Scene `", sceneName, "` was set in place perfectly! Yay!");
+  logInfo("Scene `", sceneName, "` was set in place perfectly in `", time, "`ms. Yay!");
 }
 
 class Scene extends EventReceiver {

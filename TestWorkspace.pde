@@ -89,7 +89,7 @@ Scene testScene = new Scene() {
     circleTexture = new Asset("PFP.jpg", AssetType.PICTURE).beginAsyncLoad();
 
     circle = new Entity() {
-      Transform form = new Transform(this);
+      Transformation form = new Transformation(this);
       Renderer display;
 
       public void setup() {
@@ -98,12 +98,14 @@ Scene testScene = new Scene() {
         this.display.stroke = color(0);
         this.display.strokeWeight = 0.05f;
 
-        // A try-catch would be better here...?
-        Transform savedForm = readTransform("circle_transform");
-        if (savedForm != null)
-          this.form.pos = savedForm.pos;
+        //A try-catch would be better here...?
+        try {
+          this.form.read("circle_transform");
+        } 
+        catch (NullPointerException e) {
+        }
 
-        this.form.scale.mult(32);
+        this.form.scale.set(32, 32, 32);
       }
 
       public void update() {
@@ -120,7 +122,8 @@ Scene testScene = new Scene() {
       public void keyPressed() {
         // Saving a state :D
         if (keyIsPressed(32)) {
-          writeTransform((Transform)circle.getComponent(Transform.class), "circle_transform");
+          this.form.write("circle_transform");
+          //writeTransform((Transform)circle.getComponent(Transform.class), "circle_transform");
           println(currentCam == rev);
           println(currentCam == cam);
         }
@@ -133,11 +136,11 @@ Scene testScene = new Scene() {
     };
 
     quad = new Entity() {
-      Transform form;
+      Transformation form;
       Renderer display;
 
       public void setup() {
-        this.form = new Transform(this);
+        this.form = new Transformation(this);
         this.form.scale.mult(15);
         this.display = new Renderer(this, RendererType.QUAD, boxTexture);
         this.display.strokeWeight = 0.05f;
@@ -149,11 +152,11 @@ Scene testScene = new Scene() {
     };
 
     light = new Entity() {
-      Transform form = new Transform(this), quadForm;
+      Transformation form = new Transformation(this), quadForm;
       Light light = new Light(this);
 
       public void setup() {
-        this.quadForm = quad.getComponent(Transform.class);
+        this.quadForm = quad.getComponent(Transformation.class);
         this.light.col.set(255, 255, 255);
       }
 
@@ -163,7 +166,7 @@ Scene testScene = new Scene() {
     };
 
     groundBox = new Entity() {
-      Transform form = new Transform(this);
+      Transformation form = new Transformation(this);
       Renderer display = new Renderer(this, RendererType.BOX, boxTexture);
 
       public void setup() {

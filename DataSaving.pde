@@ -76,7 +76,6 @@ void writeObject(Serializable p_object, String p_fname) {
 
 <T> T readObject(String p_fname) {
   T ret = null;
-
   File objFile = new File(savesFolder, p_fname.concat(".sav_frag"));
 
   try {
@@ -106,36 +105,35 @@ void writeObject(Serializable p_object, String p_fname) {
 }
 
 
-Transform readTransform(String p_fname) throws NullPointerException {
-  TransformSer ser = readObject(p_fname);
+class VectorSerializer implements Serializable {
+  float[] data = new float[3];
 
-  if (ser == null)
-    return null;
+  VectorSerializer(PVector p_vec) {
+    this.data[0] = p_vec.x;
+    this.data[1] = p_vec.y;
+    this.data[2] = p_vec.z;
+  }
 
-  return new Transform(null, 
-    new PVector(ser.data[0], ser.data[1], ser.data[2]), 
-    new PVector(ser.data[3], ser.data[4], ser.data[5]), 
-    new PVector(ser.data[6], ser.data[7], ser.data[8]));
-}
-
-void writeTransform(Transform p_form, String p_fname) {
-  writeObject(new TransformSer(p_form), p_fname);
-}
-
-static class TransformSer implements Serializable {
-  float[] data = new float[9];
-
-  TransformSer(Transform p_form) {
-    this.data[0] = p_form.pos.x;
-    this.data[1] = p_form.pos.y;
-    this.data[2] = p_form.pos.z;
-
-    this.data[3] = p_form.rot.x;
-    this.data[4] = p_form.rot.y;
-    this.data[5] = p_form.rot.z;
-
-    this.data[6] = p_form.scale.x;
-    this.data[7] = p_form.scale.y;
-    this.data[8] = p_form.scale.z;
+  VectorSerializer(Vector3f p_vec) {
+    this.data[0] = p_vec.x;
+    this.data[1] = p_vec.y;
+    this.data[2] = p_vec.z;
   }
 }
+
+
+// Should probably just use `Integer` instead:
+/*
+class ColorSerializer implements Serializable {
+ float[] data = new float[4];
+ 
+ ColorSerializer(color p_color) {
+ this.data[0] = p_color >> 16 & 0xFF;
+ this.data[1] = p_color & 0xFF;
+ this.data[2] = p_color >> 8 & 0xFF;
+ }
+ 
+ ColorSerializer(float p_red, float p_green, float p_blue, float p_alpha) {
+ }
+ }
+ */

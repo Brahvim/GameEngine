@@ -1,8 +1,63 @@
-class Transform extends Component {
+static class TransformationSerializer implements Serializable {
+  float[] data = new float[9];
+
+  TransformationSerializer(Transformation p_form) {
+    this.data[0] = p_form.pos.x;
+    this.data[1] = p_form.pos.y;
+    this.data[2] = p_form.pos.z;
+
+    this.data[3] = p_form.rot.x;
+    this.data[4] = p_form.rot.y;
+    this.data[5] = p_form.rot.z;
+
+    this.data[6] = p_form.scale.x;
+    this.data[7] = p_form.scale.y;
+    this.data[8] = p_form.scale.z;
+  }
+}
+
+class Transformation extends Component {
   PVector pos, rot, scale;
   private PMatrix3D mat;
 
-  Transform(Entity p_entity) {
+  /*
+  // Wish this worked <Sniffle>:
+   class Serializer implements Serializable {
+   float[] data = new float[9];
+   private final static long serialVersionUID = 2024542466L;
+   
+   Serializer(Transform p_form) {
+   this.data[0] = p_form.pos.x;
+   this.data[1] = p_form.pos.y;
+   this.data[2] = p_form.pos.z;
+   
+   this.data[3] = p_form.rot.x;
+   this.data[4] = p_form.rot.y;
+   this.data[5] = p_form.rot.z;
+   
+   this.data[6] = p_form.scale.x;
+   this.data[7] = p_form.scale.y;
+   this.data[8] = p_form.scale.z;
+   }
+   }
+   */
+
+  void write(String p_fname) {
+    writeObject(new TransformationSerializer(this), p_fname);
+  }
+
+  void read(String p_fname) throws NullPointerException {
+    TransformationSerializer ser = readObject(p_fname);
+
+    if (ser == null)
+      throw new NullPointerException("Failed to load `" + p_fname + "`.");
+
+    this.pos.set(ser.data[0], ser.data[1], ser.data[2]);
+    this.rot.set(ser.data[3], ser.data[4], ser.data[5]);
+    this.scale.set(ser.data[6], ser.data[7], ser.data[8]);
+  }
+
+  Transformation(Entity p_entity) {
     super(p_entity);
 
     this.pos = new PVector();
@@ -11,7 +66,7 @@ class Transform extends Component {
     this.mat = new PMatrix3D();
   }
 
-  Transform(Entity p_entity, PVector p_pos) {
+  Transformation(Entity p_entity, PVector p_pos) {
     super(p_entity);
 
     this.pos = p_pos;
@@ -20,7 +75,7 @@ class Transform extends Component {
     this.mat = new PMatrix3D();
   }
 
-  Transform(Entity p_entity, PVector p_pos, PVector p_rot, PVector p_scale) {
+  Transformation(Entity p_entity, PVector p_pos, PVector p_rot, PVector p_scale) {
     super(p_entity);
 
     this.pos = p_pos;
@@ -29,7 +84,7 @@ class Transform extends Component {
     this.mat = new PMatrix3D();
   }
 
-  public void set(Transform p_form) {
+  public void set(Transformation p_form) {
     if (p_form == null)
       throw new NullPointerException(
         "`Transform.set()` received a `null` `Transform` object :|");
@@ -101,7 +156,7 @@ class Material extends Component {
 }
 
 class Light extends Component {
-  private Transform form; // There's NO reason to call it `parentForm`.
+  private Transformation form; // There's NO reason to call it `parentForm`.
   private PVector pos;
   PVector off, col;
 
@@ -109,7 +164,7 @@ class Light extends Component {
 
   Light(Entity p_entity) {
     super(p_entity);
-    this.form = p_entity.getComponent(Transform.class);
+    this.form = p_entity.getComponent(Transformation.class);
 
     if (this.form == null)
       throw new NullPointerException("A `Light` needs a `Transform`!");
@@ -191,7 +246,7 @@ public enum RendererType {
 
 class ShapeRenderer extends Component {
   PShape shape;
-  Transform form;
+  Transformation form;
   Asset shapeLoader;
   boolean doStyle = true;
 
@@ -224,13 +279,13 @@ class ShapeRenderer extends Component {
 //}
 
 class ParticleSystem extends Component {
-  Transform startPos;
+  Transformation startPos;
   PShape shape;
   float lifetime = -1, startTime;
 
   ParticleSystem(Entity p_entity) {
     super(p_entity);
-    this.startPos = p_entity.getComponent(Transform.class);
+    this.startPos = p_entity.getComponent(Transformation.class);
   }
 
   void start() {
@@ -245,7 +300,7 @@ class ParticleSystem extends Component {
 }
 
 class Renderer extends Component {
-  Transform form;
+  Transformation form;
   RendererType type;
   color fill, stroke; // Tinting should be done by the user themselves.
   float strokeWeight = 1;
@@ -259,7 +314,7 @@ class Renderer extends Component {
 
   Renderer(Entity p_entity) {
     super(p_entity);
-    this.form = p_entity.getComponent(Transform.class);
+    this.form = p_entity.getComponent(Transformation.class);
 
     if (this.form == null)
       logEx(new NullPointerException("A `Renderer` needs a `Transform`!"));

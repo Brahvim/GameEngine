@@ -130,7 +130,17 @@ class Component {
   // Format:
   //Component(Entity p_entity, Component... p_componentsNeeded) { this.parent = p_entity; }
   //public void update() { }
+  //public void read(String p_fname) { }
+  //public void write(String p_fname) { }
 
   public void update() {
+  }
+
+  @SuppressWarnings("unused")
+    public void read(String p_fname) {
+  }
+
+  @SuppressWarnings("unused")
+    public void write(String p_fname) {
   }
 }
