@@ -130,8 +130,6 @@ class Component {
   // Format:
   //Component(Entity p_entity, Component... p_componentsNeeded) { this.parent = p_entity; }
   //public void update() { }
-  //public void read(String p_fname) throws NullPointerException { }
-  //public void write(String p_fname) { }
 
   public void update() {
   }
@@ -142,8 +140,19 @@ class SerializableComponent extends Component {
     super(p_entity);
   }
 
+  // Complete Format:
+  //Component(Entity p_entity, Component... p_componentsNeeded) { this.parent = p_entity; }
+  //public void update() { }
+  //public void read(String p_fname) { }
+  //public void read(String p_fname, OnCatch p_catcher) { }
+  //public void write(String p_fname) { }
+
   @SuppressWarnings("unused")
-    public void read(String p_fname) throws FileNotFoundException {
+    public void read(String p_fname) {
+  }
+
+  @SuppressWarnings("unused")
+    void read(String p_fname, OnCatch p_catcher) {
   }
 
   @SuppressWarnings("unused")

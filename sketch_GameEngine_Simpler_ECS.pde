@@ -252,18 +252,21 @@ void draw() {
   push();
   // Unproject the mouse position:
 
-  float originalNear = currentCam.near;
-  currentCam.near = currentCam.mouseZ;
-  currentCam.applyMatrix();
+  if (focused) {
+    float originalNear = currentCam.near;
+    currentCam.near = currentCam.mouseZ;
+    currentCam.applyMatrix();
 
-  // Unproject:
-  Unprojector.captureViewMatrix((PGraphics3D)g);
-  // `0.9f`: at the near clipping plane.
-  // `0.9999f`: at the far clipping plane.
-  Unprojector.gluUnProject(mouseX, height - mouseY, 
-    //0.9f+ map(mouseY, height, 0, 0, 0.1f),
-    0, mouse);
-  currentCam.near = originalNear;
+    // Unproject:
+    Unprojector.captureViewMatrix((PGraphics3D)g);
+    // `0.9f`: at the near clipping plane.
+    // `0.9999f`: at the far clipping plane.
+    Unprojector.gluUnProject(mouseX, height - mouseY, 
+      //0.9f + map(mouseY, height, 0, 0, 0.1f),
+      0, mouse);
+    currentCam.near = originalNear;
+  }
+
   currentCam.apply();
 
   for (Component c : currentScene.components)

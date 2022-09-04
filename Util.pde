@@ -16,16 +16,16 @@ public static class Unprojector {
   public static PVector ptStartPos = new PVector();
   public static PVector ptEndPos = new PVector();
 
-  public boolean isValid() { 
+  public boolean isValid() {
     return bValid;
   }
 
-  public static PMatrix3D getMatrix() { 
+  public static PMatrix3D getMatrix() {
     return pMatrix;
   }
 
   // Maintain own viewport data.
-  public static int[] getViewport() { 
+  public static int[] getViewport() {
     return aiViewport;
   }
 
@@ -46,7 +46,7 @@ public static class Unprojector {
     // Invert the resultant matrix.
     //pMatrix.invert();
 
-    // "Couldn't we do this in today's modern world?:" 
+    // "Couldn't we do this in today's modern world?:"
     // - Brahvim
     //
     pMatrix.set(p_g3d.projmodelview);
@@ -105,13 +105,20 @@ public static class Unprojector {
   }
 
   // Calculate positions on the near and far 3D frustum planes.
-  public static boolean calculatePickPoints(float x, float y) {
+  public static boolean calculatePickPoints(float p_x, float p_y) {
     bValid = true; // Have to do both in order to reset the `PVector` in case of an error.
-    if (!gluUnProject(x, y, 0, ptStartPos))
-      bValid = false;
-    if (!gluUnProject(x, y, 1, ptEndPos))
-      bValid = false;
+    // Brahvim: "Can't we optimize this?"...
+
+    bValid = gluUnProject(p_x, p_y, 0, ptStartPos);
+    bValid = gluUnProject(p_x, p_y, 1, ptEndPos);
     return bValid;
+
+    // Original version:
+    //if (!gluUnProject(p_x, p_y, 0, ptStartPos))
+    //bValid = false;
+    //if (!gluUnProject(p_x, p_y, 1, ptEndPos))
+    //bValid = false;
+    //return bValid;
   }
 }
 

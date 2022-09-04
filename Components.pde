@@ -113,23 +113,25 @@ class Transformation extends SerializableComponent {
 
   void read(String p_fname, OnCatch p_catcher) {
     try {
-      this.read(p_fname);
+      this.readImpl(p_fname);
     }
     catch (FileNotFoundException e) {
       p_catcher.run(e);
     }
   }
 
-  void read(String p_fname) throws FileNotFoundException {
-    TransformationSerializer ser = null;
-
+  void read(String p_fname) {
     try {
-      ser = readObject(p_fname);
+      this.readImpl(p_fname);
     }
     catch (FileNotFoundException e) {
       logError("Failed to load `" + p_fname + "`.");
       return;
     }
+  }
+
+  void readImpl(String p_fname) throws FileNotFoundException {
+    TransformationSerializer ser = readObject(p_fname);
 
     this.pos.set(ser.data[0], ser.data[1], ser.data[2]);
     this.rot.set(ser.data[3], ser.data[4], ser.data[5]);
@@ -156,16 +158,26 @@ class Material extends SerializableComponent {
     writeObject(new MaterialSerializer(this), p_fname);
   }
 
-  void read(String p_fname) throws FileNotFoundException {
-    MaterialSerializer ser = null;
-
+  void read(String p_fname) {
     try {
-      ser = readObject(p_fname);
+      this.readImpl(p_fname);
     }
     catch (FileNotFoundException e) {
       logError("Failed to load `" + p_fname + "`.");
-      throw e;
     }
+  }
+
+  void read(String p_fname, OnCatch p_catcher) {
+    try {
+      this.readImpl(p_fname);
+    }
+    catch (FileNotFoundException e) {
+      p_catcher.run(e);
+    }
+  }
+
+  void readImpl(String p_fname) throws FileNotFoundException {
+    MaterialSerializer ser = readObject(p_fname);
 
     this.shine = ser.data[9]; // :P-lease!
     this.amb.set(ser.data[0], ser.data[1], ser.data[2]);
