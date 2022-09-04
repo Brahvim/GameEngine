@@ -252,6 +252,14 @@ void draw() {
   push();
   // Unproject the mouse position:
 
+  currentCam.clear();
+  currentCam.runScript();
+  // ^^^ Running the script here does not cause Z-fighting issues :O
+  // [https://stackoverflow.com/questions/55185184/objects-shake-when-rotating]
+  // [https://en.wikipedia.org/wiki/Z-fighting]
+
+  // (If you run the script later, the camera rotation causes mouse-ray objects to shake.)
+
   if (focused) {
     float originalNear = currentCam.near;
     currentCam.near = currentCam.mouseZ;
@@ -267,7 +275,7 @@ void draw() {
     currentCam.near = originalNear;
   }
 
-  currentCam.apply();
+  currentCam.applyMatrix();
 
   for (Component c : currentScene.components)
     if (!(c instanceof Renderer))
