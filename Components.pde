@@ -348,7 +348,7 @@ class RenderingComponent extends Component {
   }
 
   // Format:
-  // There is not format.
+  // There is no format!
 
   public void update() {
   }
