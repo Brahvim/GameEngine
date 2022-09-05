@@ -88,7 +88,7 @@ class Scene extends EventReceiver {
     this.namedEntities = new HashMap<Integer, Entity>();
     this.entities = new ArrayList<Entity>();
     this.components = new ArrayList<Component>();
-    this.renderers = new ArrayList<Renderer>();
+    this.renderers = new ArrayList<RenderingComponent>();
     this.B2D_BODIES = new ArrayList<FBody>();
     this.BT_BODIES = new ArrayList<PhysicsBody>();
   }
@@ -97,7 +97,7 @@ class Scene extends EventReceiver {
     this.namedEntities = new HashMap<Integer, Entity>(p_entCount);
     this.entities = new ArrayList<Entity>(p_entCount);
     this.components = new ArrayList<Component>(2 * p_entCount);
-    this.renderers = new ArrayList<Renderer>(p_entCount);
+    this.renderers = new ArrayList<RenderingComponent>(p_entCount);
     this.B2D_BODIES = new ArrayList<FBody>(p_entCount);
     this.BT_BODIES = new ArrayList<PhysicsBody>(p_entCount);
   }
@@ -190,7 +190,7 @@ class Scene extends EventReceiver {
     for (Entity e : this.entities)
       e.render();
 
-    for (Renderer r : this.renderers)
+    for (RenderingComponent r : this.renderers)
       r.update();
   }
 
