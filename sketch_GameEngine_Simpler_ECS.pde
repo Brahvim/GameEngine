@@ -1,6 +1,9 @@
 
-// "Nerd Engine! - Not an Engine!"
-// "Nerd - The Game Framework"
+// "Nerd Engine! - Not an Engine!",
+// "Nerd - The Game Framework".
+
+// PS jMonkeyEngine works similarly, so...
+// ..."Nerd Engine"!
 
 // YO! Go work on the Renderer class.
 // The `update()` method's `switch` needs stuff to draw! (For `SPHERE`!)
