@@ -130,8 +130,12 @@ class Component {
   // Format:
   //Component(Entity p_entity, Component... p_componentsNeeded) { this.parent = p_entity; }
   //public void update() { }
+  //public void disabledUpdate() { }
 
   public void update() {
+  }
+
+  public void disabledUpdate() {
   }
 }
 

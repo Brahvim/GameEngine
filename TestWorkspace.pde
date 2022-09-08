@@ -95,13 +95,16 @@ Scene testScene = new Scene() {
         this.display = new Renderer(this, ELLIPSE, circleTexture);
         this.display.fill = color(230);
         this.display.stroke = color(0);
-        this.display.strokeWeight = 0.05f;
+        this.display.strokeWeight = 0.05f;        
 
-        // A try-catch would be better here...? :)
-        // `OnCatch` exists ";D!~
+        // Simply prints an error message to the console on failure:
+        //this.form.read("circle_transform");
+
+        // A try-catch would be better here...?
+        // `OnCatch` exists! ":D!
         this.form.read("circle_transform", new OnCatch() {
           public void run(Exception p_except) {
-            logInfo(p_except.getClass() == FileNotFoundException.class);
+            logInfo(p_except instanceof FileNotFoundException);
           }
         }
         );
@@ -122,11 +125,9 @@ Scene testScene = new Scene() {
 
       public void keyPressed() {
         // Saving a state :D
-        if (keyIsPressed(32)) {
+        if (keyIsPressed(KeyEvent.VK_SPACE)) {
           this.form.write("circle_transform");
-          //writeTransform((Transform)circle.getComponent(Transform.class), "circle_transform");
-          println(currentCam == rev);
-          println(currentCam == cam);
+          logInfo("I wrote you a save file! :D");
         }
         // ^^^ This works in `update()` without any problems (O_O")
 

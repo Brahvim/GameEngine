@@ -215,7 +215,7 @@ class Light extends Component {
     this.pos = PVector.add(this.form.pos, this.off);
 
     if (!this.enabled)
-      return;
+      println("Lights off!");
 
     switch(this.type) {
     case AMBIENT:
@@ -546,14 +546,15 @@ class Renderer extends RenderingComponent {
       // Basically, I should've removed that call to `flush()` rather writing all of these :joy:
       //}
 
-      float x, y; // STACK ALLOC!!!11
-      for (int i = 0; i < 36; i++)
-        vertex(x = cos(i * TAU / 36), 
-          y = sin(i * TAU / 36), 
+      float x, y, tauFract; // STACK ALLOC!!!11
+      for (int i = 0; i < 36; i++) {
+        tauFract = i * TAU / 36;
+        vertex(x = cos(tauFract), y = sin(tauFract), 
           // The addition translates in the texture,
           // The multiplication *inversely* scales it.
           0.5f + x * 0.5f, 
           0.5f + y * 0.5f);
+      }
       endShape(CLOSE);
       // PS if we were to not use `x` and `y` in the place for `(u, v)` coordinates,
       // And write something like `trig_fxn(i * TAU / 36 * ROTATION_VALUE)`,

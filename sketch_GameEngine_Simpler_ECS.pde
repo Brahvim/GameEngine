@@ -1,10 +1,3 @@
-
-// "Nerd Engine! - Not an Engine!",
-// "Nerd - The Game Framework".
-
-// PS jMonkeyEngine works similarly, so...
-// ..."Nerd Engine"!
-
 // YO! Go work on the Renderer class.
 // The `update()` method's `switch` needs stuff to draw! (For `SPHERE`!)
 // Also, get it textured! :joy: 
@@ -214,7 +207,8 @@ void draw() {
   deltaTime = frameTime * 0.01f;
 
   // Ah... the tradition of using `background()` first :)
-  currentCam.clear();
+  if (doCamera)
+    currentCam.clear();
 
   // *OpenGL reference.*
   // *Every video game reference:*
@@ -279,7 +273,7 @@ void draw() {
 
   // Step the Physics Engines later, because...
   // I'd like to be at the origin of the world on my first frame...
-  // Also, the user changes Physics- related data in their updates.
+  // Also, the user changes Physics-related data in their updates.
   if (b2d != null && b2dShouldUpdate)
     b2d.step(deltaTime);
 

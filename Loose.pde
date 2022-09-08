@@ -19,6 +19,7 @@ import java.lang.reflect.*;
 import java.util.Map;
 import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.awt.event.KeyEvent;
 
 
 // The one. The only one:
@@ -53,7 +54,8 @@ boolean pfocused;
 
 // `doAnyDrawing` refers to both UI and world rendering.
 boolean doUpdates = true, doAnyDrawing = true, 
-  doRendering = true, doUIRendering = true;
+  doRendering = true, doUIRendering = true, 
+  doCamera;
 
 //final int INIT_WIDTH = 800, INIT_HEIGHT = 600;
 final int INIT_WIDTH = 1280, INIT_HEIGHT = 720;
@@ -100,6 +102,13 @@ float frameStartTime, deltaTime, pframeTime, frameTime;
 //  }
 //}
 
+// The `PostFX` library:
+//PostFXSupervisor fx;
+//boolean doPostProcessing, doPostProcessingState;
+//void applyPass(Pass p_pass) {
+//if (this.doPostProcessingState)
+//fx.pass(p_pass);
+//}
 
 @FunctionalInterface
   interface AnonFxn {
