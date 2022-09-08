@@ -20,11 +20,6 @@ import java.util.Map;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 
-// "PostFX for Processing":
-import ch.bildspur.postfx.builder.*;
-import ch.bildspur.postfx.pass.*;
-import ch.bildspur.postfx.*;
-
 
 // The one. The only one:
 final PApplet SKETCH = this;
@@ -105,14 +100,6 @@ float frameStartTime, deltaTime, pframeTime, frameTime;
 //  }
 //}
 
-// The `PostFX` library:
-PostFXSupervisor fx;
-boolean doPostProcessing, doPostProcessingState;
-
-void applyPass(Pass p_pass) {
-  if (this.doPostProcessingState)
-    fx.pass(p_pass);
-}
 
 @FunctionalInterface
   interface AnonFxn {

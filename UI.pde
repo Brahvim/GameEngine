@@ -1,17 +1,3 @@
-import uibooster.*;
-import uibooster.components.*;   
-import uibooster.model.*;
-import uibooster.model.formelements.*;   
-import uibooster.utils.*;
-
-UiBooster uibd, uibn, uibs;
-
-void initUiBooster() {
-  uibd = new UiBooster(UiBoosterOptions.Theme.DARK_THEME);
-  uibn = new UiBooster(UiBoosterOptions.Theme.OS_NATIVE);
-  uibs = new UiBooster(UiBoosterOptions.Theme.SWING);
-}
-
 class PC_Button {
   PVector transform;
   float size;

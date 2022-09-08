@@ -57,7 +57,6 @@ void engineSetup() {
 Scene testScene = new Scene() {
   @SuppressWarnings("unused")
     Asset audio, boxTexture, circleTexture, cursorImage;
-  Pass bloomPass, vignettePass;
   Camera cam = new Camera(), rev = new Camera(); // A 'normal' and a 'revolving' camera.
 
   @SuppressWarnings("unused")
@@ -198,9 +197,6 @@ Scene testScene = new Scene() {
       }
     };
 
-    bloomPass = new BloomPass(SKETCH, 0.75f, 10, 4);
-    vignettePass = new VignettePass(SKETCH, 0.1f, 0.75f);
-
     wave.start(0);
     wave.endIn(3600);
     wave.extendEndBy(10000);
@@ -210,8 +206,6 @@ Scene testScene = new Scene() {
     if (mouseLeft)
       camLerpUpdate(cam, rev, (float)mouseX / (float)width);
 
-    applyPass(bloomPass);
-    applyPass(vignettePass);
     //doPostProcessing = true;
 
     //gl.enable(PGL.CULL_FACE);

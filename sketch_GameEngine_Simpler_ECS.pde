@@ -107,7 +107,7 @@ void setup() {
   // Where's my `logInfoIndented()`?! :rofl:
 
   // Library initialization:
-  fx = new PostFXSupervisor(this);
+
   Fisica.init(this);
 
   logInfo("Loading LibBulletJME...");
@@ -115,8 +115,7 @@ void setup() {
     new File(sketchPath("lib")), // Do NOT use `sketchPath + "lib"`! That failed. 
     "Release", "Sp");
 
-  initUiBooster();
-
+  // Can't do this on Android!:
   logInfo("Sketch arguments:");
   for (String s : sketchArgs)
     logInfo('\t', s);
@@ -126,24 +125,6 @@ void setup() {
 
   window = (GLWindow)surface.getNative();
   glGraphics = (PGraphicsOpenGL)g;
-
-  /*
-    // Javadoc:
-   // [C:\Users\Brahvim\Documents\PC stuff I always want with me\jogl-javadoc
-   // \jogl\javadoc\com\jogamp\nativewindow\SurfaceUpdatedListener.html]
-   
-   // This has now been replaced by `PApplet.focusLost()` and `PApplet.focusGained()`.
-   
-   //import com.jogamp.nativewindow.SurfaceUpdatedListener;
-   //import com.jogamp.nativewindow.NativeSurface;
-   
-   window.addSurfaceUpdatedListener(0, new SurfaceUpdatedListener() {
-   public void surfaceUpdated(Object updater, NativeSurface ns, long when) {
-   println("Surface updated!");
-   }
-   }
-   );
-   */
 
   javaGraphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
   javaScreens = javaGraphicsEnvironment.getScreenDevices();
@@ -218,7 +199,7 @@ void pre() {
   mouseScrollDelta = mouseScroll - pmouseScroll;
 
   if (!(pwidth == width || pheight == height)) {
-    fx.setResolution(width, height);
+    //fx.setResolution(width, height); // If I ever want to bring PostFX back, well, this is how.
     updateRatios();
     currentScene.windowResized();
   }
@@ -239,9 +220,9 @@ void draw() {
   // *Every video game reference:*
   gl = beginPGL();
 
-  // Start *post* Processing!:
-  if (doPostProcessingState)
-    fx.render();
+  // Start *post* Processing with PostFX!:
+  //if (doPostProcessingState)
+  //fx.render();
 
   lights(); //, `camera()`, // `action()`! ";D!
 
@@ -316,11 +297,11 @@ void post() {
   // YOU CAN RENDER HERE APPARENTLY!:
   // (Might break libraries :|)
 
-  if (doPostProcessingState && focused) {
-    blendMode(SCREEN);
-    image(fx.getCurrentPass(), cx, cy, width, height);
-    blendMode(BLEND);
-  }
+  //if (doPostProcessingState && focused) {
+  //blendMode(SCREEN);
+  //image(fx.getCurrentPass(), cx, cy, width, height);
+  //blendMode(BLEND);
+  //}
 
   if (doAnyDrawing && doUIRendering) {
     noLights();
@@ -331,7 +312,7 @@ void post() {
 
   endPGL();
 
-  doPostProcessingState = doPostProcessing;
+  //doPostProcessingState = doPostProcessing;
 
   pwidth = width;
   pheight = height;
