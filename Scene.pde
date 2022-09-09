@@ -31,7 +31,7 @@ void switchScene(Scene p_scene) {
   p_scene.timesReloaded++;
   currentScene = p_scene;
 
-  logInfo("Switched to scene `", sceneName, "` just in time. Yay!");
+  nerdLogInfo("Switched to scene `", sceneName, "` just in time. Yay!");
 }
 
 void setScene(Scene p_scene) {
@@ -68,7 +68,7 @@ void setScene(Scene p_scene) {
     e.setup();
   int time = millis() - startt;
 
-  logInfo("Scene `", sceneName, "` was set in place perfectly in `", time, "`ms. Yay!");
+  nerdLogInfo("Scene `", sceneName, "` was set in place perfectly in `", time, "`ms. Yay!");
 }
 
 class Scene extends EventReceiver {
@@ -103,61 +103,84 @@ class Scene extends EventReceiver {
   }
 
   Scene addEntity(Entity p_entity) {
-    /* 
-     // *String ID bab:*
-     Class entClass = p_entity.getClass();
-     String entName = entClass.getSimpleName(); // Only a pointer, no allocations ..:D!
-     int howMany = 1;
-     
-     for (Map.Entry<Integer, Entity> e : namedEntities.entrySet())
-     if (e.getKey().getClass() == entClass)
-     howMany++;
-     
-     this.namedEntities.put(entName.concat(Integer.toString(howMany)), p_entity);
-     */
-
     this.namedEntities.put(this.entities.size(), p_entity);
-    this.entities.add(p_entity); // Nah, I don't wanna get an iterator for my map, :P
+    this.entities.add(p_entity); // Nah, I don't wanna get an iterator for my map everytime, :P
     return this;
   }
 
-  Scene addEntity(String p_name, Entity p_entity) {
+  Scene addEntity(Entity p_entity, int p_tag) {
+    p_entity.tag = p_tag;
+    this.namedEntities.put(this.entities.size(), p_entity);
+    this.entities.add(p_entity);
+    return this;
+  }
+
+  Scene addEntity(Entity p_entity, String p_name) {
     p_entity.name = p_name;
     this.namedEntities.put(this.entities.size(), p_entity);
-    this.entities.add(p_entity); // Nah, I don't wanna get an iterator for my map, :P
+    this.entities.add(p_entity);
     return this;
   }
 
-  // ..back in the simpler days:
-  /*
-  Scene addEntity(Entity p_entity) {
-   this.entities.add(p_entity);
-   return this;
-   }
-   */
+  Scene addEntity(Entity p_entity, String p_name, int p_tag) {
+    p_entity.name = p_name;
+    p_entity.tag = p_tag;
+    this.namedEntities.put(this.entities.size(), p_entity);
+    this.entities.add(p_entity);
+    return this;
+  }
 
-  Entity getEntityOfType(Class p_entClass) {
+  Entity getEntityTyped(Class p_class) {
     for (Entity e : this.entities)
-      if (e.getClass() == p_entClass) 
+      if (e.getClass().equals(p_class)) 
         return e;
     return null;
   }
 
-  Entity[] getEntitiesOfType(Class p_entClass) {
+  Entity[] getEntitiesTyped(Class p_class) {
     ArrayList<Entity> ret = new ArrayList<Entity>();
     for (Entity e : this.entities)
-      if (e.getClass() == p_entClass) {
+      if (e.getClass().equals(p_class))
         ret.add(e);
-      }
+    if (ret.isEmpty()) 
+      return null;
+    return (Entity[])ret.toArray();
+  }
+
+  Entity[] getEntitiesSubbing(Class p_class) {
+    ArrayList<Entity> ret = new ArrayList<Entity>();
+    for (Entity e : this.entities)
+      if (e.getClass().isAssignableFrom(p_class))
+        ret.add(e);
+    if (ret.isEmpty()) 
+      return null;
     return (Entity[])ret.toArray();
   }
 
   Entity getEntityNamed(String p_name) {
     for (Entity e : this.entities)
-      if (e.name == p_name)
+      if (e.name.equals(p_name))
         return e;
     return null;
   }
+
+  Entity[] getEntitiesWithTag(int p_tag) {
+    ArrayList<Entity> ret = new ArrayList<Entity>();
+    for (Entity e : this.entities)
+      if (e.tag == p_tag)
+        ret.add(e);
+    if (ret.isEmpty()) 
+      return null;
+    return (Entity[])ret.toArray();
+  }
+
+  Entity getEntityWithTag(int p_tag) {
+    for (Entity e : this.entities)
+      if (e.tag == p_tag)
+        return e;
+    return null;
+  }
+
 
   // Execution structure:
 

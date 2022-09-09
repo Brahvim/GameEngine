@@ -1,13 +1,5 @@
 import java.io.*;
 
-//import java.util.Enumeration;
-//import java.util.Scanner;
-// Are we zippin'?
-//import java.util.zip.*;
-//
-// ...we ain't zippin'.
-
-
 File savesFolder;
 String savesFolderPath = null;
 

@@ -78,13 +78,7 @@ Scene testScene = new Scene() {
     }
     ).beginAsyncLoad();
 
-    boxTexture = new Asset("LearnOpenGL_container2.png", AssetType.PICTURE, new Runnable() {
-      public void run() {
-        //logInfo("Box texture done loading!");
-      }
-    }
-    ).beginAsyncLoad();
-
+    boxTexture = new Asset("LearnOpenGL_container2.png", AssetType.PICTURE).beginAsyncLoad();
     circleTexture = new Asset("PFP.jpg", AssetType.PICTURE).beginAsyncLoad();
 
     circle = new Entity() {
@@ -104,7 +98,7 @@ Scene testScene = new Scene() {
         // `OnCatch` exists! ":D!
         this.form.read("circle_transform", new OnCatch() {
           public void run(Exception p_except) {
-            logInfo(p_except instanceof FileNotFoundException);
+            nerdLogInfo(p_except instanceof FileNotFoundException);
           }
         }
         );

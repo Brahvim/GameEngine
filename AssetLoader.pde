@@ -1,16 +1,11 @@
 import processing.sound.*;
 
-// This approach will NOT work. You just can't return any type you want without casting!:
-/*
-public <T> T getAsset(Asset p_asset) { 
- switch(p_asset.type)
- case PICTURE:
- return (T)Assets.pictures.get(p_asset.id);
- */
+// Do I really need this?
+ArrayList<Asset> ASSETS = new ArrayList<Asset>();
 
 // We're only loading a few types, so there is no use of generics:
 static enum AssetType {
-  SOUND, PICTURE, SHADER, SHAPE; //, TEXTFILE, SAVEFILE;
+  SOUND, PICTURE, SHADER, SHAPE;
 
   static int getMaxEntriesForType(AssetType p_type) {
     switch (p_type) {
@@ -22,7 +17,6 @@ static enum AssetType {
       return Assets.shaders.size();
     case SHAPE:
       return Assets.shaders.size();
-      //case TEXTFILE: return Assets.textFiles.length - 1;
     default:
       throw new RuntimeException("Unknown `AssetType`. How did this error even occur?!");
     }
@@ -34,25 +28,6 @@ static class Assets {
   static ArrayList<PImage> pictures = new ArrayList<PImage>();
   static ArrayList<PShader> shaders = new ArrayList<PShader>();
   static ArrayList<PShape> shapes = new ArrayList<PShape>();
-  // Strings are immutable, COME ON!:
-  //final static StringBuilder[] textFiles = new StringBuilder[0];
-
-
-  // Dis gunna get @Deprecated sh-oon:
-  //static void init(int p_soundFiles, int p_pictures, int p_shaders, int p_shapes) {
-  //Assets.pictures = new ArrayList<PImage>(p_pictures);
-  //Assets.sounds = new ArrayList<SoundFile>(p_soundFiles);
-  //Assets.shaders = new ArrayList<PShader>(p_shaders);
-  //Assets.shapes = new ArrayList<PShape>(p_shapes);
-
-  //Assets.isInit = true;
-
-  //logInfo("`Assets.init()` was called with arguments:");
-  //logInfo('\t', p_soundFiles, " [Sounds]");
-  //logInfo('\t', p_pictures, " [Pictures]");
-  //logInfo('\t', p_shaders, " [Shaders]");
-  //logInfo('\t', p_shapes, " [Shapes]");
-  //}
 
   // Just a note: Method overloading is faster than `instanceof` checks (which are done at runtime).
   // [https://stackoverflow.com/questions/19394815/
@@ -74,6 +49,10 @@ static class Assets {
     return Assets.shapes.get(p_asset.id);
   }
 
+
+  // Do we really need these shortcuts?
+  // Would you rather type `Assets.assetType.get(id);`
+  // or `Assets.getAssetType(id);`?
   static PShape getShape(int p_id) {
     return Assets.shapes.get(p_id);
   }
@@ -91,35 +70,22 @@ static class Assets {
   }
 }
 
-ArrayList<Asset> ASSETS = new ArrayList<Asset>();
 class Asset extends Thread {
-  // None of these needs to be `private`. They're fine the way they are!:
+  // None of this class's fields needs to be `private`.
+  // They're fine the way they are!:
   String path = null;
+  AssetType type = null;
   Object loadedData = null;
+
+  // Extra helper data:
   Runnable onLoad = null;
   boolean loaded, ploaded;
-  int id = -1;
-  int loadFrame = -1;
+  int id = -1, loadFrame = -1;
   float loadTime = -1;
-  AssetType type = null;
 
   Asset(String p_path, AssetType p_type) {
     ASSETS.add(this);
     this.path = p_path; 
-    this.type = p_type;
-    this.id = AssetType.getMaxEntriesForType(p_type);
-  }
-
-  // I wanted to make an array of paths, 
-  // but that would mean more `.pde` files, so here we are - it's an arg!
-  Asset(String p_path, AssetType p_type, int p_id) {
-    ASSETS.add(this);
-    this.path = p_path;
-
-    // Avoid the huge switch-case statement:
-    if (p_id >= AssetType.getMaxEntriesForType(p_type))
-      throw new ArrayIndexOutOfBoundsException("You gave an asset an incorrect ID :P");
-    this.id = p_id;
     this.type = p_type;
   }
 
@@ -128,14 +94,6 @@ class Asset extends Thread {
     this.path = p_path;
     this.type = p_type;
     this.onLoad = p_onLoad;
-    this.id = AssetType.getMaxEntriesForType(p_type);
-  }
-
-  Asset(String p_path, AssetType p_type, int p_id, Runnable p_onLoad) {
-    // Thank you, `javac`:
-    this(p_path, p_type, p_id);
-    this.onLoad = p_onLoad;
-    this.id = AssetType.getMaxEntriesForType(p_type);
   }
 
   Asset beginAsyncLoad() {
@@ -147,34 +105,31 @@ class Asset extends Thread {
     this.load();
   }
 
-  // Loads the asset. Use `.run()` instead to load in a new thread.
+  // Loads the asset. Use `.run()` instead to load in a new thread:
   Asset load() {
     // So now that we're here, welp, what else do we have to do?!
     // Determine the file's type and get loadiiiiiinggggg:
 
     switch(this.type) {
     case SOUND:
-      while (this.loadedData == null)
-        this.loadedData = new SoundFile(SKETCH, this.path); 
+      this.loadedData = new SoundFile(SKETCH, this.path); 
 
       synchronized(Assets.sounds) {
         this.id = Assets.sounds.size();
-        Assets.sounds.add((SoundFile)this.loadedData);
-        ((SoundFile)this.loadedData).rate(1.09f);
-      }
 
+        SoundFile loadedAudio = (SoundFile)this.loadedData;
+        loadedAudio.rate(1.09f);
+        Assets.sounds.add(loadedAudio);
+      }
       break;
 
     case PICTURE:
-      while (this.loadedData == null)
-        this.loadedData = loadImage(this.path);
+      this.loadedData = loadImage(this.path);
 
       synchronized(Assets.pictures) {
         this.id = Assets.pictures.size();
-        //println(System.identityHashCode(this));
         Assets.pictures.add((PImage)this.loadedData);
       }
-
       break; 
 
     case SHADER:
@@ -187,51 +142,36 @@ class Asset extends Thread {
 
 
       if (shaders.length == 1)
-        while (this.loadedData == null)
-          // If the user is trying to load two shaders, do:
-          this.loadedData = loadShader(shaders[0], shaders[1]);
+        // If the user is trying to load two shaders, do:
+        this.loadedData = loadShader(shaders[0], shaders[1]);
 
       // Otherwise, it's just a fragment shader. Get it. Go on! :)
-      else while (this.loadedData == null)
-        this.loadedData = loadShader(this.path);
+      else this.loadedData = loadShader(this.path);
 
       synchronized(Assets.shaders) {
         this.id = Assets.shaders.size();
         Assets.shaders.add((PShader)this.loadedData);
       }
-
       break;
 
     case SHAPE:
-      while (this.loadedData == null)
-        this.loadedData = loadShape(this.path);
+      this.loadedData = loadShape(this.path);
 
       synchronized(Assets.shapes) {
         this.id = Assets.shapes.size();
         Assets.shapes.add((PShape)this.loadedData);
       }
       break;
-
-      //case TEXTFILE:  break;
     }
 
     this.loaded = true;
     this.loadFrame = frameCount;
     this.loadTime = millis();
 
-    if (this.onLoad != null) 
+    if (this.onLoad != null)
       this.onLoad.run();
 
     return this;
-  }
-
-  void waitTillLoaded() {
-    while (!this.loaded);
-  }
-
-  void runOnLoadCallback() {
-    if (this.onLoad != null)
-      this.onLoad.run();
   }
 
   PImage asPicture() {
@@ -241,20 +181,14 @@ class Asset extends Thread {
   }
 
   SoundFile asSound() {
-    // No need to check for null values!    
     return (SoundFile)this.loadedData;
-    // ...and if the type of data being loaded is different, well...
   }
 
   PShader asShader() {
-    // No need to check for null values!    
     return (PShader)this.loadedData;
-    // ...and if the type of data being loaded is different, well...
   }
 
   PShape asShape() {
-    // No need to check for null values!    
     return (PShape)this.loadedData;
-    // ...and if the type of data being loaded is different, well...
   }
 }

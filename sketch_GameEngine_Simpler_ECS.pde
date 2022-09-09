@@ -18,7 +18,7 @@ void dispose() {
   window.setVisible(false);
   while (window.isVisible());
 
-  logInfo("`engineExit()` called...");
+  nerdLogInfo("`engineExit()` called...");
 
   if (onExit != null)
     onExit.run();
@@ -28,15 +28,17 @@ void dispose() {
 
   if (Log.openFileOnExit)
   try {
-    println("Find the log file at:", Log.absPath);
+    if (Log.nerdCanLog)
+      println("Find the log file at: ", Log.absPath);
     new ProcessBuilder("notepad", Log.absPath).start();
-  }
+  }  
   catch (IOException e) {
     e.printStackTrace();
     // Seriously? What do you expect me to do now? Open that stream up again and write to it?
     // <sigh.>
     // Fine, here we go...
-    logInfo("Hey! By the way, the log file kinda got logged out, if you will... you know, understand?");
+    nerdLogInfo("Hey! By the way, the log file kinda got logged out,"
+      + " if you will... you know, understand?");
     logEx(e);
   }
 
@@ -48,15 +50,13 @@ void dispose() {
   // With proper monitoring of window fullscreen events in `post()` now, this is superfast :D
   //super.exit(); // This is now `dispose()` and not `exit()`.
 
-  // Fun fact: `Ctrl + G` continues to search for the text you last searched for.
+  // Fun fact: `Ctrl + G`, in the PDE, continues to search for the text you last searched for.
 
   //window.destroy(); // Faster, but might let the application stop responding completely!
   // No longer needed though :D
 }
 
-import guru.ttslib.*;
 void setup() {
-  //new TTS().speak(new File("").getAbsolutePath());
   updateRatios();
 
   // Should load this up from a save file (or a `--smooth` argument from the launcher):
@@ -85,8 +85,8 @@ void setup() {
   initLog();
   initSaving();
 
-  logInfo("Executable directory: ");
-  logInfo("\t", sketchPath());
+  nerdLogInfo("Executable directory: ");
+  nerdLogInfo("\t", sketchPath());
   //logInfo(
   //"(Perhaps the only difference is that it ends in a `File.separator`, but `sketchPath()` DOES that!)");
 
@@ -95,25 +95,25 @@ void setup() {
   //for (String s : soundDevices)
   //logToFile(Log.lvInfo, '\t', s);
 
-  logInfo("Will load LibBulletJME from:");
-  logInfo("\t", new File(sketchPath("lib")).getAbsolutePath());
+  nerdLogInfo("Will load LibBulletJME from:");
+  nerdLogInfo("\t", new File(sketchPath("lib")).getAbsolutePath());
   // Where's my `logInfoIndented()`?! :rofl:
 
   // Library initialization:
 
   Fisica.init(this);
 
-  logInfo("Loading LibBulletJME...");
+  nerdLogInfo("Loading LibBulletJME...");
   NativeLibraryLoader.loadLibbulletjme(true, 
     new File(sketchPath("lib")), // Do NOT use `sketchPath + "lib"`! That failed. 
     "Release", "Sp");
 
   // Can't do this on Android!:
-  logInfo("Sketch arguments:");
+  nerdLogInfo("Sketch arguments:");
   for (String s : sketchArgs)
-    logInfo('\t', s);
+    nerdLogInfo('\t', s);
 
-  logInfo(INSIDE_PDE? "Yep! The sketch is running inside the PDE!" 
+  nerdLogInfo(INSIDE_PDE? "Yep! The sketch is running inside the PDE!" 
     : "Nope, the sketch wasn't running in the PDE.");
 
   window = (GLWindow)surface.getNative();
@@ -155,7 +155,7 @@ void setup() {
   textSize(DEFAULT_TEXT_SIZE);
   textAlign(CENTER, CENTER);
 
-  logInfo("`engineSetup()` TO BE CALLED!"); // Errors would occur after this.
+  nerdLogInfo("`engineSetup()` TO BE CALLED!"); // Errors would occur after this.
 
   /*
   Method[] sketchMethods = this.getClass().getDeclaredMethods();
@@ -185,7 +185,7 @@ void setup() {
    */
 
   engineSetup();
-  logInfo("`engineSetup()` succeded."); // Errors would occur... after this.
+  nerdLogInfo("`engineSetup()` succeded."); // Errors would occur... after this.
 }
 
 void pre() {

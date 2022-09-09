@@ -2,28 +2,6 @@ class Transformation extends SerializableComponent {
   PVector pos, rot, scale;
   protected PMatrix3D mat;
 
-  /*
-  // Wish this worked <Sniffle>:
-   class Serializer implements Serializable {
-   float[] data = new float[9];
-   private final static long serialVersionUID = 2024542466L;
-   
-   Serializer(Transform p_form) {
-   this.data[0] = p_form.pos.x;
-   this.data[1] = p_form.pos.y;
-   this.data[2] = p_form.pos.z;
-   
-   this.data[3] = p_form.rot.x;
-   this.data[4] = p_form.rot.y;
-   this.data[5] = p_form.rot.z;
-   
-   this.data[6] = p_form.scale.x;
-   this.data[7] = p_form.scale.y;
-   this.data[8] = p_form.scale.z;
-   }
-   }
-   */
-
   Transformation(Entity p_entity) {
     super(p_entity);
 
@@ -61,23 +39,8 @@ class Transformation extends SerializableComponent {
   }
 
   public void applyMatrix() {
-    // Nobody needs *so* much function call reduction:
-    SKETCH.applyMatrix(this.getRefreshedMatrix());
-    // Who knows? The JIT might optimize `getRefreshedMatrix()`, too!
-  }
-
-  public PMatrix3D getRefreshedMatrix() {
-    // Stop doing all of this!:
-    //this.mat.reset(); // Sets it to an identity matrix.
-    //this.mat.translate(this.pos.x, this.pos.y, this.pos.z);
-    //this.mat.rotateX(this.rot.x);
-    //this.mat.rotateY(this.rot.y);
-    //this.mat.rotateZ(this.rot.z);
-    //this.mat.scale(this.scale.x, this.scale.y, this.scale.z);
-
-    // JIT for the win! All three functions are now faster, ":D!~
     this.refreshMatrix();
-    return this.mat;
+    SKETCH.applyMatrix(this.mat);
   }
 
   public PMatrix3D getMatrix() {
@@ -97,8 +60,7 @@ class Transformation extends SerializableComponent {
   // even easier to use with Bullet/bRigid:
 
   //public void applyMatrix4f(Matrix4f p_mat) {
-  //  // Hope that the user called `this.refreshMatrix()` beforehand...
-  //  //this.refreshMatrix();
+  //this.refreshMatrix();
   //this.mat.apply(p_mat.m00, p_mat.m01, p_mat.m02, p_mat.m03, 
   //p_mat.m10, p_mat.m11, p_mat.m12, p_mat.m13, 
   //p_mat.m20, p_mat.m21, p_mat.m22, p_mat.m23, 
@@ -125,7 +87,7 @@ class Transformation extends SerializableComponent {
       this.readImpl(p_fname);
     }
     catch (FileNotFoundException e) {
-      logError("Failed to load `" + p_fname + "`.");
+      nerdLogError("Failed to load `" + p_fname + "`.");
       return;
     }
   }
@@ -163,7 +125,7 @@ class Material extends SerializableComponent {
       this.readImpl(p_fname);
     }
     catch (FileNotFoundException e) {
-      logError("Failed to load `" + p_fname + "`.");
+      nerdLogError("Failed to load `" + p_fname + "`.");
     }
   }
 
@@ -256,18 +218,6 @@ class SpotLight extends Light {
   }
 }
 
-/*
-public enum RendererType {
- QUAD(4), BOX(24), SPHERE(32);
- 
- int vertCount;
- 
- private RendererType(int p_a) {
- this.vertCount = p_a;
- }
- }
- */
-
 // DO NOT INHERIT FROM THIS.
 // ...I guess :P
 
@@ -325,14 +275,15 @@ class SvgRenderer extends RenderingComponent {
 
 // Dream.
 //class InstancedRenderer {
-//  Transform form;
-//  RendererType type;
+//Transform form;
+//RendererType type;
+//PShape THE_POWERFUL_ONE;
 //}
 
 class ParticleSystem extends Component {
   Transformation startPos;
   PShape shape;
-  float lifetime = -1, startTime;
+  float lifetime = -1, startTime = 0;
 
   ParticleSystem(Entity p_entity) {
     super(p_entity);
@@ -356,7 +307,6 @@ class RenderingComponent extends Component {
   // Who knows what might come our way?!
 
   // This is more of an interface than a class.
-
   RenderingComponent(Entity p_entity) {
     super(p_entity);
 
@@ -367,25 +317,23 @@ class RenderingComponent extends Component {
 
   // Format:
   // There is no format!
-
-  // You can have this, I guess:
-  public void update() {
-  }
 };
 
 
 // What to name this now that we have the need for so many renderers? `ImmediateShapeRenderer`?
 class Renderer extends RenderingComponent {
   Transformation form;
-  int type;
+
   color fill, stroke; // Tinting should be done by the user themselves.
   float strokeWeight = 1;
-  int strokeCap = MITER, strokeJoin = ROUND;
+  int type, strokeCap = MITER, strokeJoin = ROUND, roundness = 36;
   boolean doFill = true, doStroke = true, doTexture = true;
 
   // Texturing:
   Asset textureLoader;
-  int textureWrap = CLAMP;
+  int textureWrap = CLAMP; 
+  // ^^^ Will I remove this? If they really want so much control,
+  // they better write their own render method.
   PImage texture;
 
   Renderer(Entity p_entity) {
@@ -397,7 +345,7 @@ class Renderer extends RenderingComponent {
   }
 
   Renderer(Entity p_entity, int p_type) {
-    this(p_entity);
+    this(p_entity); // Uhm, too many constructor calls. Sign of a code smell.
     this.type = p_type;
   }
 
@@ -410,31 +358,23 @@ class Renderer extends RenderingComponent {
   Renderer(Entity p_entity, int p_type, PImage p_texture) {
     this(p_entity);
     this.type = p_type;
-    this.texture = p_texture.copy();
+    this.texture = p_texture;
   }
 
   public void applyTexture() {
     if (!this.doTexture) 
       return;
+
     textureMode(NORMAL);
     textureWrap(this.textureWrap);
 
-    // `texture()` does this already, but I'll do it anyway:
-    //if (this.texture != null)
+    // `texture()` checks for `null`. No need to check it ourselves.
     texture(this.texture);
   }
 
-  // This exists so SvgRenderer can extend this class ._.
-  // I don't want `ArrayLists` everywhere, ..alright?!
-  // ...how about a `RenderingComponent` interface, though..? :thinking:
-  public void textureCheck() {
-    // Do this only once:
+  public void update() {
     if (this.textureLoader != null)
       this.texture = this.textureLoader.asPicture();
-  }
-
-  public void update() {
-    this.textureCheck();
 
     pushMatrix();
     pushStyle();
@@ -466,6 +406,7 @@ class Renderer extends RenderingComponent {
     case BOX:
       // Coordinate data from:
       // [https://www.wikihow.com/Make-a-Cube-in-OpenGL]
+      // ...and that's how you get work done faster. Pfft.
       beginShape(QUADS);
       this.applyTexture();
 
@@ -516,63 +457,25 @@ class Renderer extends RenderingComponent {
       sphere(1);
       break;
 
-      // [https://stackoverflow.com/a/24843626/13951505] ; - ;)
-      // Only used as a reference! I already knew this Math, just keep forgetting it :joy:
+      // [https://stackoverflow.com/a/24843626/13951505]
+      // Only used as a reference! I understand the Math, only forgot the expression :joy:
       // Fun fact, even *that* code was borrowed from: [http://slabode.exofire.net/circle_draw.shtml]
 
     case ELLIPSE:
-      beginShape(POLYGON); // Begin the circle. `LINE_LOOP`, `TRIANGLE_STRIP` etcetera... all have failed!
-      //this.applyTexture(); // Not right now!
-      //vertex(x, y, 0, 0); 
-      // ^^^ Center of circle. THIS WAS CAUSING THE ISSUE. 
-      // It placed a texture coordinate there, when it wasn't needed. 
-      // The shape can be completed by iterating once more in the loop below, or,
-      // using the `endShape()` function with `CLOSE`. `endShape(CLOSE);`.
-      // Of course I used the latter techniquue because it saves the computer from 
-      // from doing more trigonometry.
-      // (Hope memory access is fast enough!)
-
-      this.applyTexture(); // ...now, we can do this!
-
-      // Here's what it does:
-      //public void applyTexture() {
-      //if (!this.doTexture) 
-      //return;
-      //textureMode(NORMAL);
-      //textureWrap(this.textureWrap); // Preferred mode: `CLAMP`.
-      //texture(this.texture);
-      //flush(); // Nice idea, but it's not needed since we're using a batch renderer.
-      // No, instance renderers won't be effected by this in any way either.
-      // Basically, I should've removed that call to `flush()` rather writing all of these :joy:
-      //}
+      beginShape(POLYGON);
+      this.applyTexture();
 
       float x, y, tauFract; // STACK ALLOC!!!11
-      for (int i = 0; i < 36; i++) {
-        tauFract = i * TAU / 36;
-        vertex(x = cos(tauFract), y = sin(tauFract), 
+      for (int i = 0; i < this.roundness; i++) {
+        tauFract = i * TAU / this.roundness;
+        vertex(x = cos(tauFract), y = sin(tauFract), // Wish I had a LUT! 
           // The addition translates in the texture,
           // The multiplication *inversely* scales it.
           0.5f + x * 0.5f, 
           0.5f + y * 0.5f);
       }
       endShape(CLOSE);
-      // PS if we were to not use `x` and `y` in the place for `(u, v)` coordinates,
-      // And write something like `trig_fxn(i * TAU / 36 * ROTATION_VALUE)`,
-      // It would rotate the texture. We could do this over time!
-      // For the sake of simplicity, that will be done by the transformation matrices.
-      // This is a nice way to do it in shaders, though.
-
-      // ...and with `textureWrap(REPEAT);`, and omitted code for 
-      // that centre vertex, we can do some effects with our `(u, v)`s!:
-
-      //cos(i * TAU / 36) * 0.5f - 1, sin(i * TAU / 36) * 0.5f - 1); // Crazy stuff.
-      //1 + (0.25f * abs(cos(i * TAU / 36))), 1 + (0.25f * abs(sin(i * TAU / 36)))); // Eye!
-      //abs(cos(0.25f + i * TAU / 36)), abs(sin(0.25f + i * TAU / 36))); // `0.25f` is rotation!
       break;
-
-      // Use this when there are `int`s:
-      //default:
-      //throw new RuntimeException("Unavailable `Renderer` type !");
     }
 
     popStyle();
