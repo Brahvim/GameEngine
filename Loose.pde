@@ -204,9 +204,45 @@ PImage svgToImage(PShape p_shape, float p_width, float p_height) {
   return buffer;
 }
 
-PImage svgToImage(Asset p_shapeLoader, float p_width, float p_height) {
+PImage svgToImage(PShape p_shape, float p_width, float p_height, boolean p_doStyle) {
+  if (p_shape == null)
+  try {
+    throw new NullPointerException("`svgToImage(null , p_width, p_height, p_doStyle) won't work.`");
+  } 
+  catch (NullPointerException e) {
+    e.printStackTrace();
+  }
+
+  if (p_doStyle)
+    p_shape.disableStyle();
+  else p_shape.enableStyle();
+
   PGraphics buffer = createGraphics((int)ceil(p_width), (int)ceil(p_height), P3D);
+
+  if (buffer == null)
+    throw new NullPointerException("`buffer` is `null`!");
+
+  buffer.beginDraw();
+  buffer.shape(p_shape, 0, 0, p_width, p_height);
+  buffer.endDraw();
+  return buffer;
+}
+
+PImage svgToImage(Asset p_shapeLoader, float p_width, float p_height) {
+  if (p_shapeLoader == null)
+  try {
+    throw new NullPointerException("`svgToImage(null , p_width, p_height) won't work.`");
+  } 
+  catch (NullPointerException e) {
+    e.printStackTrace();
+  }
+
   while (!p_shapeLoader.loaded);
+
+  PGraphics buffer = createGraphics((int)ceil(p_width), (int)ceil(p_height), P3D);
+
+  if (buffer == null)
+    throw new NullPointerException("`buffer` is `null`!");
 
   buffer.beginDraw();
   buffer.shape(p_shapeLoader.asShape(), 0, 0, p_width, p_height);
@@ -220,6 +256,10 @@ PGraphics createGraphics(int p_width, int p_height) {
 
 PGraphics createGraphics(float p_width, float p_height) {
   return createGraphics((int)p_width, (int)p_height, P3D);
+}
+
+void shape(PShape p_shape) {
+  shape(p_shape, 0, 0);
 }
 
 void image(PImage p_image) {
