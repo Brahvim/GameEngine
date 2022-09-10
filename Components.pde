@@ -345,6 +345,8 @@ class ShapeRenderer extends RenderingComponent {
     pushMatrix();
     pushStyle();
 
+    this.textureLoaderCheck();
+
     // For the Bullet Physics Engine!:
     // Yes, it might be slow, but it's something we'll have to do.
     this.form.applyMatrix();
@@ -484,9 +486,14 @@ class SvgRenderer extends ShapeRenderer {
     this.svg = p_shape;
   }
 
-  public void applyTexture() {
+
+  public void textureLoaderCheck() {
     if (this.textureLoader != null)
-      this.texture = svgToImage(this.textureLoader.asShape(), this.form.scale.x, this.form.scale.y);
+      this.svg = this.textureLoader.asShape();
+  }
+
+  public void applyTexture() {
+    this.textureLoaderCheck();
 
     // Re-render :D
     if (this.svg != this.psvg || !this.form.scale.equals(this.pscale))
