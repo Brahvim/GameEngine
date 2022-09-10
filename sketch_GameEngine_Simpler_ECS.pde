@@ -59,6 +59,17 @@ void dispose() {
 void setup() {
   updateRatios();
 
+  cp = new ControlP5(this);
+
+  cp.addButton("a").onClick(new CallbackListener() {
+    public void controlEvent(CallbackEvent p_evt) {
+      println(p_evt);
+    }
+  }
+  ).setValue(128)
+    .setPosition(100, 100)
+    .setSize(400, 400);
+
   // Should load this up from a save file (or a `--smooth` argument from the launcher):
   //int a = 2;
   //smooth(a);
@@ -272,6 +283,14 @@ void draw() {
   if (bt != null && btShouldUpdate)
     bt.update(deltaTime);
   pop();
+
+
+  begin2D();
+  if (doAnyDrawing && doUIRendering) {
+    noLights();
+    currentScene.drawUI();
+  }
+  end2D();
 }
 
 
@@ -282,6 +301,7 @@ void post() {
 
   // YOU CAN RENDER HERE APPARENTLY!:
   // (Might break libraries :|)
+  // (It did. Our UI rendered on top of ControlP5's.)
 
   //if (doPostProcessingState && focused) {
   //blendMode(SCREEN);
@@ -289,12 +309,7 @@ void post() {
   //blendMode(BLEND);
   //}
 
-  if (doAnyDrawing && doUIRendering) {
-    noLights();
-    begin2D();
-    currentScene.drawUI();
-    end2D();
-  }
+
 
   endPGL();
 

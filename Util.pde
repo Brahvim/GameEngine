@@ -128,7 +128,7 @@ public static class Unprojector {
 
 class SineWave {
   float angleOffset, freqMult, freq;
-  private float endTime = Float.MAX_VALUE - 1, aliveTime;
+  float endTime = Float.MAX_VALUE - 1, aliveTime;
   boolean active = true, zeroWhenInactive;
 
   SineWave() {

@@ -192,14 +192,13 @@ Scene testScene = new Scene() {
       }
     };
 
+    doCamera = false;
     wave.start(0);
     wave.endIn(3600);
     wave.extendEndBy(10000);
   }
 
   public void draw() {
-    doCamera = false;
-
     if (mouseLeft)
       camLerpUpdate(cam, rev, (float)mouseX / (float)width);
     else currentCam.applyMatrix();
