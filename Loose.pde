@@ -214,8 +214,8 @@ PImage svgToImage(PShape p_shape, float p_width, float p_height, boolean p_doSty
   }
 
   if (p_doStyle)
-    p_shape.disableStyle();
-  else p_shape.enableStyle();
+    p_shape.enableStyle();
+  else p_shape.disableStyle();
 
   PGraphics buffer = createGraphics((int)ceil(p_width), (int)ceil(p_height), P3D);
 

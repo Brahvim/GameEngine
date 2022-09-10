@@ -495,7 +495,7 @@ class SvgRenderer extends ShapeRenderer {
     if (super.textureLoader != null)
       if (this.textureLoader.type == AssetType.SHAPE) {
         this.svg = this.textureLoader.asShape();
-        this.resScale = dist(0, 0, this.svg.width, this.svg.height);// * 0.05f;
+        this.resScale = dist(0, 0, this.svg.width, this.svg.height) * 0.05f;
       } else if (this.textureLoader.type == AssetType.PICTURE)
         super.texture = this.textureLoader.asPicture();
   }
