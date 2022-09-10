@@ -3,7 +3,7 @@ import java.io.*;
 File savesFolder;
 String savesFolderPath = null;
 
-// Every part of this should be very scalable.
+// Every part of this should have FULL control and should be as scalable as possible.
 
 // The plan of action:
 // Just create a system that allows one to save and load objects.

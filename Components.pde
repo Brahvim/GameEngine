@@ -353,12 +353,13 @@ class ShapeRenderer extends RenderingComponent {
 
     if (this.doFill)
       fill(this.fill);
+    else noFill();
     if (this.doStroke) {
       stroke(this.stroke);
       strokeCap(this.strokeCap);
       strokeJoin(this.strokeJoin);
       strokeWeight(this.strokeWeight);
-    }
+    } else noStroke();
 
     switch(this.type) {
     case QUAD:
@@ -470,35 +471,50 @@ class SvgRenderer extends ShapeRenderer {
   // `if (this.psvg != this.svg) reRender();`!
 
   PVector pscale;
+  float resScale;
 
   SvgRenderer(Entity p_entity) {
     super(p_entity);
     this.pscale = new PVector();
   }
 
-  SvgRenderer(Entity p_entity, Asset p_assetLoader) {
-    this(p_entity);
-    this.textureLoader = p_assetLoader;
+  SvgRenderer(Entity p_entity, int p_type, Asset p_assetLoader) {
+    super(p_entity, p_type, p_assetLoader);
+    this.pscale = new PVector();
   }
 
-  SvgRenderer(Entity p_entity, PShape p_shape) {
+  SvgRenderer(Entity p_entity, int p_type, PShape p_shape) {
     this(p_entity);
+    super.type = p_type;
     this.svg = p_shape;
+    this.pscale = new PVector();
+    this.resScale = dist(0, 0, this.svg.width, this.svg.height) * 0.05f;
   }
-
 
   public void textureLoaderCheck() {
-    if (this.textureLoader != null)
-      this.svg = this.textureLoader.asShape();
+    if (super.textureLoader != null)
+
+      if (this.textureLoader.type == AssetType.SHAPE) {
+        this.svg = this.textureLoader.asShape();
+        this.resScale = dist(0, 0, this.svg.width, this.svg.height) * 0.05f;
+      } else if (this.textureLoader.type == AssetType.PICTURE)
+        super.texture = this.textureLoader.asPicture();
   }
 
   public void applyTexture() {
     this.textureLoaderCheck();
 
     // Re-render :D
-    if (this.svg != this.psvg || !this.form.scale.equals(this.pscale))
-      this.texture = svgToImage(this.svg, this.form.scale.x, this.form.scale.y);
+    if (!(this.svg == null || super.form.scale.x == 0 && super.form.scale.y == 0))
+      if (this.svg != this.psvg || abs(PVector.sub(this.form.scale, this.pscale).magSq())
+        < this.resScale) {
+        this.texture = svgToImage(this.svg, abs(this.form.scale.x * this.resScale), 
+          abs(this.form.scale.y * this.resScale));
+        println("Re-rendered SVG", frameCount);
+      }
     // I guess not accessing the `z` helps CPU cache.
+
+    this.pscale = super.form.scale;
 
     if (!this.doTexture)
       return;

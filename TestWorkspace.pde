@@ -56,7 +56,7 @@ void engineSetup() {
 
 Scene testScene = new Scene() {
   @SuppressWarnings("unused")
-    Asset audio, boxTexture, circleTexture, cursorImage;
+    Asset audio, boxTexture, circleTexture, cursorImage, svgImage;
   //Pass bloomPass;
   Camera cam = new Camera(), rev = new Camera(); // A 'normal' and a 'revolving' camera.
 
@@ -82,6 +82,7 @@ Scene testScene = new Scene() {
 
     boxTexture = new Asset("LearnOpenGL_container2.png", AssetType.PICTURE).beginAsyncLoad();
     circleTexture = new Asset("PFP.jpg", AssetType.PICTURE).beginAsyncLoad();
+    svgImage = new Asset("bot1.svg", AssetType.SHAPE).beginAsyncLoad();
 
     circle = new Entity() {
       Transformation form = new Transformation(this);
@@ -91,7 +92,7 @@ Scene testScene = new Scene() {
         this.display = new ShapeRenderer(this, ELLIPSE, circleTexture);
         this.display.fill = color(230);
         this.display.stroke = color(0);
-        this.display.strokeWeight = 0.05f;        
+        this.display.strokeWeight = 0.05f;
 
         // Simply prints an error message to the console on failure:
         this.form.read("circle_transform");
@@ -135,17 +136,20 @@ Scene testScene = new Scene() {
 
     quad = new Entity() {
       Transformation form;
-      ShapeRenderer display;
+      SvgRenderer display;
 
       public void setup() {
         this.form = new Transformation(this);
         this.form.scale.mult(15);
-        this.display = new ShapeRenderer(this, QUAD, boxTexture);
+        this.display = new SvgRenderer(this, QUAD, svgImage);
         this.display.strokeWeight = 0.05f;
+        this.display.textureWrap = REPEAT;
       }
 
       public void update() {
         this.form.pos.set(mouse);
+        float a = sin(millis() * 0.001f) * 15;
+        this.form.scale.set(a, a, a);
       }
     };
 
@@ -215,7 +219,6 @@ Scene testScene = new Scene() {
 
   public void drawUI() {
     //gl.disable(PGL.CULL_FACE);
-
     image(boxTexture, cx + wave.get() * cx, mouseY, 160, 160);
 
     fill(255, 0, 0, 60); // The alpha used to be `80`.
