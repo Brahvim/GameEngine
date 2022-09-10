@@ -13,6 +13,7 @@ String savesFolderPath = null;
 //
 // PS the logs could be put in `temp` on Windows (`C:\\Windows\\Temp`).
 // (On GNU/Linux, `/tmp` or `/var/tmp`. ...and who'd like to read the Apple T&Cs daily?)
+// (Actually, store that temporary stuff in the same dir as the app. That's Apple's good practices.)
 //
 // *Very* easy, and efficient enough (e.g. if the user wants to load a specific object,
 // you will have to traverse through the entire file to find it, then ever parse its

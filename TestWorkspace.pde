@@ -94,16 +94,16 @@ Scene testScene = new Scene() {
         this.display.strokeWeight = 0.05f;        
 
         // Simply prints an error message to the console on failure:
-        //this.form.read("circle_transform");
+        this.form.read("circle_transform");
 
         // A try-catch would be better here...?
         // `OnCatch` exists! ":D!
-        this.form.read("circle_transform", new OnCatch() {
-          public void run(Exception p_except) {
-            nerdLogInfo(p_except instanceof FileNotFoundException);
-          }
-        }
-        );
+        //this.form.read("circle_transform", new OnCatch() {
+        //public void run(Exception p_except) {
+        //nerdLogInfo(p_except instanceof FileNotFoundException);
+        //}
+        //}
+        //);
 
         this.form.scale.set(32, 32, 32);
       }
