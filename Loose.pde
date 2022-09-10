@@ -55,7 +55,7 @@ boolean pfocused;
 // `doAnyDrawing` refers to both UI and world rendering.
 boolean doUpdates = true, doAnyDrawing = true, 
   doRendering = true, doUIRendering = true, 
-  doCamera;
+  doCamera = true, doLights = true;
 
 //final int INIT_WIDTH = 800, INIT_HEIGHT = 600;
 final int INIT_WIDTH = 1280, INIT_HEIGHT = 720;
@@ -137,6 +137,20 @@ void updateRatios() {
 //  rotateZ(p_rot.z);
 //  scale(p_scale.x, p_scale.y, p_scale.z);
 //}
+
+void camera(Camera p_cam) {
+  camera(p_cam.pos.x, p_cam.pos.y, p_cam.pos.z, 
+    p_cam.center.x, p_cam.center.y, p_cam.center.z, 
+    p_cam.up.x, p_cam.up.y, p_cam.up.z);
+}
+
+void perspective(Camera p_cam) {
+  perspective(p_cam.fov, (float)width / (float)height, p_cam.near, p_cam.far);
+}
+
+void ortho(Camera p_cam) {
+  ortho(-cx, cx, -cy, cy, p_cam.near, p_cam.far);
+}
 
 void begin2D() {
   hint(DISABLE_DEPTH_TEST);

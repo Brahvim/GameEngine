@@ -198,8 +198,11 @@ Scene testScene = new Scene() {
   }
 
   public void draw() {
+    doCamera = false;
+
     if (mouseLeft)
       camLerpUpdate(cam, rev, (float)mouseX / (float)width);
+    else currentCam.applyMatrix();
 
     //doPostProcessing = true;
 

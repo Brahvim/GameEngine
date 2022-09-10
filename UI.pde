@@ -5,27 +5,27 @@ class PC_Button {
   SineWave wave = new SineWave();
   Runnable renderMethod, hoverMethod, clickMethod;
 
-  PC_Button(float _x, float _y, float _size) {
-    this.transform = new PVector(_x, _y);
-    this.size = _size;
+  PC_Button(float p_x, float p_y, float p_size) {
+    this.transform = new PVector(p_x, p_y);
+    this.size = p_size;
   }
 
   // Constructor overloading may exist, but I like this:
-  PC_Button(float _x, float _y, float _size, float _rot) {
-    this.transform = new PVector(_x, _y, _rot);
-    this.size = _size;
+  PC_Button(float p_x, float p_y, float p_size, float p_rot) {
+    this.transform = new PVector(p_x, p_y, p_rot);
+    this.size = p_size;
   }
 
-  void setPos(float _x, float _y) {
-    this.transform.set(_x, _y);
+  void setPos(float p_x, float p_y) {
+    this.transform.set(p_x, p_y);
   }
 
-  void setRot(float _rot) {
-    this.transform.z = _rot;
+  void setRot(float p_rot) {
+    this.transform.z = p_rot;
   }
 
-  void setTransform(float _x, float _y, float _rot) {
-    this.transform.set(_x, _y, _rot);
+  void setTransform(float p_x, float p_y, float p_rot) {
+    this.transform.set(p_x, p_y, p_rot);
   }
 
   void update() {

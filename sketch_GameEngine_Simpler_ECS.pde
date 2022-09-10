@@ -218,7 +218,8 @@ void draw() {
   //if (doPostProcessingState)
   //fx.render();
 
-  lights(); //, `camera()`, // `action()`! ";D!
+  if (doLights)
+    lights(); //, `camera()`, // `action()`! :D!
 
   // Apply camera transformations first, so
   // that entities and Rendering components
@@ -234,27 +235,18 @@ void draw() {
   // **after this `if`**, the camera rotation causes mouse-ray objects to shake.)
 
   // Unproject the mouse position:
-  if (focused) {
-    float originalNear = currentCam.near;
-    currentCam.near = currentCam.mouseZ;
+  if (focused)
+    unprojectMouse();
+
+  // (Yeah. This place? Running the script here? There's gunna be Z-fighting action - get popcorn! :joy:)
+  if (doCamera)
     currentCam.applyMatrix();
-
-    // Unproject:
-    Unprojector.captureViewMatrix((PGraphics3D)g);
-    // `0.9f`: at the near clipping plane.
-    // `0.9999f`: at the far clipping plane.
-    Unprojector.gluUnProject(mouseX, height - mouseY, 
-      //0.9f + map(mouseY, height, 0, 0, 0.1f),
-      0, mouse);
-    currentCam.near = originalNear;
-  }
-
-  // (Yep! This place! Running the script here? Get popcorn for some Z-fighting action!)
-  currentCam.applyMatrix();
 
   for (Component c : currentScene.components)
     if (!(c instanceof Renderer))
-      c.update();
+      if (c.enabled && c.parent.enabled)
+        c.update();
+      else c.disabledUpdate();
 
   currentScene.draw();
 

@@ -57,15 +57,14 @@ class Transformation extends SerializableComponent {
   }
 
   // This should be given a new name, or be made 
-  // even easier to use with Bullet/bRigid:
-
-  //public void applyMatrix4f(Matrix4f p_mat) {
-  //this.refreshMatrix();
-  //this.mat.apply(p_mat.m00, p_mat.m01, p_mat.m02, p_mat.m03, 
-  //p_mat.m10, p_mat.m11, p_mat.m12, p_mat.m13, 
-  //p_mat.m20, p_mat.m21, p_mat.m22, p_mat.m23, 
-  //p_mat.m30, p_mat.m31, p_mat.m32, p_mat.m33);
-  //}
+  // even easier to use with Bullet:
+  public void applyMatrix4f(Matrix4f p_mat) {
+    this.refreshMatrix();
+    this.mat.apply(p_mat.m00, p_mat.m01, p_mat.m02, p_mat.m03, 
+      p_mat.m10, p_mat.m11, p_mat.m12, p_mat.m13, 
+      p_mat.m20, p_mat.m21, p_mat.m22, p_mat.m23, 
+      p_mat.m30, p_mat.m31, p_mat.m32, p_mat.m33);
+  }
 
   // ...and finally,
 
@@ -176,9 +175,6 @@ class Light extends Component {
   public void update() {
     this.pos = PVector.add(this.form.pos, this.off);
 
-    if (!this.enabled)
-      println("Lights off!");
-
     switch(this.type) {
     case AMBIENT:
       ambientLight(this.col.x, this.col.y, this.col.z, 
@@ -191,6 +187,28 @@ class Light extends Component {
     case POINT:
       pointLight(this.col.x, this.col.y, this.col.z, 
         this.pos.x, this.pos.y, this.pos.z);
+      break;
+    case SPOT:
+      throw new RuntimeException("Please use the `SpotLight` class instead of assigning " 
+        + "`SPOT` to the `p_lightType` of a `Light`!");
+    default:
+      throw new RuntimeException("Unavailable light type!");
+    }
+  }
+
+  void disabledUpdate() {
+    switch(this.type) {
+    case AMBIENT:
+      ambientLight(this.col.x, this.col.y, this.col.z, 
+        this.pos.x, this.pos.y, currentCam.far * 2);
+      break;
+    case DIRECTIONAL:
+      directionalLight(this.col.x, this.col.y, this.col.z, 
+        this.pos.x, this.pos.y, currentCam.far * 2);
+      break;
+    case POINT:
+      pointLight(this.col.x, this.col.y, this.col.z, 
+        this.pos.x, this.pos.y, currentCam.far * 2);
       break;
     case SPOT:
       throw new RuntimeException("Please use the `SpotLight` class instead of assigning " 

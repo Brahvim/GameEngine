@@ -34,41 +34,18 @@ boolean keysPressed(int... p_keyCodes) {
 }
 
 void unprojectMouse() {
-  //mouse.set(new float[0]);
-  mouse.set(mouseX, mouseY);
-  //mouse.set((float)mouseX / (float)width, (float)mouseY / (float)height);
+  float originalNear = currentCam.near;
+  currentCam.near = currentCam.mouseZ;
+  currentCam.applyMatrix();
 
-  //FloatBuffer modelview = FloatBuffer.allocate(16);
-  //modelview.put(glGraphics.modelview.get(null));
-
-  //u.captureViewMatrix((PGraphics3D)g);
-  //u.gluUnProject(mouseX, height - mouseY, 0.8f, mouse);
-
-
-  //float[]f=null;
-  //new PMatrix3D().set(f);
-
-  //glu.gluUnProject();
-
-  // The order does not matter:
-  mouse = glGraphics.camera.mult(mouse, null);
-  mouse = glGraphics.modelviewInv.mult(mouse, null);
-
-  // [https://www.gamedev.net/forums/topic/675595-math-behind-gluunproject/]
-  // Multiply the resulting point by the inverse of the `(model * projection)` matrix.
-  /*
-  PMatrix3D model = glGraphics.modelview.get();
-   model.apply(glGraphics.camera);
-   //model.apply(glGraphics.projection);
-   model.invert();
-   
-   mouse = model.mult(mouse, null);
-   mouse.sub(width, 0);
-   mouse.y = Math.abs(mouse.y);
-   mouse.y -= height;
-   */
-  //mouse.z += 25;
-  //println(mouse);
+  // Unproject:
+  Unprojector.captureViewMatrix((PGraphics3D)g);
+  // `0.9f`: at the near clipping plane.
+  // `0.9999f`: at the far clipping plane.
+  Unprojector.gluUnProject(mouseX, height - mouseY, 
+    //0.9f + map(mouseY, height, 0, 0, 0.1f),
+    0, mouse);
+  currentCam.near = originalNear;
 }
 
 
