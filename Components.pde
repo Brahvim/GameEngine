@@ -239,57 +239,56 @@ class SpotLight extends Light {
 // DO NOT INHERIT FROM THIS.
 // ...I guess :P
 
-/*
+
 class SvgRenderer extends RenderingComponent {
- // I could've declared `shape` as `private` and used a pair of
- // getter and setter / accessor and modifier methods, but I
- // went with this approach instead for performance!
- 
- // In a setter, you'd be rendering the SVG to a texture.
- // With this approach, you render in the update loop itself
- // when an update is needed.
- 
- PShape svg;
- protected PShape psvg;
- Asset svgLoader;
- // ^^^ That's the magic of this approach!
- // `if (this.pshape != this.shape) reRender();`!
- 
- protected PVector pscale;
- boolean doStyle = true;
- 
- SvgRenderer(Entity p_entity) {
- super(p_entity);
- this.pscale = new PVector();
- }
- 
- SvgRenderer(Entity p_entity, Asset p_assetLoader) {
- this(p_entity);
- this.svgLoader = p_assetLoader;
- }
- 
- SvgRenderer(Entity p_entity, PShape p_shape) {
- this(p_entity);
- this.svg = p_shape;
- }
- 
- public void applyTexture() {
- // Re-render :D
- if (this.svg != this.psvg || !this.form.scale.equals(this.pscale))
- this.texture = svgToImage(this.svg, this.form.scale.x, this.form.scale.y);
- // I guess not accessing the `z` helps CPU cache.
- 
- if (!this.doTexture)
- return;
- textureMode(NORMAL);
- textureWrap(this.textureWrap);
- 
- // `texture()` does this already, but I'll do it anyway:
- //if (this.texture != null)
- texture(this.texture);
- }
- }
- */
+  // I could've declared `shape` as `private` and used a pair of
+  // getter and setter / accessor and modifier methods, but I
+  // went with this approach instead for performance!
+
+  // In a setter, you'd be rendering the SVG to a texture.
+  // With this approach, you render in the update loop itself
+  // when an update is needed.
+
+  PShape svg, psvg;
+  Asset svgLoader;
+  // ^^^ That's the magic of this approach!
+  // `if (this.psvg != this.svg) reRender();`!
+
+  PVector pscale;
+  boolean doStyle = true;
+
+  SvgRenderer(Entity p_entity) {
+    super(p_entity);
+    this.pscale = new PVector();
+  }
+
+  SvgRenderer(Entity p_entity, Asset p_assetLoader) {
+    this(p_entity);
+    this.svgLoader = p_assetLoader;
+  }
+
+  SvgRenderer(Entity p_entity, PShape p_shape) {
+    this(p_entity);
+    this.svg = p_shape;
+  }
+
+  public void applyTexture() {
+    // Re-render :D
+    if (this.svg != this.psvg || !this.form.scale.equals(this.pscale))
+      this.texture = svgToImage(this.svg, this.form.scale.x, this.form.scale.y);
+    // I guess not accessing the `z` helps CPU cache.
+
+    if (!this.doTexture)
+      return;
+    textureMode(NORMAL);
+    textureWrap(this.textureWrap);
+
+    // `texture()` does this already, but I'll do it anyway:
+    //if (this.texture != null)
+    texture(this.texture);
+  }
+}
+
 
 // Dream.
 //class InstancedRenderer {
@@ -339,7 +338,7 @@ class RenderingComponent extends Component {
 
 
 // What to name this now that we have the need for so many renderers? `ImmediateShapeRenderer`?
-class Renderer extends RenderingComponent {
+class ShapeRenderer extends RenderingComponent {
   Transformation form;
 
   color fill, stroke; // Tinting should be done by the user themselves.
@@ -354,7 +353,7 @@ class Renderer extends RenderingComponent {
   // they better write their own render method.
   PImage texture;
 
-  Renderer(Entity p_entity) {
+  ShapeRenderer(Entity p_entity) {
     super(p_entity);
     this.form = p_entity.getComponent(Transformation.class);
 
@@ -362,18 +361,18 @@ class Renderer extends RenderingComponent {
       logEx(new NullPointerException("A `Renderer` needs a `Transform`!"));
   }
 
-  Renderer(Entity p_entity, int p_type) {
+  ShapeRenderer(Entity p_entity, int p_type) {
     this(p_entity); // Uhm, too many constructor calls. Sign of a code smell.
     this.type = p_type;
   }
 
-  Renderer(Entity p_entity, int p_type, Asset p_assetLoader) {
+  ShapeRenderer(Entity p_entity, int p_type, Asset p_assetLoader) {
     this(p_entity);
     this.type = p_type;
     this.textureLoader = p_assetLoader;
   }
 
-  Renderer(Entity p_entity, int p_type, PImage p_texture) {
+  ShapeRenderer(Entity p_entity, int p_type, PImage p_texture) {
     this(p_entity);
     this.type = p_type;
     this.texture = p_texture;

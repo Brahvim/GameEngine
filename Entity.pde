@@ -17,15 +17,109 @@ class Entity extends EventReceiver {
 
   // Remember: ONLY call `getComponent()` in `setup()`!
   public <T extends Component> T getComponent(Class p_class) {
-    for (Component c : this.components) {
-      if (c.getClass() == p_class)
+    for (Component c : this.components)
+      if (c.getClass().equals(p_class))
         return (T)c;
-    }
     return null;
+  }
+
+  public <T extends Component> T getComponentSubbing(Class p_class) {
+    for (Component c : this.components)
+      if (c.getClass().isAssignableFrom(p_class))
+        return (T)c;
+    return null;
+  }
+
+  public ArrayList<Component> getComponents(Class p_class) {
+    ArrayList<Component> ret = new ArrayList<Component>();
+
+    for (Component c : this.components)
+      if (c.getClass().equals(p_class))
+        ret.add(c);
+
+    if (ret.isEmpty())
+      return null;
+    return ret;
+  }
+
+  public ArrayList<? extends Component> getComponentsSubbing(Class p_class) {
+    ArrayList<Component> ret = new ArrayList<Component>();
+
+    for (Component c : this.components)
+      if (c.getClass().isAssignableFrom(p_class))
+        ret.add(c);
+
+    if (ret.isEmpty())
+      return null;
+    return ret;
+  }
+
+  // These should NOT be used...:
+  // How are you going to handle `null` components as the user...?
+  public void removeComponent(Component p_component) {
+    this.components.remove(p_component);
+    currentScene.components.remove(p_component);
+  }
+
+  public void removeComponentTyped(Class p_class) {
+    Component component = null;
+
+    for (Component c : this.components)
+      if (c.getClass().equals(p_class))
+        component = c;
+
+    if (component != null) {
+      this.components.remove(component);
+      currentScene.components.remove(component);
+    }
+  }
+
+  public void removeComponentSubbing(Class p_class) {
+    Component component = null;
+
+    for (Component c : this.components)
+      if (c.getClass().isAssignableFrom(p_class))
+        component = c;
+
+    if (component != null) {
+      this.components.remove(component);
+      currentScene.components.remove(component);
+    }
+  }
+
+  public void removeAllComponentsTyped(Class p_class) {
+    ArrayList<Component> components = new ArrayList<Component>();
+
+    for (Component c : this.components)
+      if (c.getClass().equals(p_class))
+        components.add(c);
+
+    if (!components.isEmpty())
+      for (Component c : components) {
+        this.components.remove(c);
+        currentScene.components.remove(c);
+        //System.gc(); }
+      }
+  }
+
+  public void removeAllComponentsSubbing(Class p_class) {
+    ArrayList<Component> components = new ArrayList<Component>();
+
+    for (Component c : this.components)
+      if (c.getClass().isAssignableFrom(p_class))
+        components.add(c);
+
+    if (!components.isEmpty())
+      for (Component c : components) {
+        this.components.remove(c);
+        currentScene.components.remove(c);
+      }
+    //System.gc(); }
   }
 
   public void setup() {
   }
+
 
   public void update() {
   }

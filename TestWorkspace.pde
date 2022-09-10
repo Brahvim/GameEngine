@@ -85,10 +85,10 @@ Scene testScene = new Scene() {
 
     circle = new Entity() {
       Transformation form = new Transformation(this);
-      Renderer display;
+      ShapeRenderer display;
 
       public void setup() {
-        this.display = new Renderer(this, ELLIPSE, circleTexture);
+        this.display = new ShapeRenderer(this, ELLIPSE, circleTexture);
         this.display.fill = color(230);
         this.display.stroke = color(0);
         this.display.strokeWeight = 0.05f;        
@@ -135,12 +135,12 @@ Scene testScene = new Scene() {
 
     quad = new Entity() {
       Transformation form;
-      Renderer display;
+      ShapeRenderer display;
 
       public void setup() {
         this.form = new Transformation(this);
         this.form.scale.mult(15);
-        this.display = new Renderer(this, QUAD, boxTexture);
+        this.display = new ShapeRenderer(this, QUAD, boxTexture);
         this.display.strokeWeight = 0.05f;
       }
 
@@ -165,7 +165,7 @@ Scene testScene = new Scene() {
 
     groundBox = new Entity() {
       Transformation form = new Transformation(this);
-      Renderer display = new Renderer(this, BOX, boxTexture);
+      ShapeRenderer display = new ShapeRenderer(this, BOX, boxTexture);
 
       public void setup() {
         this.display.fill = color(255);
@@ -178,7 +178,6 @@ Scene testScene = new Scene() {
     cam.clearColor = color(0); 
     rev.clearColor = color(30, 120, 170, 80); //15);
     setCam(rev);
-
 
     cam.script = new CamScript() {
       public void run(Camera p_cam) {
@@ -239,7 +238,7 @@ Scene testScene = new Scene() {
       if (isLightDimmed) {
         doLights = false;
         l.col.set(65, 50, 50);
-      } else { 
+      } else {
         doLights = true;
         l.col.set(255, 255, 255);
       }

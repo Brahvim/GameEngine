@@ -243,7 +243,7 @@ void draw() {
     currentCam.applyMatrix();
 
   for (Component c : currentScene.components)
-    if (!(c instanceof Renderer))
+    if (!(c instanceof RenderingComponent))
       if (c.enabled && c.parent.enabled)
         c.update();
       else c.disabledUpdate();
