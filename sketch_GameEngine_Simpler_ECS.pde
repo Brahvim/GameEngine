@@ -102,7 +102,7 @@ void setup() {
   // Library initialization:
 
   Fisica.init(this);
-
+  //fx = new PostFXSupervisor(this);
   nerdLogInfo("Loading LibBulletJME...");
   NativeLibraryLoader.loadLibbulletjme(true, 
     new File(sketchPath("lib")), // Do NOT use `sketchPath + "lib"`! That failed. 
@@ -272,6 +272,15 @@ void draw() {
   if (bt != null && btShouldUpdate)
     bt.update(deltaTime);
   pop();
+
+  if (doAnyDrawing && doUIRendering) {
+    begin2D();
+    noLights();
+    currentScene.drawUI();
+    end2D();
+  }
+
+  endPGL();
 }
 
 
@@ -289,15 +298,6 @@ void post() {
   //image(fx.getCurrentPass(), cx, cy, width, height);
   //blendMode(BLEND);
   //}
-
-  if (doAnyDrawing && doUIRendering) {
-    begin2D();
-    noLights();
-    currentScene.drawUI();
-    end2D();
-  }
-
-  endPGL();
 
   //doPostProcessingState = doPostProcessing;
 

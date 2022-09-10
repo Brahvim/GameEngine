@@ -57,6 +57,7 @@ void engineSetup() {
 Scene testScene = new Scene() {
   @SuppressWarnings("unused")
     Asset audio, boxTexture, circleTexture, cursorImage;
+  //Pass bloomPass;
   Camera cam = new Camera(), rev = new Camera(); // A 'normal' and a 'revolving' camera.
 
   @SuppressWarnings("unused")
@@ -64,6 +65,7 @@ Scene testScene = new Scene() {
   SineWave wave = new SineWave(0.001f);
 
   public void setup() {
+    //bloomPass = new BloomPass(SKETCH, 0.5f, 20, 30);
     cursorImage = new Asset("Unnamed_RPG_cursor.png", AssetType.PICTURE, new Runnable() {
       public void run() {
         cursor(cursorImage.asPicture(), -4, -4);
@@ -204,6 +206,7 @@ Scene testScene = new Scene() {
     else currentCam.applyMatrix();
 
     //doPostProcessing = true;
+    //applyPass(bloomPass);
 
     //gl.enable(PGL.CULL_FACE);
     //gl.cullFace(PGL.FRONT);
@@ -225,10 +228,21 @@ Scene testScene = new Scene() {
     text((int)frameRate, 0, 0);
   }  
 
+  boolean isLightDimmed;
   public void mousePressed() {
     if (mouseButton == RIGHT)
       setCam(currentCam == rev? cam : rev);
-    else if (mouseButton == CENTER)
-      light.enabled = !light.enabled;
-  }
+    else if (mouseButton == CENTER) {
+      //light.enabled = !light.enabled; // Causes COMPLETE darkness!
+      isLightDimmed = !isLightDimmed;
+      Light l = light.getComponent(Light.class);
+      if (isLightDimmed) {
+        doLights = false;
+        l.col.set(65, 50, 50);
+      } else { 
+        doLights = true;
+        l.col.set(255, 255, 255);
+      }
+    }
+  } // End of `mousePressed()`.
 };

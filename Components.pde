@@ -200,15 +200,15 @@ class Light extends Component {
     switch(this.type) {
     case AMBIENT:
       ambientLight(this.col.x, this.col.y, this.col.z, 
-        this.pos.x, this.pos.y, currentCam.far * 2);
+        this.pos.x, this.pos.y, currentCam.far + Float.MAX_VALUE);
       break;
     case DIRECTIONAL:
       directionalLight(this.col.x, this.col.y, this.col.z, 
-        this.pos.x, this.pos.y, currentCam.far * 2);
+        this.pos.x, this.pos.y, currentCam.far + Float.MAX_VALUE);
       break;
     case POINT:
       pointLight(this.col.x, this.col.y, this.col.z, 
-        this.pos.x, this.pos.y, currentCam.far * 2);
+        this.pos.x, this.pos.y, currentCam.far + Float.MAX_VALUE);
       break;
     case SPOT:
       throw new RuntimeException("Please use the `SpotLight` class instead of assigning " 

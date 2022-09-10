@@ -103,6 +103,10 @@ float frameStartTime, deltaTime, pframeTime, frameTime;
 //}
 
 // The `PostFX` library:
+//import ch.bildspur.postfx.builder.*;
+//import ch.bildspur.postfx.pass.*;
+//import ch.bildspur.postfx.*;
+
 //PostFXSupervisor fx;
 //boolean doPostProcessing, doPostProcessingState;
 //void applyPass(Pass p_pass) {
