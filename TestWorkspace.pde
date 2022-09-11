@@ -62,17 +62,6 @@ void engineSetup() {
 }
 
 
-class Player extends Entity {
-  Asset skin;
-
-  public void setup() {
-  }
-
-  public void update() {
-  }
-}
-
-
 Scene testScene = new Scene() {
   @SuppressWarnings("unused")
     Asset audio, boxTexture, circleTexture, cursorImage, svgImage;
@@ -94,7 +83,7 @@ Scene testScene = new Scene() {
 
     audio = new Asset("UnicycleGirrafe.mp3", AssetType.SOUND, new Runnable() {
       public void run() {
-        //audio.asSound().loop();
+        audio.asSound().loop();
       }
     }
     ).beginAsyncLoad();

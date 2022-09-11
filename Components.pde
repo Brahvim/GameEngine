@@ -514,7 +514,7 @@ class SvgRenderer extends ShapeRenderer {
             this.resScale = dist(0, 0, this.svg.width, this.svg.height) * 0.05f;
 
         if (!super.textureLoader.ploaded && super.textureLoader.loaded)
-          this.rasterize();
+          this.rasterize(); // Apparently the SVG might not be visible if not exporting with Java!
       } else if (super.textureLoader.type == AssetType.PICTURE)
         super.texture = (PImage)this.textureLoader.loadedData;
   }
