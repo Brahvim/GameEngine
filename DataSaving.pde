@@ -89,8 +89,6 @@ void writeObject(Serializable p_object, String p_fname) {
   } 
   catch (FileNotFoundException e) {
     throw e;
-    //logEx(e);
-    //return null;
   }
   catch (IOException e) {
     nerdLogEx(e);
@@ -100,6 +98,7 @@ void writeObject(Serializable p_object, String p_fname) {
 
 
 class VectorSerializer implements Serializable {
+  private final static long serialVersionUID = 685642643L;
   float[] data = new float[3];
 
   VectorSerializer(PVector p_vec) {
@@ -132,7 +131,21 @@ class ColorSerializer implements Serializable {
  }
  */
 
+class ColorSerializer implements Serializable {
+  private final static long serialVersionUID = 54865654L;
+  int data;
+
+  ColorSerializer(color p_color) {
+    this.data = p_color;
+  }
+
+  ColorSerializer(float p_red, float p_green, float p_blue, float p_alpha) {
+    this.data = color(p_red, p_green, p_blue, p_alpha);
+  }
+}
+
 static class TransformationSerializer implements Serializable {
+  private final static long serialVersionUID = 856598746L;
   float[] data = new float[9];
 
   TransformationSerializer(Transformation p_form) {
@@ -151,6 +164,7 @@ static class TransformationSerializer implements Serializable {
 }
 
 static class MaterialSerializer implements Serializable {
+  private final static long serialVersionUID = 435461531L;
   float[] data = new float[10];
 
   MaterialSerializer(Material p_mat) {
