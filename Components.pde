@@ -464,7 +464,7 @@ class SvgRenderer extends ShapeRenderer {
   // In a setter, you'd be rendering the SVG to a texture.
   // With this approach, you render in the update loop itself
   // when an update is needed.
-  boolean doStyle = true, didStyle, doRasterize;
+  boolean doStyle = true;
 
   PShape svg, psvg = null;
   // ^^^ That's the magic of this approach!
@@ -493,16 +493,12 @@ class SvgRenderer extends ShapeRenderer {
 
   public void textureLoaderCheck() {
     if (super.textureLoader != null)
+
       if (this.textureLoader.type == AssetType.SHAPE) {
         this.svg = this.textureLoader.asShape();
-        this.resScale = dist(0, 0, this.svg.width, this.svg.height);// * 0.05f;
+        this.resScale = dist(0, 0, this.svg.width, this.svg.height) * 0.05f;
       } else if (this.textureLoader.type == AssetType.PICTURE)
         super.texture = this.textureLoader.asPicture();
-  }
-
-  public void renderSvg() {
-    this.texture = svgToImage(this.svg, abs(this.form.scale.x * this.resScale), 
-      abs(this.form.scale.y * this.resScale), this.doStyle);
   }
 
   public void applyTexture() {
@@ -511,8 +507,10 @@ class SvgRenderer extends ShapeRenderer {
     // Re-render :D
     if (!(this.svg == null || super.form.scale.x == 0 && super.form.scale.y == 0))
       if (this.svg != this.psvg || abs(PVector.sub(this.form.scale, this.pscale).magSq())
-        > this.resScale) {
-        this.renderSvg();
+        < this.resScale) {
+        this.texture = svgToImage(this.svg, abs(this.form.scale.x * this.resScale), 
+          abs(this.form.scale.y * this.resScale));
+        println("Re-rendered SVG", frameCount);
       }
     // I guess not accessing the `z` helps CPU cache.
 
