@@ -326,7 +326,7 @@ class ShapeRenderer extends RenderingComponent {
   }
 
   public void applyTexture() {
-    if (!this.doTexture) 
+    if (!this.doTexture)
       return;
 
     textureMode(NORMAL);
@@ -508,7 +508,7 @@ class SvgRenderer extends ShapeRenderer {
       if (super.textureLoader.type == AssetType.SHAPE) {
         this.svg = (PShape)super.textureLoader.loadedData; //super.textureLoader.asShape();
 
-        // Calculate the rasterization scale before rasterizing. 
+        // Calculate the rasterization scale before rasterizing!:
         if (this.svg != null)
           if (this.doAutoCalc)
             this.resScale = dist(0, 0, this.svg.width, this.svg.height) * 0.05f;
@@ -524,7 +524,7 @@ class SvgRenderer extends ShapeRenderer {
 
     // Re-render :D
     if (!(this.svg != null && super.form.scale.x == 0 && super.form.scale.y == 0))
-      if (this.form.scale != this.pscale && this.doAutoRaster) 
+      if (this.form.scale != this.pscale && this.doAutoRaster)
         this.rasterize();
 
     this.pscale = super.form.scale;
