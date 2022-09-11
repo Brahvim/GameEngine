@@ -1,7 +1,7 @@
 // Fun Fact: these are the SAME as `javax.media.opengl.ClassName`:
 import com.jogamp.newt.opengl.GLWindow;
 
-// `PJOGL` holds references to `gl` and `glu`! (...and even the OpenGL `context`!)
+// `PJOGL` holds references to `gl` and `glu`! (...and even the OpenGL context!)
 // [file:///C:/Projects/ProcessingAll_JavaDocs/core/index.html]
 //import com.jogamp.opengl.glu.GLU;
 //import java.nio.*; //FloatBuffer;
@@ -38,7 +38,7 @@ PGL gl;
 // `PJOGL` has them, as stated in a comment on line 4 of this `.pde` file.
 
 final Sound SOUND = new Sound(this);
-String[] soundDevices;
+String[] soundDevices; // Should use OpenAL to provide these, but JSyn handles device changes very well.
 Runnable onExit = null;
 
 // Environment identification:
@@ -84,6 +84,7 @@ float frameStartTime, deltaTime, pframeTime, frameTime;
 // `PApplet.millis()` starts counting from when the class is instantiated, and returns an `int`.
 // Bad, bad, bad!
 // The overload in this class returns a long, and starts at the end of `setup()`.
+// Wait, I can't overload it, *my bad!* :sweat_smile:
 
 
 // Failed to get these via reflection, copy-pasted them. I hope I use these at some point!:
@@ -186,17 +187,13 @@ void pop() {
 
 PImage svgToImage(PShape p_shape, float p_width, float p_height) {
   if (p_shape == null)
-  try {
-    throw new NullPointerException("`svgToImage(null , p_width, p_height) won't work.`");
-  } 
-  catch (NullPointerException e) {
-    e.printStackTrace();
-  }
+    new NullPointerException("`svgToImage(null , p_width, p_height)` won't work.").printStackTrace();
+
 
   PGraphics buffer = createGraphics((int)ceil(p_width), (int)ceil(p_height), P3D);
 
   if (buffer == null)
-    throw new NullPointerException("`buffer` is `null`!");
+    new NullPointerException("`buffer` is `null`!").printStackTrace();
 
   buffer.beginDraw();
   buffer.shape(p_shape, 0, 0, p_width, p_height);

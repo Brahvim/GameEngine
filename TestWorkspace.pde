@@ -4,6 +4,10 @@
  
  // `Setup.pde`:
  
+ static {
+ iconPath = "sunglass_nerd.png";
+ }
+ 
  void engineSetup() { // Generally called via reflection.
  functionThatLoadsAssets();
  restOfTheSetup();
@@ -40,6 +44,10 @@
  ```
  */
 
+static {
+  PJOGL.setIcon("sunglass_nerd.png");
+}
+
 void engineSetup() {
   // Bullet `PhysicsRigidBody`s have a `.activate()` method.
 
@@ -52,7 +60,6 @@ void engineSetup() {
   // The Engine won't load any scenes automatically to avoid allocating too much memory:
   setScene(testScene);
 }
-
 
 Scene testScene = new Scene() {
   @SuppressWarnings("unused")
@@ -144,6 +151,8 @@ Scene testScene = new Scene() {
         this.display = new SvgRenderer(this, QUAD, svgImage);
         this.display.strokeWeight = 0.05f;
         this.display.textureWrap = REPEAT;
+        this.display.doAutoRaster = false;
+        //this.display.rasterize();
       }
 
       public void update() {

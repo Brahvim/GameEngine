@@ -47,7 +47,7 @@ void writeObject(Serializable p_object, String p_fname) {
       objFile.createNewFile();
   }
   catch (IOException e) {
-    logEx(e);
+    nerdLogEx(e);
   }
 
   try {
@@ -60,10 +60,10 @@ void writeObject(Serializable p_object, String p_fname) {
     fout.close();
   }
   catch (FileNotFoundException e) {
-    logEx(e);
+    nerdLogEx(e);
   }
   catch (IOException e) {
-    logEx(e);
+    nerdLogEx(e);
   }
 }
 
@@ -79,7 +79,7 @@ void writeObject(Serializable p_object, String p_fname) {
       ret = (T)oStream.readObject();
     }
     catch(ClassNotFoundException e) {
-      logEx(e);
+      nerdLogEx(e);
     }
     finally {
       oStream.close();
@@ -93,7 +93,7 @@ void writeObject(Serializable p_object, String p_fname) {
     //return null;
   }
   catch (IOException e) {
-    logEx(e);
+    nerdLogEx(e);
     return null;
   }
 }

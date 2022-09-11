@@ -25,7 +25,7 @@ void switchScene(Scene p_scene) {
     }
   }
   catch (IllegalAccessException e) {
-    logEx(e); // Shouldn't occur unless `p_scene` is `null`, ...which won't work!
+    nerdLogEx(e); // Shouldn't occur unless `p_scene` is `null`, ...which won't work!
   }
 
   p_scene.timesReloaded++;
@@ -54,7 +54,7 @@ void setScene(Scene p_scene) {
     }
   }
   catch (IllegalAccessException e) {
-    logEx(e); // Shouldn't occur unless `p_scene` is `null`, ...which won't work!
+    nerdLogEx(e); // Shouldn't occur unless `p_scene` is `null`, ...which won't work!
   }
 
   int startt = millis();

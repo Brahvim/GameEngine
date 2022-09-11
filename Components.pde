@@ -305,7 +305,7 @@ class ShapeRenderer extends RenderingComponent {
     this.form = p_entity.getComponent(Transformation.class);
 
     if (this.form == null)
-      logEx(new NullPointerException("A `Renderer` needs a `Transform`!"));
+      nerdLogEx(new NullPointerException("A `Renderer` needs a `Transform`!"));
   }
 
   ShapeRenderer(Entity p_entity, int p_type) {
@@ -464,7 +464,7 @@ class SvgRenderer extends ShapeRenderer {
   // In a setter, you'd be rendering the SVG to a texture.
   // With this approach, you render in the update loop itself
   // when an update is needed.
-  boolean doStyle = true;
+  boolean doStyle = true, doAutoCalc = true, doAutoRaster = false;
 
   PShape svg, psvg = null;
   // ^^^ That's the magic of this approach!
@@ -491,29 +491,53 @@ class SvgRenderer extends ShapeRenderer {
     this.resScale = dist(0, 0, this.svg.width, this.svg.height) * 0.05f;
   }
 
+  public void calcScale() {
+    this.resScale = dist(0, 0, this.svg.width, this.svg.height) * 0.05f;
+  }
+
+  public void rasterize() {
+    if (this.svg != null)
+      this.texture = svgToImage(this.svg, abs(this.form.scale.x * this.resScale), 
+        abs(this.form.scale.y * this.resScale));
+    println("Re-rendererd SVG.");
+  }
+
   public void textureLoaderCheck() {
     if (super.textureLoader != null)
 
-      if (this.textureLoader.type == AssetType.SHAPE) {
+      if (super.textureLoader.type == AssetType.SHAPE) {
         this.svg = this.textureLoader.asShape();
-        this.resScale = dist(0, 0, this.svg.width, this.svg.height) * 0.05f;
-      } else if (this.textureLoader.type == AssetType.PICTURE)
-        super.texture = this.textureLoader.asPicture();
+        if (this.doAutoCalc)
+          if (this.svg != null)
+            this.resScale = dist(0, 0, this.svg.width, this.svg.height) * 0.05f;
+        if (!super.textureLoader.ploaded && super.textureLoader.loaded)
+          this.rasterize();
+      } else if (super.textureLoader.type == AssetType.PICTURE)
+        super.texture = super.textureLoader.asPicture();
   }
 
   public void applyTexture() {
     this.textureLoaderCheck();
 
     // Re-render :D
-    if (!(this.svg == null || super.form.scale.x == 0 && super.form.scale.y == 0))
-      if (this.svg != this.psvg || this.form.scale != this.pscale)
-        //abs(PVector.sub(this.form.scale, this.pscale).magSq())  < this.resScale) {
-        this.texture = svgToImage(this.svg, abs(this.form.scale.x * this.resScale), 
-          abs(this.form.scale.y * this.resScale));
+    if (!(this.svg != null && super.form.scale.x == 0 && super.form.scale.y == 0)) {
+      if (this.form.scale != this.pscale && this.doAutoRaster) {
+        println("Scale changed. Rasterizing.");
+        this.rasterize();
+      }
+    }
+
+
+    //if (this.doAutoRaster)
+    //  if (this.svg != null)
+    //    if (!(this.svg == null || super.form.scale.x == 0 && super.form.scale.y == 0))
+    //      if (this.svg != this.psvg || this.form.scale != this.pscale)
+    //        //abs(PVector.sub(this.form.scale, this.pscale).magSq())  < this.resScale)
+    //        this.rasterize();
 
     this.pscale = super.form.scale;
 
-    if (!this.doTexture)
+    if (!super.doTexture)
       return;
     textureMode(NORMAL);
     textureWrap(this.textureWrap);

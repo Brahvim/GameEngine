@@ -7,7 +7,7 @@
 
 void settings() {
   size(INIT_WIDTH, INIT_HEIGHT, P3D);
-  PJOGL.setIcon("sunglass_nerd.png");
+  //PJOGL.setIcon(iconPath); // This is now handles by the user.
   //PJOGL.setIcon(new String[]{"sunglass_nerd.png"});
   // For when you need to provide multiple resolution icons yourself!
 }
@@ -39,7 +39,7 @@ void dispose() {
     // Fine, here we go...
     nerdLogInfo("Hey! By the way, the log file kinda got logged out,"
       + " if you will... you know, understand?");
-    logEx(e);
+    nerdLogEx(e);
   }
 
   Log.fileLogger.flush();

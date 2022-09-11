@@ -1,8 +1,9 @@
 static class Log {
-  public final static byte lvInfo = 0, lvWarn = 1, lvError = 2;
-  public static byte logLevel = Log.lvError, nerdLogLevel = Log.lvError;
+  public final static byte lvInfo = 0, lvWarn = 1, lvError = 2; 
+  public static boolean canInfo = true, canWarn = true, canError = true;
+  public static boolean nerdCanInfo = true, nerdCanWarn = true, nerdCanError = true;
   public static boolean logToFile = true, openFileOnExit = true, 
-    logToConsole = true, enabled = true, canFile = false, 
+    logToConsole = true, enabled = true, canFile = true, 
     nerdCanLog = true, nerdCanFile = true;
 
   public static SimpleDateFormat dateFormat
@@ -20,8 +21,8 @@ public void initLog() {
   Log.absPath = Log.logFile.getAbsolutePath();
 
   // MAKE THE PROGRAM FASTER outside the PDE by disabling console-only logging!:
-  Log.logToConsole = !INSIDE_PDE;
-  Log.nerdCanLog = !INSIDE_PDE;
+  Log.logToConsole = INSIDE_PDE;
+  Log.nerdCanLog = INSIDE_PDE;
 
   if (!Log.logFile.exists())
   try {
@@ -50,10 +51,11 @@ public static void logInfo(String p_message) {
   if (!Log.enabled)
     return;
 
-  if (Log.logToConsole && Log.logLevel < Log.lvInfo)
+  if (!Log.canInfo)
     return;
 
-  System.out.println(p_message);
+  if (Log.logToConsole)
+    System.out.println(p_message);
 
   if (Log.logToFile) {
     Log.fileLogger.printf("[Info] [%s] %s\n", Log.dateFormat.format(new Date()), p_message);
@@ -65,11 +67,13 @@ public static void nerdLogInfo(String p_message) {
   if (!Log.enabled)
     return;
 
-  if (Log.nerdCanLog && Log.nerdLogLevel < Log.lvInfo)
+  if (!Log.nerdCanInfo)
     return;
 
-  System.out.print("[Nerd] ");
-  System.out.println(p_message);
+  if (Log.nerdCanLog) {
+    System.out.print("[Nerd-Info] ");
+    System.out.println(p_message);
+  }
 
   if (Log.nerdCanFile) {
     Log.fileLogger.printf("[Nerd-Info] [%s] %s\n", Log.dateFormat.format(new Date()), p_message);
@@ -81,10 +85,11 @@ public static void logWarn(String p_message) {
   if (!Log.enabled)
     return;
 
-  if (Log.logToConsole && Log.logLevel < Log.lvWarn)
+  if (!Log.canWarn)
     return;
 
-  System.out.println("[!] " + p_message);
+  if (Log.logToConsole)
+    System.out.println("[!] " + p_message);
 
   if (Log.logToFile) {
     Log.fileLogger.printf("[Warn] [%s] %s\n", Log.dateFormat.format(new Date()), p_message);
@@ -96,13 +101,14 @@ public static void nerdLogWarn(String p_message) {
   if (!Log.enabled)
     return;
 
-  if (Log.nerdCanLog && Log.nerdLogLevel < Log.lvWarn)
+  if (!Log.nerdCanWarn)
     return;
 
-  System.out.println("[!Nerd] " + p_message);
+  if (Log.nerdCanLog)
+    System.out.println("[Nerd-Warn] " + p_message);
 
   if (Log.nerdCanFile) {
-    Log.fileLogger.printf("[NerdWarn] [%s] %s\n", Log.dateFormat.format(new Date()), p_message);
+    Log.fileLogger.printf("[Nerd-Warn] [%s] %s\n", Log.dateFormat.format(new Date()), p_message);
     Log.fileLogger.flush();
   }
 }
@@ -112,10 +118,11 @@ public static void logError(String p_message) {
   if (!Log.enabled)
     return;
 
-  if (Log.logToConsole && Log.logLevel < Log.lvError)
+  if (!Log.canError)
     return;
 
-  System.err.println(p_message);
+  if (Log.logToConsole)
+    System.err.println(p_message);
 
   if (Log.logToFile) {
     Log.fileLogger.printf("[ERROR] [%s] %s\n", Log.dateFormat.format(new Date()), p_message);
@@ -127,14 +134,16 @@ public static void nerdLogError(String p_message) {
   if (!Log.enabled)
     return;
 
-  if (Log.nerdCanLog && Log.nerdLogLevel < Log.lvError)
+  if (!Log.nerdCanError)
     return;
 
-  System.err.print("[Nerd] ");
-  System.err.println(p_message);
+  if (Log.nerdCanLog) {
+    System.err.print("[Nerd] ");
+    System.err.println(p_message);
+  }
 
   if (Log.nerdCanFile) {
-    Log.fileLogger.printf("[Nerd-ERROR] [%s] %s\n", Log.dateFormat.format(new Date()), p_message);
+    Log.fileLogger.printf("[Nerd-Error] [%s] %s\n", Log.dateFormat.format(new Date()), p_message);
     Log.fileLogger.flush();
   }
 }
@@ -142,10 +151,10 @@ public static void nerdLogError(String p_message) {
 // These two take in a `java.lang.RuntimeException`:
 
 public static void logEx(Exception p_except) {
-  if (!Log.enabled)
+  if (!(Log.enabled || Log.nerdCanError))
     return;
 
-  if (Log.logToConsole && Log.logLevel >= Log.lvError)
+  if (Log.nerdCanLog)
     p_except.printStackTrace(); // To the console it goes!
 
   // I learnt this on Stackoverflow, too. Didn't mention the source ; - ;)
@@ -172,6 +181,40 @@ public static void logEx(Exception p_except) {
   }
 }
 
+
+public static void nerdLogEx(Exception p_except) {
+  if (!(Log.enabled || Log.nerdCanError))
+    return;
+
+  if (Log.nerdCanLog)
+    p_except.printStackTrace(); // To the console it goes!
+
+  // I learnt this on Stackoverflow, too. Didn't mention the source ; - ;)
+  if (Log.logToFile) {
+    StringWriter sw = new StringWriter();
+    PrintWriter pw = new PrintWriter(sw);
+    p_except.printStackTrace(pw);
+
+    try {
+      sw.close();
+    } 
+    catch (IOException e) {
+      // But Sir, this is 'a' `logEx()`. :rofl:
+      e.printStackTrace();
+    }
+
+    pw.close();
+
+    if (Log.nerdCanFile) {
+      Log.fileLogger.printf("[Nerd-Exception] [%s]\n\t\t%s\n", 
+        // The extra `\n` at the start is actually comfortable. Do not change that. Please trust me.
+        Log.dateFormat.format(new Date()), sw.toString());
+      Log.fileLogger.flush();
+    }
+  }
+}
+
+// `Throwable`s, `Exception`s - nothing works!
 public static void logThrownEx(RuntimeException p_thrown) {
   logEx(p_thrown);
   throw p_thrown;
@@ -180,35 +223,10 @@ public static void logThrownEx(RuntimeException p_thrown) {
 // Varargs methods:
 
 public static void nerdLogInfo(Object... p_args) {
-  if (!Log.enabled) 
+  if (!(Log.enabled || Log.nerdCanInfo))
     return;
 
-  if (Log.logToConsole && Log.logLevel < Log.lvInfo) {
-    for (int i = 0; i < p_args.length; i++)
-      System.out.printf("%s", p_args[i]);
-    System.out.write('\n');
-  }
-
-  if (Log.logToFile) {
-    Log.fileLogger.printf("[Nerd-Info] [%s] ", Log.dateFormat.format(new Date()));
-
-    for (int i = 0; i < p_args.length; i++)
-      if (p_args[i] != null)
-        Log.fileLogger.printf("%s", p_args[i] instanceof String? p_args[i] : p_args[i].toString());
-      else
-        Log.fileLogger.printf("%s", "null");
-
-    Log.fileLogger.write('\n');
-    Log.fileLogger.flush();
-  }
-}
-
-
-public static void logInfo(Object... p_args) {
-  if (!Log.enabled) 
-    return;
-
-  if (Log.nerdCanLog && Log.nerdLogLevel < Log.lvInfo) {
+  if (Log.nerdCanLog) {
     for (int i = 0; i < p_args.length; i++)
       System.out.printf("%s", p_args[i]);
     System.out.write('\n');
@@ -229,11 +247,36 @@ public static void logInfo(Object... p_args) {
 }
 
 
-public static void nerdLogWarn(Object... p_args) {
-  if (!Log.enabled) 
+public static void logInfo(Object... p_args) {
+  if (!(Log.enabled || Log.canInfo)) 
     return;
 
-  if (Log.nerdCanLog && Log.nerdLogLevel < Log.lvInfo) {
+  if (Log.logToConsole) {
+    for (int i = 0; i < p_args.length; i++)
+      System.out.printf("%s", p_args[i]);
+    System.out.write('\n');
+  }
+
+  if (Log.canFile) {
+    Log.fileLogger.printf("[Nerd-Info] [%s] ", Log.dateFormat.format(new Date()));
+
+    for (int i = 0; i < p_args.length; i++)
+      if (p_args[i] != null)
+        Log.fileLogger.printf("%s", p_args[i] instanceof String? p_args[i] : p_args[i].toString());
+      else
+        Log.fileLogger.printf("%s", "null");
+
+    Log.fileLogger.write('\n');
+    Log.fileLogger.flush();
+  }
+}
+
+
+public static void nerdLogWarn(Object... p_args) {
+  if (!(Log.enabled || Log.nerdCanWarn))
+    return;
+
+  if (Log.nerdCanLog) {
     for (int i = 0; i < p_args.length; i++)
       System.out.printf("%s", p_args[i]);
     System.out.write('\n');
@@ -257,7 +300,7 @@ public static void logWarn(Object... p_args) {
   if (!Log.enabled) 
     return;
 
-  if (Log.logToConsole && Log.logLevel < Log.lvInfo) {
+  if (Log.logToConsole && Log.canWarn) {
     for (int i = 0; i < p_args.length; i++)
       System.out.printf("%s", p_args[i]);
     System.out.write('\n');
@@ -281,7 +324,7 @@ public static void nerdLogError(Object... p_args) {
   if (!Log.enabled) 
     return;
 
-  if (Log.nerdCanLog && Log.nerdLogLevel < Log.lvInfo) {
+  if (Log.nerdCanLog && Log.canError) {
     for (int i = 0; i < p_args.length; i++)
       System.out.printf("%s", p_args[i]);
     System.out.write('\n');
@@ -302,10 +345,10 @@ public static void nerdLogError(Object... p_args) {
 }
 
 public static void logError(Object... p_args) {
-  if (!Log.enabled) 
+  if (!Log.enabled)
     return;
 
-  if (Log.logToConsole && Log.logLevel < Log.lvInfo) {
+  if (Log.logToConsole && Log.canError) {
     for (int i = 0; i < p_args.length; i++)
       System.out.printf("%s", p_args[i]);
     System.out.write('\n');
@@ -326,7 +369,7 @@ public static void logError(Object... p_args) {
 }
 
 void nerdLogToFile(int p_lv, Object... p_args) {
-  if (!(Log.logToFile && Log.enabled))
+  if (!(Log.nerdCanFile && Log.enabled))
     return;
 
   if (Log.nerdCanFile) {
