@@ -1,4 +1,4 @@
-// YO! Go work on the Renderer class.
+// YO! Go work on the Renderer class. //<>//
 // The `update()` method's `switch` needs stuff to draw! (For `SPHERE`!)
 // Also, get it textured! :joy: 
 
@@ -149,7 +149,7 @@ void setup() {
 
   rectMode(CENTER);
   imageMode(CENTER);
-  //hint(ENABLE_STROKE_P);
+  //hint(ENABLE_STROKE_PERSPECTIVE);
 
   textFont(createFont("SansSerif", TEXT_TEXTURE_SIZE));
   textSize(DEFAULT_TEXT_SIZE);
@@ -206,9 +206,13 @@ void draw() {
   pframeTime = frameStartTime;
   deltaTime = frameTime * 0.01f;
 
+  if (currentCam == null)
+    setCam(DEFAULT_CAMERA);
+
   // Ah... the tradition of using `background()` first :)
-  if (doCamera)
-    currentCam.clear();
+  if (doCamera && currentCam != null)
+    if (currentCam.doAutoClear)
+      currentCam.clear();
 
   // *OpenGL reference.*
   // *Every video game reference:*
@@ -226,7 +230,8 @@ void draw() {
   // can use methods such as `modelX()`, and check matrices.
 
   push();
-  currentCam.runScript();
+  if (doCamera && currentCam != null)
+    currentCam.runScript();
   // ^^^ Running the script here does not cause Z-fighting issues :O
   // [https://stackoverflow.com/questions/55185184/objects-shake-when-rotating]
   // [https://en.wikipedia.org/wiki/Z-fighting]
@@ -239,7 +244,7 @@ void draw() {
     unprojectMouse();
 
   // (Yeah. This place? Running the script here? There's gunna be Z-fighting action - get popcorn! :joy:)
-  if (doCamera)
+  if (doCamera && currentCam != null)
     currentCam.applyMatrix();
 
   for (Component c : currentScene.components)

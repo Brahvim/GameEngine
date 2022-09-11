@@ -58,8 +58,8 @@ boolean doUpdates = true, doAnyDrawing = true,
   doCamera = true, doLights = true;
 
 //final int INIT_WIDTH = 800, INIT_HEIGHT = 600;
-final int INIT_WIDTH = 1280, INIT_HEIGHT = 720;
-final float INIT_DEPTH = INIT_WIDTH + INIT_HEIGHT; // Super simple! No `sqrt()`.
+final static int INIT_WIDTH = 1280, INIT_HEIGHT = 720;
+final static float INIT_DEPTH = INIT_WIDTH + INIT_HEIGHT; // Super simple! No `sqrt()`.
 float pwidth, pheight;
 
 // Getting the refresh rate and number of display, etcetera:

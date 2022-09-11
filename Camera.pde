@@ -1,6 +1,20 @@
 final ArrayList<Camera> CAMERAS = new ArrayList<Camera>();
 Camera currentCam, 
   lerpeable; // `lerpeable` is allocated all the time during lerps, don't do that right now.
+
+
+final PVector DEFAULT_CAM_POS = new PVector(INIT_WIDTH / 2, INIT_HEIGHT / 2, 300), 
+  DEFAULT_CAM_CENTER = new PVector(INIT_WIDTH / 2, INIT_HEIGHT / 2, 0), 
+  DEFAULT_CAM_UP = new PVector(0, 1, 0);
+
+final static float DEFAULT_CAM_FOV = radians(60), 
+  DEFAULT_CAM_NEAR = 0.05f, DEFAULT_CAM_FAR = 10000;
+
+final Camera DEFAULT_CAMERA = new Camera(
+  DEFAULT_CAM_POS, DEFAULT_CAM_CENTER, DEFAULT_CAM_UP, 
+  DEFAULT_CAM_FOV, DEFAULT_CAM_NEAR, DEFAULT_CAM_FAR);
+
+
 boolean camLerpRequest, pcamLerpRequest, camIsLerp = false, camLerpMouse = true;
 float camLerpAmt;
 Camera camToLerpFrom, camToLerpTo;
@@ -103,10 +117,10 @@ void camLerpUpdate(Camera p_from, Camera p_to, float p_lerpAmt, float p_start, f
 
 class Camera extends Entity {
   PVector pos, center, up;
-  float fov = radians(60), near = 0.05f, far = 10000, mouseZ = 25;
+  float fov = DEFAULT_CAM_FOV, near = 0.05f, far = 10000, mouseZ = 25;
   CamScript script;
   color clearColor = color(0);
-  boolean doScript = true;
+  boolean doScript = true, doAutoClear = true;
   int projection = PERSPECTIVE;
 
   Camera() {

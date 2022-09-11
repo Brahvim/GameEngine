@@ -5,7 +5,7 @@
  // `Setup.pde`:
  
  static {
- iconPath = "sunglass_nerd.png";
+ PJOGL.setIcon("sunglass_nerd.png");
  }
  
  void engineSetup() { // Generally called via reflection.
@@ -60,6 +60,18 @@ void engineSetup() {
   // The Engine won't load any scenes automatically to avoid allocating too much memory:
   setScene(testScene);
 }
+
+
+class Player extends Entity {
+  Asset skin;
+
+  public void setup() {
+  }
+
+  public void update() {
+  }
+}
+
 
 Scene testScene = new Scene() {
   @SuppressWarnings("unused")
@@ -213,6 +225,7 @@ Scene testScene = new Scene() {
   }
 
   public void draw() {
+    doCamera = !mouseLeft;
     if (mouseLeft)
       camLerpUpdate(cam, rev, (float)mouseX / (float)width);
     else currentCam.applyMatrix();

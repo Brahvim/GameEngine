@@ -191,4 +191,8 @@ class Asset extends Thread {
   PShape asShape() {
     return (PShape)this.loadedData;
   }
+
+  <T> T getData() {
+    return (T)this.loadedData;
+  }
 }

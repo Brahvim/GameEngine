@@ -34,9 +34,12 @@ boolean keysPressed(int... p_keyCodes) {
 }
 
 void unprojectMouse() {
-  float originalNear = currentCam.near;
-  currentCam.near = currentCam.mouseZ;
-  currentCam.applyMatrix();
+  float originalNear = 0;
+  if (currentCam != null) {
+    originalNear = currentCam.near;
+    currentCam.near = currentCam.mouseZ;
+    currentCam.applyMatrix();
+  }
 
   // Unproject:
   Unprojector.captureViewMatrix((PGraphics3D)g);
@@ -45,7 +48,9 @@ void unprojectMouse() {
   Unprojector.gluUnProject(mouseX, height - mouseY, 
     //0.9f + map(mouseY, height, 0, 0, 0.1f),
     0, mouse);
-  currentCam.near = originalNear;
+
+  if (currentCam != null)
+    currentCam.near = originalNear;
 }
 
 
