@@ -189,7 +189,6 @@ PImage svgToImage(PShape p_shape, float p_width, float p_height) {
   if (p_shape == null)
     new NullPointerException("`svgToImage(null , p_width, p_height)` won't work.").printStackTrace();
 
-
   PGraphics buffer = createGraphics((int)ceil(p_width), (int)ceil(p_height), P3D);
 
   if (buffer == null)
@@ -203,7 +202,7 @@ PImage svgToImage(PShape p_shape, float p_width, float p_height) {
 
 PImage svgToImage(Asset p_shapeLoader, float p_width, float p_height) {
   PGraphics buffer = createGraphics((int)ceil(p_width), (int)ceil(p_height), P3D);
-  while (!p_shapeLoader.loaded);
+  //while (!p_shapeLoader.loaded);
 
   buffer.beginDraw();
   buffer.shape(p_shapeLoader.asShape(), 0, 0, p_width, p_height);

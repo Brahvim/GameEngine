@@ -1,4 +1,4 @@
-// YO! Go work on the Renderer class. //<>//
+// YO! Go work on the Renderer class.
 // The `update()` method's `switch` needs stuff to draw! (For `SPHERE`!)
 // Also, get it textured! :joy: 
 
@@ -7,7 +7,6 @@
 
 void settings() {
   size(INIT_WIDTH, INIT_HEIGHT, P3D);
-  //PJOGL.setIcon(iconPath); // This is now handles by the user.
   //PJOGL.setIcon(new String[]{"sunglass_nerd.png"});
   // For when you need to provide multiple resolution icons yourself!
 }

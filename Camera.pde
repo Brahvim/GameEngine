@@ -62,7 +62,8 @@ void camLerpUpdate(Camera p_from, Camera p_to, float p_lerpAmt, float p_start, f
     setCam(p_to);
     lerpeable.clearColor = color(red(p_to.clearColor), 
       green(p_to.clearColor), blue(p_to.clearColor), 255);
-    lerpeable.clear();
+    if (p_to.doAutoClear)
+      lerpeable.clear();
     p_to.applyMatrix();
     camIsLerp = false;
     return;
@@ -70,7 +71,8 @@ void camLerpUpdate(Camera p_from, Camera p_to, float p_lerpAmt, float p_start, f
     setCam(p_from);
     lerpeable.clearColor = color(red(p_from.clearColor), 
       green(p_from.clearColor), blue(p_from.clearColor), 255);
-    lerpeable.clear();
+    if (p_from.doAutoClear)
+      lerpeable.clear();
     p_from.applyMatrix();
     camIsLerp = false;
     return;

@@ -162,9 +162,8 @@ Scene testScene = new Scene() {
         this.form.scale.mult(15);
         this.display = new SvgRenderer(this, QUAD, svgImage);
         this.display.strokeWeight = 0.05f;
-        this.display.textureWrap = REPEAT;
+        //this.display.textureWrap = REPEAT;
         this.display.doAutoRaster = false;
-        //this.display.rasterize();
       }
 
       public void update() {
@@ -181,6 +180,7 @@ Scene testScene = new Scene() {
       public void setup() {
         this.quadForm = quad.getComponent(Transformation.class);
         this.light.col.set(255, 255, 255);
+        this.light.off.z = 1.5f;
       }
 
       public void update() {
@@ -201,7 +201,8 @@ Scene testScene = new Scene() {
     };
 
     cam.clearColor = color(0); 
-    rev.clearColor = color(30, 120, 170, 80); //15);
+    rev.clearColor = color(30, 120, 170, 1); //80);
+    //rev.doAutoClear = false;
     setCam(rev);
 
     cam.script = new CamScript() {
@@ -230,6 +231,9 @@ Scene testScene = new Scene() {
       camLerpUpdate(cam, rev, (float)mouseX / (float)width);
     else currentCam.applyMatrix();
 
+    //rev.pos.z += mouseScrollDelta;
+    //println(rev.pos.z, mouseScrollDelta);
+
     //doPostProcessing = true;
     //applyPass(bloomPass);
 
@@ -250,6 +254,8 @@ Scene testScene = new Scene() {
       textAscent() - textDescent());
     fill(255);
     text((int)frameRate, 0, 0);
+
+    doLights = false;
   }  
 
   boolean isLightDimmed;
@@ -261,10 +267,10 @@ Scene testScene = new Scene() {
       isLightDimmed = !isLightDimmed;
       Light l = light.getComponent(Light.class);
       if (isLightDimmed) {
-        doLights = false;
+        //doLights = false;
         l.col.set(65, 50, 50);
       } else {
-        doLights = true;
+        //doLights = true;
         l.col.set(255, 255, 255);
       }
     }

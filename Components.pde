@@ -338,7 +338,7 @@ class ShapeRenderer extends RenderingComponent {
 
   public void textureLoaderCheck() {
     if (this.textureLoader != null)
-      this.texture = this.textureLoader.asPicture();
+      this.texture = (PImage)this.textureLoader.loadedData; //this.textureLoader.asPicture();
   }
 
   public void update() {
@@ -506,34 +506,26 @@ class SvgRenderer extends ShapeRenderer {
     if (super.textureLoader != null)
 
       if (super.textureLoader.type == AssetType.SHAPE) {
-        this.svg = this.textureLoader.asShape();
-        if (this.doAutoCalc)
-          if (this.svg != null)
+        this.svg = (PShape)super.textureLoader.loadedData; //super.textureLoader.asShape();
+
+        // Calculate the rasterization scale before rasterizing. 
+        if (this.svg != null)
+          if (this.doAutoCalc)
             this.resScale = dist(0, 0, this.svg.width, this.svg.height) * 0.05f;
+
         if (!super.textureLoader.ploaded && super.textureLoader.loaded)
           this.rasterize();
       } else if (super.textureLoader.type == AssetType.PICTURE)
-        super.texture = super.textureLoader.asPicture();
+        super.texture = (PImage)this.textureLoader.loadedData;
   }
 
   public void applyTexture() {
     this.textureLoaderCheck();
 
     // Re-render :D
-    if (!(this.svg != null && super.form.scale.x == 0 && super.form.scale.y == 0)) {
-      if (this.form.scale != this.pscale && this.doAutoRaster) {
-        println("Scale changed. Rasterizing.");
+    if (!(this.svg != null && super.form.scale.x == 0 && super.form.scale.y == 0))
+      if (this.form.scale != this.pscale && this.doAutoRaster) 
         this.rasterize();
-      }
-    }
-
-
-    //if (this.doAutoRaster)
-    //  if (this.svg != null)
-    //    if (!(this.svg == null || super.form.scale.x == 0 && super.form.scale.y == 0))
-    //      if (this.svg != this.psvg || this.form.scale != this.pscale)
-    //        //abs(PVector.sub(this.form.scale, this.pscale).magSq())  < this.resScale)
-    //        this.rasterize();
 
     this.pscale = super.form.scale;
 
