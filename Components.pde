@@ -243,12 +243,17 @@ class SpotLight extends Light {
 //PShape THE_POWERFUL_ONE;
 //}
 
-class ParticleSystem extends Component {
+class ParticleEmitter extends Component {
   Transformation startPos;
   PShape shape;
   float lifetime = -1, startTime = 0;
 
-  ParticleSystem(Entity p_entity) {
+  ParticleEmitter(Entity p_entity) {
+    super(p_entity);
+    this.startPos = p_entity.getComponent(Transformation.class);
+  }
+
+  ParticleEmitter(Entity p_entity, int p_shape) {
     super(p_entity);
     this.startPos = p_entity.getComponent(Transformation.class);
   }
@@ -305,7 +310,7 @@ class ShapeRenderer extends RenderingComponent {
     this.form = p_entity.getComponent(Transformation.class);
 
     if (this.form == null)
-      nerdLogEx(new NullPointerException("A `Renderer` needs a `Transform`!"));
+      nerdLogEx(new NullPointerException("A `ShapeRenderer` needs a `Transformation`!"));
   }
 
   ShapeRenderer(Entity p_entity, int p_type) {
@@ -419,11 +424,33 @@ class ShapeRenderer extends RenderingComponent {
       break;
 
     case SPHERE:
-      // You don't want a textured sphere. Trust me, you don't.
-      // - Me after looking at the p5.js source code.
-      // :eyes: `Ctrl + Shift + O`, "Topics", "Textures".
-      // - Me after recalling Processing's legacy.
-      sphere(1);
+      // [https://www.songho.ca/opengl/gl_sphere.html#sphere]
+      // (...plus heavy optimizations!)
+
+      float sectorStep = TAU / 36;
+      float stackStep = PI / 36, cosStackAngle;
+      float sectorAngle = 0, stackAngle = 0;
+
+      int j;
+      for (int i = 0; i < 37; i++) {
+        beginShape(LINE_LOOP);
+        this.applyTexture();
+        stackAngle = PI / 2 - i * stackStep; // Starting from `HALF_PI` to `-HALF_PI`,
+        cosStackAngle = cos(stackAngle); // `r * cos(u)`.
+
+        // Add (`sectorCount + 1`) vertices per stack.
+        // The first and last vertices have same position and normal, but different texture coords.
+        for (j = 0; j < 37; j++) {
+          sectorAngle = j * sectorStep; // Starting from `0` towards `TAU`.
+
+          // Vertex tex coord (u, v) range between [0, 1]:
+          vertex(cosStackAngle * cos(sectorAngle), // `r * cos(u) * cos(v)`.
+            cosStackAngle * sin(sectorAngle), // `r * cos(u) * sin(v)`.
+            sin(stackAngle), (float)i / 36, (float)j / 36);
+          // (^^^ I never though texturing would be THAT simple...)
+        }
+        endShape(CLOSE);
+      }
       break;
 
       // [https://stackoverflow.com/a/24843626/13951505]
@@ -434,14 +461,14 @@ class ShapeRenderer extends RenderingComponent {
       beginShape(POLYGON);
       this.applyTexture();
 
-      float x, y, tauFract; // STACK ALLOC!!!11
+      float ex, ey, eTauFract; // STACK ALLOC!!!11
       for (int i = 0; i < this.roundness; i++) {
-        tauFract = i * TAU / this.roundness;
-        vertex(x = cos(tauFract), y = sin(tauFract), // Wish I had a LUT! 
+        eTauFract = i * TAU / this.roundness;
+        vertex(ex = cos(eTauFract), ey = sin(eTauFract), // Wish I had a LUT! 
           // The addition translates in the texture,
           // The multiplication *inversely* scales it.
-          0.5f + x * 0.5f, 
-          0.5f + y * 0.5f);
+          0.5f + ex * 0.5f, 
+          0.5f + ey * 0.5f);
       }
       endShape(CLOSE);
       break;
@@ -534,5 +561,36 @@ class SvgRenderer extends ShapeRenderer {
     textureMode(NORMAL);
     textureWrap(this.textureWrap);
     texture(this.texture);
+  }
+}
+
+class ModelRenderer extends RenderingComponent {
+  ModelRenderer(Entity p_entity) {
+    super(p_entity);
+  }
+}
+
+class InstanceRenderer extends RenderingComponent {
+  Transformation form;
+  PShape instance;
+
+  InstanceRenderer(Entity p_entity) {
+    super(p_entity);
+    this.form = p_entity.getComponent(Transformation.class);
+
+    if (this.form == null)
+      nerdLogEx(new NullPointerException("An `InstanceRenderer` needs a `Transformation`!"));
+  }
+
+  InstanceRenderer(Entity p_entity, PShape p_instance) {
+    this(p_entity);
+    this.instance = p_instance;
+  }
+
+  void update() {
+    pushMatrix();
+    this.form.applyMatrix();
+    shape(this.instance);
+    popMatrix();
   }
 }

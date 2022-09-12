@@ -83,7 +83,7 @@ Scene testScene = new Scene() {
 
     audio = new Asset("UnicycleGirrafe.mp3", AssetType.SOUND, new Runnable() {
       public void run() {
-        audio.asSound().loop();
+        //audio.asSound().loop();
       }
     }
     ).beginAsyncLoad();
@@ -149,21 +149,26 @@ Scene testScene = new Scene() {
       public void setup() {
         this.form = new Transformation(this);
         this.form.scale.mult(15);
-        this.display = new SvgRenderer(this, QUAD, svgImage);
+        this.display = new SvgRenderer(this, SPHERE, svgImage);
         this.display.strokeWeight = 0.05f;
+        this.display.fill = 255;
         //this.display.textureWrap = REPEAT;
         this.display.doAutoRaster = false;
+        this.display.resScale *= 5;
+        this.display.rasterize();
       }
 
       public void update() {
         this.form.pos.set(mouse);
-        float a = sin(millis() * 0.001f) * 15;
-        this.form.scale.set(a, a, a);
+        float scale = sin(millis() * 0.001f) * 15;
+        this.form.scale.set(scale, scale, scale);
       }
     };
 
     light = new Entity() {
+      // Didn't we want to avoid this type of instantiation in general...?
       Transformation form = new Transformation(this), quadForm;
+      ParticleEmitter part;
       Light light = new Light(this);
 
       public void setup() {
@@ -244,7 +249,7 @@ Scene testScene = new Scene() {
     fill(255);
     text((int)frameRate, 0, 0);
 
-    doLights = false;
+    //doLights = false;
   }  
 
   boolean isLightDimmed;
