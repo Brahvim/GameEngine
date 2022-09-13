@@ -240,8 +240,9 @@ void draw() {
   // **after this `if`**, the camera rotation causes mouse-ray objects to shake.)
 
   // Unproject the mouse position:
-  if (focused)
-    unprojectMouse();
+
+  //if (focused)
+  unprojectMouse();
 
   // (Yeah. This place? Running the script here? There's gunna be Z-fighting action - get popcorn! :joy:)
   if (doCamera && currentCam != null)

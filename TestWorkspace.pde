@@ -151,16 +151,17 @@ Scene testScene = new Scene() {
         this.form.scale.mult(15);
         this.display = new SvgRenderer(this, SPHERE, svgImage);
         this.display.strokeWeight = 0.05f;
+        this.display.doStroke = false;
         this.display.fill = 255;
         //this.display.textureWrap = REPEAT;
         this.display.doAutoRaster = false;
-        this.display.resScale *= 5;
+        this.display.resScale *= 15;
         this.display.rasterize();
       }
 
       public void update() {
         this.form.pos.set(mouse);
-        float scale = sin(millis() * 0.001f) * 15;
+        float scale = sin(millis() * 0.001f) * 5;
         this.form.scale.set(scale, scale, scale);
       }
     };

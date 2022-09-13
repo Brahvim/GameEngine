@@ -338,12 +338,14 @@ class ShapeRenderer extends RenderingComponent {
     textureWrap(this.textureWrap);
 
     // `texture()` checks for `null`. No need to check it ourselves.
+    // ...but apparently the code for the sphere does suffer from not doing it!...
     texture(this.texture);
   }
 
   public void textureLoaderCheck() {
     if (this.textureLoader != null)
-      this.texture = (PImage)this.textureLoader.loadedData; //this.textureLoader.asPicture();
+      //this.texture = (PImage)this.textureLoader.loadedData; //
+      this.texture = this.textureLoader.asPicture();
   }
 
   public void update() {
@@ -424,16 +426,22 @@ class ShapeRenderer extends RenderingComponent {
       break;
 
     case SPHERE:
+      // UGH.
+      if (this.texture == null)
+        return;
 
-      int v1, v11, v2;
-      //r = (r + 240 ) * 0.33;
+      // Thanks, Processing Community! :D
+      int v1, v11, v2, i = 0;
 
       beginShape(TRIANGLE_STRIP);
       this.applyTexture();
+      textureMode(IMAGE);
+
       float iu = (float) (this.texture.width - 1) / SPHERE_DETAIL;
       float iv = (float) (this.texture.height - 1) / SPHERE_DETAIL;
       float u = 0, v = iv;
-      for (int i = 0; i < SPHERE_DETAIL; i++) {
+
+      for (i = 0; i < SPHERE_DETAIL; i++) {
         vertex(0, -1, 0, u, 0);
         vertex(sphereX[i], sphereY[i], sphereZ[i], u, v);
         u += iu;
@@ -442,22 +450,27 @@ class ShapeRenderer extends RenderingComponent {
       vertex(sphereX[0], sphereY[0], sphereZ[0], u, v);
       endShape();
 
-      // Middle rings
-      int voff = 0;
-      for (int i = 2; i < SPHERE_DETAIL; i++) {
+      // Middle rings:
+
+      int voff = 0, j;
+      for (i = 2; i < SPHERE_DETAIL; i++) {
         v1 = v11 = voff;
         voff += SPHERE_DETAIL;
         v2 = voff;
         u = 0;
+
         beginShape(TRIANGLE_STRIP);
         this.applyTexture();
-        for (int j = 0; j < SPHERE_DETAIL; j++) {
+        textureMode(IMAGE);
+
+        for (j = 0; j < SPHERE_DETAIL; j++) {
           vertex(sphereX[v1], sphereY[v1], sphereZ[v1++], u, v);
           vertex(sphereX[v2], sphereY[v2], sphereZ[v2++], u, v + iv);
           u += iu;
         }
 
         // Close each ring:
+
         v1 = v11;
         v2 = voff;
         vertex(sphereX[v1], sphereY[v1], sphereZ[v1], u, v);
@@ -469,9 +482,12 @@ class ShapeRenderer extends RenderingComponent {
       u = 0;
 
       // Add the northern cap:
+
       beginShape(TRIANGLE_STRIP);
       this.applyTexture();
-      for (int i = 0; i < SPHERE_DETAIL; i++) {
+      textureMode(IMAGE);
+
+      for (i = 0; i < SPHERE_DETAIL; i++) {
         v2 = voff + i;
         vertex(sphereX[v2], sphereY[v2], sphereZ[v2], u, v);
         vertex(0, 1, 0, u, v + iv);
@@ -521,8 +537,8 @@ class ShapeRenderer extends RenderingComponent {
       this.applyTexture();
 
       float ex, ey, eTauFract; // STACK ALLOC!!!11
-      for (int i = 0; i < this.roundness; i++) {
-        eTauFract = i * TAU / this.roundness;
+      for (int k = 0; k < this.roundness; k++) {
+        eTauFract = k * TAU / this.roundness;
         vertex(ex = cos(eTauFract), ey = sin(eTauFract), // Wish I had a LUT! 
           // The addition translates in the texture,
           // The multiplication *inversely* scales it.
