@@ -350,10 +350,6 @@ class ShapeRenderer extends RenderingComponent {
   public void update() {
     this.textureLoaderCheck();
 
-    // Exiting here instead of inside the `SPHERE` case.
-    if (this.texture == null)
-      return;
-
     pushMatrix();
     pushStyle();
 
@@ -429,6 +425,12 @@ class ShapeRenderer extends RenderingComponent {
       break;
 
     case SPHERE:
+      if (this.texture == null) {
+        popMatrix();
+        popStyle();
+        return;
+      }
+
       // Thanks, Processing Community! :D
       int v1, v11, v2, i = 0;
 
@@ -566,6 +568,7 @@ class SvgRenderer extends ShapeRenderer {
   // With this approach, you render in the update loop itself
   // when an update is needed.
   boolean doStyle = true, doAutoCalc = true, doAutoRaster = false;
+  PGraphics rasterizer;
 
   PShape svg, psvg = null;
   // ^^^ That's the magic of this approach!
@@ -577,11 +580,13 @@ class SvgRenderer extends ShapeRenderer {
   SvgRenderer(Entity p_entity) {
     super(p_entity);
     this.pscale = new PVector();
+    this.rasterizer = createGraphics(0, 0, P3D);
   }
 
   SvgRenderer(Entity p_entity, int p_type, Asset p_assetLoader) {
     super(p_entity, p_type, p_assetLoader);
     this.pscale = new PVector();
+    this.rasterizer = createGraphics(0, 0, P3D);
   }
 
   SvgRenderer(Entity p_entity, int p_type, PShape p_shape) {
@@ -590,6 +595,9 @@ class SvgRenderer extends ShapeRenderer {
     this.svg = p_shape;
     this.pscale = new PVector();
     this.resScale = dist(0, 0, this.svg.width, this.svg.height) * 0.05f;
+    this.rasterizer.setSize(
+      (int)abs(this.form.scale.x * this.resScale), 
+      (int)abs(this.form.scale.y * this.resScale));
   }
 
   public void calcScale() {
@@ -597,9 +605,24 @@ class SvgRenderer extends ShapeRenderer {
   }
 
   public void rasterize() {
-    if (this.svg != null)
-      this.texture = svgToImage(this.svg, abs(this.form.scale.x * this.resScale), 
-        abs(this.form.scale.y * this.resScale));
+    if (this.svg == null)
+      return;
+
+    float reqX = abs(this.form.scale.x * this.resScale), 
+      reqY = abs(this.form.scale.y * this.resScale);
+
+    if (!(this.rasterizer.width == reqX && this.rasterizer.height == reqY))
+      this.rasterizer.setSize((int)reqX, (int)reqY); // `PShape` width and height are `float`s?!
+
+    this.rasterizer.beginDraw();
+    this.rasterizer.shape(this.svg, 0, 0, reqX, reqY);
+    this.rasterizer.endDraw();
+
+    super.texture = this.rasterizer;
+
+    //if (this.svg != null)
+    //  this.texture = svgToImage(this.svg, abs(this.form.scale.x * this.resScale), 
+    //    abs(this.form.scale.y * this.resScale));
     println("Re-rendererd SVG.");
   }
 
@@ -614,8 +637,11 @@ class SvgRenderer extends ShapeRenderer {
           if (this.doAutoCalc)
             this.resScale = dist(0, 0, this.svg.width, this.svg.height) * 0.05f;
 
-        if (!super.textureLoader.ploaded && super.textureLoader.loaded)
+        // Re-render on the image loading :D
+        if (!super.textureLoader.ploaded && super.textureLoader.loaded) {
+          println("Texture loader rasterized SVG.");
           this.rasterize(); // Apparently the SVG might not be visible if not exporting with Java!
+        }
       } else if (super.textureLoader.type == AssetType.PICTURE)
         super.texture = (PImage)this.textureLoader.loadedData;
   }
@@ -623,8 +649,8 @@ class SvgRenderer extends ShapeRenderer {
   public void applyTexture() {
     this.textureLoaderCheck();
 
-    // Re-render :D
-    if (!(this.svg != null && super.form.scale.x == 0 && super.form.scale.y == 0))
+    // Re-render on size changes :D
+    if (!(this.svg == null && super.form.scale.x == 0 && super.form.scale.y == 0))
       if (this.form.scale != this.pscale && this.doAutoRaster)
         this.rasterize();
 

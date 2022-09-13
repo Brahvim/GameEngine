@@ -2,7 +2,7 @@ static class Log {
   public final static byte lvInfo = 0, lvWarn = 1, lvError = 2; 
   public static boolean canInfo = true, canWarn = true, canError = true;
   public static boolean nerdCanInfo = true, nerdCanWarn = true, nerdCanError = true;
-  public static boolean logToFile = true, openFileOnExit = true, 
+  public static boolean logToFile = true, openFileOnExit = false, 
     logToConsole = true, enabled = true, canFile = true, 
     nerdCanLog = true, nerdCanFile = true;
 

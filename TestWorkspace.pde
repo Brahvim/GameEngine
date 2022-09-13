@@ -149,7 +149,7 @@ Scene testScene = new Scene() {
       public void setup() {
         this.form = new Transformation(this);
         this.form.scale.mult(15);
-        this.display = new SvgRenderer(this, SPHERE, svgImage);
+        this.display = new SvgRenderer(this, ELLIPSE, svgImage);
         this.display.strokeWeight = 0.05f;
         this.display.doStroke = false;
         this.display.fill = 255;
