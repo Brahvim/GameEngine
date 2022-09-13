@@ -269,28 +269,8 @@ class ParticleEmitter extends Component {
   }
 }
 
-
-
-// Simply a marker, hehe:
-class RenderingComponent extends Component {
-  // NO. Do NOT add a `Transform` reference here.
-  // Who knows what might come our way?!
-
-  // This is more of an interface than a class.
-  RenderingComponent(Entity p_entity) {
-    super(p_entity);
-
-    // Welp, there's some ease of use right here:
-    if (currentScene != null)
-      currentScene.renderers.add(this);
-  }
-
-  // Format:
-  // There is no format!
-};
-
 // What to name this now that we have the need for so many renderers? `ImmediateShapeRenderer`?
-class ShapeRenderer extends RenderingComponent {
+class BasicRenderer extends Component {
   Transformation form;
 
   int fill, stroke; // Tinting should be done by the user themselves.
@@ -305,26 +285,29 @@ class ShapeRenderer extends RenderingComponent {
   // they better write their own render method.
   PImage texture;
 
-  ShapeRenderer(Entity p_entity) {
+  BasicRenderer(Entity p_entity) {
     super(p_entity);
     this.form = p_entity.getComponent(Transformation.class);
+
+    if (currentScene != null)
+      currentScene.renderers.add(this);
 
     if (this.form == null)
       nerdLogEx(new NullPointerException("A `ShapeRenderer` needs a `Transformation`!"));
   }
 
-  ShapeRenderer(Entity p_entity, int p_type) {
+  BasicRenderer(Entity p_entity, int p_type) {
     this(p_entity); // Uhm, too many constructor calls. Sign of a code smell.
     this.type = p_type;
   }
 
-  ShapeRenderer(Entity p_entity, int p_type, Asset p_assetLoader) {
+  BasicRenderer(Entity p_entity, int p_type, Asset p_assetLoader) {
     this(p_entity);
     this.type = p_type;
     this.textureLoader = p_assetLoader;
   }
 
-  ShapeRenderer(Entity p_entity, int p_type, PImage p_texture) {
+  BasicRenderer(Entity p_entity, int p_type, PImage p_texture) {
     this(p_entity);
     this.type = p_type;
     this.texture = p_texture;
@@ -559,7 +542,7 @@ class ShapeRenderer extends RenderingComponent {
 // DO NOT INHERIT FROM THIS.
 // ...I guess :P
 
-class SvgRenderer extends ShapeRenderer {
+class SvgRenderer extends BasicRenderer {
   // I could've declared `shape` as `private` and used a pair of
   // getter and setter / accessor and modifier methods, but I
   // went with this approach instead for performance!
@@ -664,13 +647,13 @@ class SvgRenderer extends ShapeRenderer {
   }
 }
 
-class ModelRenderer extends RenderingComponent {
+class ModelRenderer extends BasicRenderer {
   ModelRenderer(Entity p_entity) {
     super(p_entity);
   }
 }
 
-class InstanceRenderer extends ShapeRenderer {
+class InstanceRenderer extends BasicRenderer {
   Transformation form;
   PShape instance;
 

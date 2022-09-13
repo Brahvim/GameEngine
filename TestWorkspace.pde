@@ -94,10 +94,10 @@ Scene testScene = new Scene() {
 
     circle = new Entity() {
       Transformation form = new Transformation(this);
-      ShapeRenderer display;
+      BasicRenderer display;
 
       public void setup() {
-        this.display = new ShapeRenderer(this, ELLIPSE, circleTexture);
+        this.display = new BasicRenderer(this, ELLIPSE, circleTexture);
         this.display.fill = color(230);
         this.display.stroke = color(0);
         this.display.strokeWeight = 0.05f;
@@ -185,7 +185,7 @@ Scene testScene = new Scene() {
 
     groundBox = new Entity() {
       Transformation form = new Transformation(this);
-      ShapeRenderer display = new ShapeRenderer(this, BOX, boxTexture);
+      BasicRenderer display = new BasicRenderer(this, BOX, boxTexture);
 
       public void setup() {
         this.display.fill = color(255);
