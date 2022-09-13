@@ -344,15 +344,18 @@ class ShapeRenderer extends RenderingComponent {
 
   public void textureLoaderCheck() {
     if (this.textureLoader != null)
-      //this.texture = (PImage)this.textureLoader.loadedData; //
-      this.texture = this.textureLoader.asPicture();
+      this.texture = (PImage)this.textureLoader.loadedData; //this.textureLoader.asPicture();
   }
 
   public void update() {
+    this.textureLoaderCheck();
+
+    // Exiting here instead of inside the `SPHERE` case.
+    if (this.texture == null)
+      return;
+
     pushMatrix();
     pushStyle();
-
-    this.textureLoaderCheck();
 
     // For the Bullet Physics Engine!:
     // Yes, it might be slow, but it's something we'll have to do.
@@ -426,10 +429,6 @@ class ShapeRenderer extends RenderingComponent {
       break;
 
     case SPHERE:
-      // UGH.
-      if (this.texture == null)
-        return;
-
       // Thanks, Processing Community! :D
       int v1, v11, v2, i = 0;
 
