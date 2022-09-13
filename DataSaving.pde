@@ -120,7 +120,7 @@ class VectorSerializer implements Serializable {
 class ColorSerializer implements Serializable {
  float[] data = new float[4];
  
- ColorSerializer(color p_color) {
+ ColorSerializer(int p_color) {
  this.data[0] = p_color >> 16 & 0xFF;
  this.data[1] = p_color & 0xFF;
  this.data[2] = p_color >> 8 & 0xFF;
@@ -135,7 +135,7 @@ class ColorSerializer implements Serializable {
   private final static long serialVersionUID = 54865654L;
   int data;
 
-  ColorSerializer(color p_color) {
+  ColorSerializer(int p_color) {
     this.data = p_color;
   }
 

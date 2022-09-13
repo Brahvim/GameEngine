@@ -121,7 +121,7 @@ class Camera extends Entity {
   PVector pos, center, up;
   float fov = DEFAULT_CAM_FOV, near = 0.05f, far = 10000, mouseZ = 25;
   CamScript script;
-  color clearColor = color(0);
+  int clearColor = color(0);
   boolean doScript = true, doAutoClear = true;
   int projection = PERSPECTIVE;
 

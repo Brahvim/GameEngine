@@ -1,7 +1,7 @@
 class Button {
   PVector transform;
   float size;
-  color fill, stroke;
+  int fill, stroke;
   boolean ppressed, pressed, hovered, phovered;
   SineWave wave = new SineWave();
   Runnable renderMethod, hoverMethod, clickMethod;

@@ -87,6 +87,14 @@ float frameStartTime, deltaTime, pframeTime, frameTime;
 // Wait, I can't overload it, *my bad!* :sweat_smile:
 
 
+// From the sphere texturing example from APDE.
+final int SPHERE_DETAIL = 36;
+float[] sphereCX, sphereCZ, sphereX, sphereY, sphereZ;
+float sinLUT[];
+float cosLUT[];
+float SINCOS_PRECISION = 0.5f;
+int SINCOS_LENGTH = (int)(360.0f / SINCOS_PRECISION);
+
 // Failed to get these via reflection, copy-pasted them. I hope I use these at some point!:
 // [https://github.com/processing/processing/blob/master/core/src/processing/core/PGraphics.java]
 //static float[] sinLUT;
@@ -123,6 +131,53 @@ float frameStartTime, deltaTime, pframeTime, frameTime;
 @FunctionalInterface
   interface OnCatch {
   public void run(Exception p_except);
+}
+
+void initSphere(int p_resolution) {
+  sinLUT = new float[SINCOS_LENGTH];
+  cosLUT = new float[SINCOS_LENGTH];
+
+  float a;
+  for (int i = 0; i < SINCOS_LENGTH; i++) {
+    a = i * DEG_TO_RAD * SINCOS_PRECISION;
+    sinLUT[i] = sin(a);
+    cosLUT[i] = cos(a);
+  }
+
+  float delta = (float) SINCOS_LENGTH / p_resolution;
+  float[] cxVal = new float[p_resolution];
+  float[] czVal = new float[p_resolution];
+
+  // Calculate a unit circle in the `X`-`Z` plane:
+  for (int i = 0; i < p_resolution; i++) {
+    cxVal[i] = -cosLUT[(int) (i * delta) % SINCOS_LENGTH];
+    czVal[i] =sinLUT[(int) (i * delta) % SINCOS_LENGTH];
+  }
+
+  // Computing vertices - they start at the south pole:
+  int vertCount = p_resolution * (p_resolution - 1) + 2;
+  int currVert = 0;
+
+  // Re-init arrays to store vertices:
+  sphereX = new float[vertCount];
+  sphereY = new float[vertCount];
+  sphereZ = new float[vertCount];
+  float angleStep = (SINCOS_LENGTH * 0.5f) / p_resolution;
+  float angle = angleStep;
+
+  // Step along Y axis
+  for (int i = 1; i < p_resolution; i++) {
+    float curradius =sinLUT[(int) angle % SINCOS_LENGTH];
+    float currY = -cosLUT[(int) angle % SINCOS_LENGTH];
+
+    for (int j = 0; j < p_resolution; j++) {
+      sphereX[currVert] = cxVal[j] * curradius;
+      sphereY[currVert] = currY;
+      sphereZ[currVert++] = czVal[j] * curradius;
+    }
+
+    angle += angleStep;
+  }
 }
 
 void updateRatios() {

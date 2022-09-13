@@ -83,6 +83,7 @@ void setup() {
 
   initLog();
   initSaving();
+  initSphere(SPHERE_DETAIL);
 
   nerdLogInfo("Executable directory: ");
   nerdLogInfo("\t", sketchPath());

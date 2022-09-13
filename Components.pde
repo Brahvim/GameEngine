@@ -293,7 +293,7 @@ class RenderingComponent extends Component {
 class ShapeRenderer extends RenderingComponent {
   Transformation form;
 
-  color fill, stroke; // Tinting should be done by the user themselves.
+  int fill, stroke; // Tinting should be done by the user themselves.
   float strokeWeight = 1;
   int type, strokeCap = MITER, strokeJoin = ROUND, roundness = 36;
   boolean doFill = true, doStroke = true, doTexture = true;
@@ -424,33 +424,92 @@ class ShapeRenderer extends RenderingComponent {
       break;
 
     case SPHERE:
-      // [https://www.songho.ca/opengl/gl_sphere.html#sphere]
-      // (...plus heavy optimizations!)
 
-      float sectorStep = TAU / 36;
-      float stackStep = PI / 36, cosStackAngle;
-      float sectorAngle = 0, stackAngle = 0;
+      int v1, v11, v2;
+      //r = (r + 240 ) * 0.33;
 
-      int j;
-      for (int i = 0; i < 37; i++) {
-        beginShape(LINE_LOOP);
-        this.applyTexture();
-        stackAngle = PI / 2 - i * stackStep; // Starting from `HALF_PI` to `-HALF_PI`,
-        cosStackAngle = cos(stackAngle); // `r * cos(u)`.
-
-        // Add (`sectorCount + 1`) vertices per stack.
-        // The first and last vertices have same position and normal, but different texture coords.
-        for (j = 0; j < 37; j++) {
-          sectorAngle = j * sectorStep; // Starting from `0` towards `TAU`.
-
-          // Vertex tex coord (u, v) range between [0, 1]:
-          vertex(cosStackAngle * cos(sectorAngle), // `r * cos(u) * cos(v)`.
-            cosStackAngle * sin(sectorAngle), // `r * cos(u) * sin(v)`.
-            sin(stackAngle), (float)i / 36, (float)j / 36);
-          // (^^^ I never though texturing would be THAT simple...)
-        }
-        endShape(CLOSE);
+      beginShape(TRIANGLE_STRIP);
+      this.applyTexture();
+      float iu = (float) (this.texture.width - 1) / SPHERE_DETAIL;
+      float iv = (float) (this.texture.height - 1) / SPHERE_DETAIL;
+      float u = 0, v = iv;
+      for (int i = 0; i < SPHERE_DETAIL; i++) {
+        vertex(0, -1, 0, u, 0);
+        vertex(sphereX[i], sphereY[i], sphereZ[i], u, v);
+        u += iu;
       }
+      vertex(0, -1, 0, u, 0);
+      vertex(sphereX[0], sphereY[0], sphereZ[0], u, v);
+      endShape();
+
+      // Middle rings
+      int voff = 0;
+      for (int i = 2; i < SPHERE_DETAIL; i++) {
+        v1 = v11 = voff;
+        voff += SPHERE_DETAIL;
+        v2 = voff;
+        u = 0;
+        beginShape(TRIANGLE_STRIP);
+        this.applyTexture();
+        for (int j = 0; j < SPHERE_DETAIL; j++) {
+          vertex(sphereX[v1], sphereY[v1], sphereZ[v1++], u, v);
+          vertex(sphereX[v2], sphereY[v2], sphereZ[v2++], u, v + iv);
+          u += iu;
+        }
+
+        // Close each ring:
+        v1 = v11;
+        v2 = voff;
+        vertex(sphereX[v1], sphereY[v1], sphereZ[v1], u, v);
+        vertex(sphereX[v2], sphereY[v2], sphereZ[v2], u, v + iv);
+        endShape();
+        v += iv;
+      }
+
+      u = 0;
+
+      // Add the northern cap:
+      beginShape(TRIANGLE_STRIP);
+      this.applyTexture();
+      for (int i = 0; i < SPHERE_DETAIL; i++) {
+        v2 = voff + i;
+        vertex(sphereX[v2], sphereY[v2], sphereZ[v2], u, v);
+        vertex(0, 1, 0, u, v + iv);
+        u += iu;
+      }
+      vertex(sphereX[voff], sphereY[voff], sphereZ[voff], u, v);
+      endShape();
+
+
+      /*
+      // [https://www.songho.ca/opengl/gl_sphere.html#sphere]
+       // (...plus heavy optimizations!)
+       
+       float sectorStep = TAU / 36;
+       float stackStep = PI / 36, cosStackAngle;
+       float sectorAngle = 0, stackAngle = 0;
+       
+       int j;
+       for (int i = 0; i < 37; i++) {
+       beginShape(LINE_LOOP);
+       this.applyTexture();
+       stackAngle = PI / 2 - i * stackStep; // Starting from `HALF_PI` to `-HALF_PI`,
+       cosStackAngle = cos(stackAngle); // `r * cos(u)`.
+       
+       // Add (`sectorCount + 1`) vertices per stack.
+       // The first and last vertices have same position and normal, but different texture coords.
+       for (j = 0; j < 37; j++) {
+       sectorAngle = j * sectorStep; // Starting from `0` towards `TAU`.
+       
+       // Vertex tex coord (u, v) range between [0, 1]:
+       vertex(cosStackAngle * cos(sectorAngle), // `r * cos(u) * cos(v)`.
+       cosStackAngle * sin(sectorAngle), // `r * cos(u) * sin(v)`.
+       sin(stackAngle), (float)i / 36, (float)j / 36);
+       // (^^^ I never though texturing would be THAT simple...)
+       }
+       endShape(CLOSE);
+       }
+       */
       break;
 
       // [https://stackoverflow.com/a/24843626/13951505]
