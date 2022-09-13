@@ -642,7 +642,7 @@ class SvgRenderer extends ShapeRenderer {
           println("Texture loader rasterized SVG.");
           this.rasterize(); // Apparently the SVG might not be visible if not exporting with Java!
         }
-      } else if (super.textureLoader.type == AssetType.PICTURE)
+      } else if (super.textureLoader.type == AssetType.IMAGE)
         super.texture = (PImage)this.textureLoader.loadedData;
   }
 
@@ -670,9 +670,14 @@ class ModelRenderer extends RenderingComponent {
   }
 }
 
-class InstanceRenderer extends RenderingComponent {
+class InstanceRenderer extends ShapeRenderer {
   Transformation form;
   PShape instance;
+
+  PImage texture;
+  protected PImage ptexture;
+  int type;
+  protected int ptype;
 
   InstanceRenderer(Entity p_entity) {
     super(p_entity);
@@ -692,5 +697,9 @@ class InstanceRenderer extends RenderingComponent {
     this.form.applyMatrix();
     shape(this.instance);
     popMatrix();
+  }
+
+  void render() {
+    this.instance = createShape();
   }
 }

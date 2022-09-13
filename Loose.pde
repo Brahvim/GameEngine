@@ -167,13 +167,13 @@ void initSphere(int p_resolution) {
 
   // Step along Y axis
   for (int i = 1; i < p_resolution; i++) {
-    float curradius =sinLUT[(int) angle % SINCOS_LENGTH];
-    float currY = -cosLUT[(int) angle % SINCOS_LENGTH];
+    float curRad = sinLUT[(int) angle % SINCOS_LENGTH];
+    float curY = -cosLUT[(int) angle % SINCOS_LENGTH];
 
     for (int j = 0; j < p_resolution; j++) {
-      sphereX[currVert] = cxVal[j] * curradius;
-      sphereY[currVert] = currY;
-      sphereZ[currVert++] = czVal[j] * curradius;
+      sphereX[currVert] = cxVal[j] * curRad;
+      sphereY[currVert] = curY;
+      sphereZ[currVert++] = czVal[j] * curRad;
     }
 
     angle += angleStep;
@@ -279,17 +279,17 @@ void image(PImage p_image) {
 
 void image(Asset p_imageAsset) {
   if (p_imageAsset.loaded)
-    super.image(p_imageAsset.asPicture(), 0, 0);
+    super.image(p_imageAsset.asImage(), 0, 0);
 }
 
 void image(Asset p_imageAsset, float p_x, float p_y) {
   if (p_imageAsset.loaded)
-    super.image(p_imageAsset.asPicture(), p_x, p_y);
+    super.image(p_imageAsset.asImage(), p_x, p_y);
 }
 
 void image(Asset p_imageAsset, float p_x, float p_y, float p_width, float p_height) {
   if (p_imageAsset.loaded)
-    super.image(p_imageAsset.asPicture(), p_x, p_y, p_width, p_height);
+    super.image(p_imageAsset.asImage(), p_x, p_y, p_width, p_height);
 }
 
 

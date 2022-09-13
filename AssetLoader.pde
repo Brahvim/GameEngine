@@ -5,14 +5,14 @@ ArrayList<Asset> ASSETS = new ArrayList<Asset>();
 
 // We're only loading a few types, so there is no use of generics:
 static enum AssetType {
-  SOUND, PICTURE, SHADER, SHAPE;
+  SOUND, IMAGE, SHADER, SHAPE;
 
   static int getMaxEntriesForType(AssetType p_type) {
     switch (p_type) {
     case SOUND:
       return Assets.sounds.size();
-    case PICTURE:
-      return Assets.pictures.size();
+    case IMAGE:
+      return Assets.images.size();
     case SHADER:
       return Assets.shaders.size();
     case SHAPE:
@@ -25,7 +25,7 @@ static enum AssetType {
 
 static class Assets {
   static ArrayList<SoundFile> sounds = new ArrayList<SoundFile>();
-  static ArrayList<PImage> pictures = new ArrayList<PImage>();
+  static ArrayList<PImage> images = new ArrayList<PImage>();
   static ArrayList<PShader> shaders = new ArrayList<PShader>();
   static ArrayList<PShape> shapes = new ArrayList<PShape>();
 
@@ -37,8 +37,8 @@ static class Assets {
     return Assets.sounds.get(p_asset.id);
   }
 
-  static PImage getPicture(Asset p_asset) {
-    return Assets.pictures.get(p_asset.id);
+  static PImage getImage(Asset p_asset) {
+    return Assets.images.get(p_asset.id);
   }
 
   static PShader getShader(Asset p_asset) {
@@ -61,8 +61,8 @@ static class Assets {
     return Assets.sounds.get(p_id);
   }
 
-  static PImage getPicture(int p_id) {
-    return Assets.pictures.get(p_id);
+  static PImage getImage(int p_id) {
+    return Assets.images.get(p_id);
   }
 
   static PShader getShader(int p_id) {
@@ -123,12 +123,12 @@ class Asset extends Thread {
       }
       break;
 
-    case PICTURE:
+    case IMAGE:
       this.loadedData = loadImage(this.path);
 
-      synchronized(Assets.pictures) {
-        this.id = Assets.pictures.size();
-        Assets.pictures.add((PImage)this.loadedData);
+      synchronized(Assets.images) {
+        this.id = Assets.images.size();
+        Assets.images.add((PImage)this.loadedData);
       }
       break; 
 
@@ -174,7 +174,7 @@ class Asset extends Thread {
     return this;
   }
 
-  PImage asPicture() {
+  PImage asImage() {
     // No need to check for null values!
     return (PImage)this.loadedData;
     // ...and if the type of data being loaded is different, well...

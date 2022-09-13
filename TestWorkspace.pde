@@ -74,9 +74,9 @@ Scene testScene = new Scene() {
 
   public void setup() {
     //bloomPass = new BloomPass(SKETCH, 0.5f, 20, 30);
-    cursorImage = new Asset("Unnamed_RPG_cursor.png", AssetType.PICTURE, new Runnable() {
+    cursorImage = new Asset("Unnamed_RPG_cursor.png", AssetType.IMAGE, new Runnable() {
       public void run() {
-        cursor(cursorImage.asPicture(), -4, -4);
+        cursor(cursorImage.asImage(), -4, -4);
       }
     }
     ).beginAsyncLoad();
@@ -88,8 +88,8 @@ Scene testScene = new Scene() {
     }
     ).beginAsyncLoad();
 
-    boxTexture = new Asset("LearnOpenGL_container2.png", AssetType.PICTURE).beginAsyncLoad();
-    circleTexture = new Asset("PFP.jpg", AssetType.PICTURE).beginAsyncLoad();
+    boxTexture = new Asset("LearnOpenGL_container2.png", AssetType.IMAGE).beginAsyncLoad();
+    circleTexture = new Asset("PFP.jpg", AssetType.IMAGE).beginAsyncLoad();
     svgImage = new Asset("bot1.svg", AssetType.SHAPE).beginAsyncLoad();
 
     circle = new Entity() {
@@ -249,8 +249,6 @@ Scene testScene = new Scene() {
       textAscent() - textDescent());
     fill(255);
     text((int)frameRate, 0, 0);
-
-    //doLights = false;
   }  
 
   boolean isLightDimmed;
@@ -261,13 +259,11 @@ Scene testScene = new Scene() {
       //light.enabled = !light.enabled; // Causes COMPLETE darkness!
       isLightDimmed = !isLightDimmed;
       Light l = light.getComponent(Light.class);
-      if (isLightDimmed) {
-        //doLights = false;
+      if (isLightDimmed)
         l.col.set(65, 50, 50);
-      } else {
-        //doLights = true;
+      else
         l.col.set(255, 255, 255);
-      }
+      doLights = !isLightDimmed;
     }
   } // End of `mousePressed()`.
 };
