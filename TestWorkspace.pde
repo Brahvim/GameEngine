@@ -61,7 +61,6 @@ void engineSetup() {
   setScene(testScene);
 }
 
-
 Scene testScene = new Scene() {
   @SuppressWarnings("unused")
     Asset audio, boxTexture, circleTexture, cursorImage, svgImage;
@@ -69,7 +68,7 @@ Scene testScene = new Scene() {
   Camera cam = new Camera(), rev = new Camera(); // A 'normal' and a 'revolving' camera.
 
   @SuppressWarnings("unused")
-    Entity circle, quad, light, groundBox;
+    Entity circle, quad, light, groundBox, instanceTest;
   SineWave wave = new SineWave(0.001f);
 
   public void setup() {
@@ -91,6 +90,21 @@ Scene testScene = new Scene() {
     boxTexture = new Asset("LearnOpenGL_container2.png", AssetType.IMAGE).beginAsyncLoad();
     circleTexture = new Asset("PFP.jpg", AssetType.IMAGE).beginAsyncLoad();
     svgImage = new Asset("bot1.svg", AssetType.SHAPE).beginAsyncLoad();
+
+    instanceTest = new Entity() {
+      Transformation form = new Transformation(this);
+      InstancedRenderer display;
+      public void setup() {
+        this.display = new InstancedRenderer(this, nerdCreateShape(BOX));
+        //this.display.enabled = false;
+        //this.display.instance.fill(255);
+        this.form.scale.set(5, 5, 5);
+      }
+
+      public void update() {
+        this.form.pos.set(mouse);
+      }
+    };
 
     circle = new Entity() {
       Transformation form = new Transformation(this);

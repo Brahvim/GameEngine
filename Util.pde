@@ -156,6 +156,10 @@ class SineWave {
     this.angleOffset = p_angleOff;
   }
 
+  void end() {
+    this.endTime = 0;
+  }
+
   void endIn(float p_millis) {
     this.endTime = this.aliveTime + p_millis;
   }

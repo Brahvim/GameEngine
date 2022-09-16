@@ -1,6 +1,6 @@
 class Transformation extends SerializableComponent {
   PVector pos, rot, scale;
-  protected PMatrix3D mat;
+  PMatrix3D mat;
 
   Transformation(Entity p_entity) {
     super(p_entity);
@@ -149,7 +149,7 @@ class Material extends SerializableComponent {
 
 class Light extends Component {
   protected Transformation form; // There's NO reason to call it `parentForm`.
-  protected PVector pos;
+  PVector pos;
   PVector off, col;
   int type;
 
@@ -236,13 +236,6 @@ class SpotLight extends Light {
   }
 }
 
-// Dream.
-//class InstancedRenderer {
-//Transform form;
-//RendererType type;
-//PShape THE_POWERFUL_ONE;
-//}
-
 class ParticleEmitter extends Component {
   Transformation startPos;
   PShape shape;
@@ -269,9 +262,18 @@ class ParticleEmitter extends Component {
   }
 }
 
+// Marker, ":P!:
+class RenderingComponent extends Component {
+  RenderingComponent(Entity p_entity) {
+    super(p_entity);
+    if (currentScene != null)
+      currentScene.renderers.add(this);
+  }
+}
+
 // What to name this now that we have the need for so many renderers? `ImmediateShapeRenderer`?
-class BasicRenderer extends Component {
-  Transformation form;
+class BasicRenderer extends RenderingComponent {
+  protected Transformation form;
 
   int fill, stroke; // Tinting should be done by the user themselves.
   float strokeWeight = 1;
@@ -288,9 +290,6 @@ class BasicRenderer extends Component {
   BasicRenderer(Entity p_entity) {
     super(p_entity);
     this.form = p_entity.getComponent(Transformation.class);
-
-    if (currentScene != null)
-      currentScene.renderers.add(this);
 
     if (this.form == null)
       nerdLogEx(new NullPointerException("A `ShapeRenderer` needs a `Transformation`!"));
@@ -479,37 +478,6 @@ class BasicRenderer extends Component {
       }
       vertex(sphereX[voff], sphereY[voff], sphereZ[voff], u, v);
       endShape();
-
-
-      /*
-      // [https://www.songho.ca/opengl/gl_sphere.html#sphere]
-       // (...plus heavy optimizations!)
-       
-       float sectorStep = TAU / 36;
-       float stackStep = PI / 36, cosStackAngle;
-       float sectorAngle = 0, stackAngle = 0;
-       
-       int j;
-       for (int i = 0; i < 37; i++) {
-       beginShape(LINE_LOOP);
-       this.applyTexture();
-       stackAngle = PI / 2 - i * stackStep; // Starting from `HALF_PI` to `-HALF_PI`,
-       cosStackAngle = cos(stackAngle); // `r * cos(u)`.
-       
-       // Add (`sectorCount + 1`) vertices per stack.
-       // The first and last vertices have same position and normal, but different texture coords.
-       for (j = 0; j < 37; j++) {
-       sectorAngle = j * sectorStep; // Starting from `0` towards `TAU`.
-       
-       // Vertex tex coord (u, v) range between [0, 1]:
-       vertex(cosStackAngle * cos(sectorAngle), // `r * cos(u) * cos(v)`.
-       cosStackAngle * sin(sectorAngle), // `r * cos(u) * sin(v)`.
-       sin(stackAngle), (float)i / 36, (float)j / 36);
-       // (^^^ I never though texturing would be THAT simple...)
-       }
-       endShape(CLOSE);
-       }
-       */
       break;
 
       // [https://stackoverflow.com/a/24843626/13951505]
@@ -557,7 +525,7 @@ class SvgRenderer extends BasicRenderer {
   // ^^^ That's the magic of this approach!
   // `if (this.psvg != this.svg) reRender();`!
 
-  protected PVector pscale;
+  PVector pscale;
   float resScale;
 
   SvgRenderer(Entity p_entity) {
@@ -653,16 +621,16 @@ class ModelRenderer extends BasicRenderer {
   }
 }
 
-class InstanceRenderer extends BasicRenderer {
+class InstancedRenderer extends RenderingComponent {
   Transformation form;
   PShape instance;
 
-  PImage texture;
-  protected PImage ptexture;
-  int type;
-  protected int ptype;
+  Asset textureLoader;
 
-  InstanceRenderer(Entity p_entity) {
+  PImage texture, ptexture;
+  int type, ptype;
+
+  InstancedRenderer(Entity p_entity) {
     super(p_entity);
     this.form = p_entity.getComponent(Transformation.class);
 
@@ -670,12 +638,37 @@ class InstanceRenderer extends BasicRenderer {
       nerdLogEx(new NullPointerException("An `InstanceRenderer` needs a `Transformation`!"));
   }
 
-  InstanceRenderer(Entity p_entity, PShape p_instance) {
+  // Caching shapes is useless. I already have the vertices for cubes, and
+  // Sphere and circles need a quality/edge/resolution control!
+  // (It is a totally good idea to cache their vertices anyway so people can
+  // actually make use of the `Entity.render()` method :D)
+  InstancedRenderer(Entity p_entity, PShape p_instance) {
     this(p_entity);
     this.instance = p_instance;
   }
 
+  InstancedRenderer(Entity p_entity, int p_type, PImage p_texture) {
+    this(p_entity);
+    this.type = p_type;
+    this.texture = p_texture;
+  }
+
+  InstancedRenderer(Entity p_entity, int p_type, Asset p_textureLoader) {
+    this(p_entity);
+    this.type = p_type;
+    this.textureLoader = p_textureLoader;
+  }
+
+
+  void textureLoaderCheck() {
+    if (this.textureLoader != null)
+      this.texture = (PImage)this.textureLoader.loadedData; //this.textureLoader.asPicture();
+  }
+
   void update() {
+    this.textureLoaderCheck();
+    this.instance.setTexture(this.texture);
+
     pushMatrix();
     this.form.applyMatrix();
     shape(this.instance);
@@ -685,4 +678,341 @@ class InstanceRenderer extends BasicRenderer {
   void render() {
     this.instance = createShape();
   }
+}
+
+
+void createShape(PShape p_shape, int p_type, PImage p_texture) {
+  switch(p_type) {
+  case QUAD:
+    p_shape.beginShape(QUAD);
+    p_shape.textureMode(NORMAL);
+    //p_shape.textureWrap(p_texMode);
+    p_shape.texture(p_texture);
+    // Yes. You bind a texture AFTER `glBegin()`. 
+    p_shape.vertex(-0.5f, -0.5f, 0, 0);
+    p_shape.vertex(0.5f, -0.5f, 1, 0);
+    p_shape.vertex(0.5f, 0.5f, 1, 1);
+    p_shape.vertex(-0.5f, 0.5f, 0, 1);
+    p_shape.endShape(CLOSE);
+    break;
+
+  case BOX:
+    // Coordinate data from:
+    // [https://www.wikihow.com/Make-a-Cube-in-OpenGL]
+    // ...and that's how you get work done faster. Pfft.
+    p_shape.beginShape(QUADS);
+    p_shape.textureMode(NORMAL);
+    //p_shape.textureWrap(p_texMode);
+    p_shape.texture(p_texture);
+
+    // Frontside:
+    p_shape.vertex(0.5f, -0.5f, -0.5f, 0, 0);
+    p_shape.vertex(0.5f, 0.5f, -0.5f, 1, 0);
+    p_shape.vertex(-0.5f, 0.5f, -0.5f, 1, 1);     
+    p_shape.vertex(-0.5f, -0.5f, -0.5f, 0, 1);
+
+    // Backside:
+    p_shape.vertex(0.5f, -0.5f, 0.5f, 0, 0);
+    p_shape.vertex(0.5f, 0.5f, 0.5f, 1, 0);
+    p_shape.vertex(-0.5f, 0.5f, 0.5f, 1, 1);
+    p_shape.vertex(-0.5f, -0.5f, 0.5f, 0, 1);
+
+    // Right:
+    p_shape.vertex(0.5f, -0.5f, -0.5f, 0, 0);
+    p_shape.vertex(0.5f, 0.5f, -0.5f, 1, 0);
+    p_shape.vertex(0.5f, 0.5f, 0.5f, 1, 1);
+    p_shape.vertex(0.5f, -0.5f, 0.5f, 0, 1);
+
+    // Left:
+    p_shape.vertex(-0.5f, -0.5f, 0.5f, 0, 0);
+    p_shape.vertex(-0.5f, 0.5f, 0.5f, 1, 0);
+    p_shape.vertex(-0.5f, 0.5f, -0.5f, 1, 1);
+    p_shape.vertex(-0.5f, -0.5f, -0.5f, 0, 1);
+
+    // Top:
+    p_shape.vertex( 0.5f, 0.5f, 0.5f, 0, 0);
+    p_shape.vertex( 0.5f, 0.5f, -0.5f, 1, 0);
+    p_shape.vertex(-0.5f, 0.5f, -0.5f, 1, 1);
+    p_shape.vertex(-0.5f, 0.5f, 0.5f, 0, 1);
+
+    // Bottom:
+    p_shape.vertex(0.5f, -0.5f, -0.5f, 0, 0);
+    p_shape.vertex(0.5f, -0.5f, 0.5f, 1, 0);
+    p_shape.vertex(-0.5f, -0.5f, 0.5f, 1, 1);
+    p_shape.vertex(-0.5f, -0.5f, -0.5f, 0, 1);
+
+    p_shape.endShape();
+    break;
+
+  case SPHERE:
+    if (p_texture == null) {
+      popMatrix();
+      popStyle();
+      return;
+    }
+
+    // Thanks, Processing Community! :D
+    int v1, v11, v2, i = 0;
+
+    p_shape.beginShape(TRIANGLE_STRIP);
+    //p_shape.textureWrap(p_texMode);
+    p_shape.texture(p_texture);
+    p_shape.textureMode(IMAGE);
+
+    float iu = (float) (p_texture.width - 1) / SPHERE_DETAIL;
+    float iv = (float) (p_texture.height - 1) / SPHERE_DETAIL;
+    float u = 0, v = iv;
+
+    for (i = 0; i < SPHERE_DETAIL; i++) {
+      p_shape.vertex(0, -1, 0, u, 0);
+      p_shape.vertex(sphereX[i], sphereY[i], sphereZ[i], u, v);
+      u += iu;
+    }
+    p_shape.vertex(0, -1, 0, u, 0);
+    p_shape.vertex(sphereX[0], sphereY[0], sphereZ[0], u, v);
+    p_shape.endShape();
+
+    // Middle rings:
+
+    int voff = 0, j;
+    for (i = 2; i < SPHERE_DETAIL; i++) {
+      v1 = v11 = voff;
+      voff += SPHERE_DETAIL;
+      v2 = voff;
+      u = 0;
+
+      p_shape.beginShape(TRIANGLE_STRIP);
+      //p_shape.textureWrap(p_texMode);
+      p_shape.texture(p_texture);
+      p_shape.textureMode(IMAGE);
+
+      for (j = 0; j < SPHERE_DETAIL; j++) {
+        p_shape.vertex(sphereX[v1], sphereY[v1], sphereZ[v1++], u, v);
+        p_shape.vertex(sphereX[v2], sphereY[v2], sphereZ[v2++], u, v + iv);
+        u += iu;
+      }
+
+      // Close each ring:
+
+      v1 = v11;
+      v2 = voff;
+      p_shape.vertex(sphereX[v1], sphereY[v1], sphereZ[v1], u, v);
+      p_shape.vertex(sphereX[v2], sphereY[v2], sphereZ[v2], u, v + iv);
+      p_shape.endShape();
+      v += iv;
+    }
+
+    u = 0;
+
+    // Add the northern cap:
+
+    p_shape.beginShape(TRIANGLE_STRIP);
+    //p_shape.textureWrap(p_texMode);
+    p_shape.texture(p_texture);
+    p_shape.textureMode(IMAGE);
+
+    for (i = 0; i < SPHERE_DETAIL; i++) {
+      v2 = voff + i;
+      p_shape.vertex(sphereX[v2], sphereY[v2], sphereZ[v2], u, v);
+      p_shape.vertex(0, 1, 0, u, v + iv);
+      u += iu;
+    }
+    p_shape.vertex(sphereX[voff], sphereY[voff], sphereZ[voff], u, v);
+    p_shape.endShape();
+    break;
+
+    // [https://stackoverflow.com/a/24843626/13951505]
+    // Only used as a reference! I understand the Math, only forgot the expression :joy:
+    // Fun fact, even *that* code was borrowed from: [http://slabode.exofire.net/circle_draw.shtml]
+
+  case ELLIPSE:
+    p_shape.beginShape(POLYGON);
+    p_shape.textureMode(NORMAL);
+    //p_shape.textureWrap(p_texMode);
+    p_shape.texture(p_texture);
+
+    float ex, ey, eTauFract; // STACK ALLOC!!!11
+    for (int k = 0; k < 36; k++) {
+      eTauFract = k * TAU / 36;
+      p_shape.vertex(ex = cos(eTauFract), ey = sin(eTauFract), // Wish I had a LUT! 
+        // The addition translates in the texture,
+        // The multiplication *inversely* scales it.
+        0.5f + ex * 0.5f, 
+        0.5f + ey * 0.5f);
+    }
+    p_shape.endShape(CLOSE);
+    break;
+  }
+}
+
+PShape nerdCreateShape(int p_type) {
+  return nerdCreateShape(p_type, null);
+}
+
+PShape nerdCreateShape(int p_type, PImage p_texture) {
+  PShape ret = createShape();
+
+  switch(p_type) {
+  case QUAD:
+    ret.beginShape(QUAD);
+    ret.textureMode(NORMAL);
+    //p_shape.textureWrap(p_texMode);
+    ret.texture(p_texture);
+    // Yes. You bind a texture AFTER `glBegin()`. 
+    ret.vertex(-0.5f, -0.5f, 0, 0);
+    ret.vertex(0.5f, -0.5f, 1, 0);
+    ret.vertex(0.5f, 0.5f, 1, 1);
+    ret.vertex(-0.5f, 0.5f, 0, 1);
+    ret.endShape(CLOSE);
+    break;
+
+  case BOX:
+    // Coordinate data from:
+    // [https://www.wikihow.com/Make-a-Cube-in-OpenGL]
+    // ...and that's how you get work done faster. Pfft.
+    ret.beginShape(QUADS);
+    ret.textureMode(NORMAL);
+    //p_shape.textureWrap(p_texMode);
+    ret.texture(p_texture);
+
+    // Frontside:
+    ret.vertex(0.5f, -0.5f, -0.5f, 0, 0);
+    ret.vertex(0.5f, 0.5f, -0.5f, 1, 0);
+    ret.vertex(-0.5f, 0.5f, -0.5f, 1, 1);     
+    ret.vertex(-0.5f, -0.5f, -0.5f, 0, 1);
+
+    // Backside:
+    ret.vertex(0.5f, -0.5f, 0.5f, 0, 0);
+    ret.vertex(0.5f, 0.5f, 0.5f, 1, 0);
+    ret.vertex(-0.5f, 0.5f, 0.5f, 1, 1);
+    ret.vertex(-0.5f, -0.5f, 0.5f, 0, 1);
+
+    // Right:
+    ret.vertex(0.5f, -0.5f, -0.5f, 0, 0);
+    ret.vertex(0.5f, 0.5f, -0.5f, 1, 0);
+    ret.vertex(0.5f, 0.5f, 0.5f, 1, 1);
+    ret.vertex(0.5f, -0.5f, 0.5f, 0, 1);
+
+    // Left:
+    ret.vertex(-0.5f, -0.5f, 0.5f, 0, 0);
+    ret.vertex(-0.5f, 0.5f, 0.5f, 1, 0);
+    ret.vertex(-0.5f, 0.5f, -0.5f, 1, 1);
+    ret.vertex(-0.5f, -0.5f, -0.5f, 0, 1);
+
+    // Top:
+    ret.vertex( 0.5f, 0.5f, 0.5f, 0, 0);
+    ret.vertex( 0.5f, 0.5f, -0.5f, 1, 0);
+    ret.vertex(-0.5f, 0.5f, -0.5f, 1, 1);
+    ret.vertex(-0.5f, 0.5f, 0.5f, 0, 1);
+
+    // Bottom:
+    ret.vertex(0.5f, -0.5f, -0.5f, 0, 0);
+    ret.vertex(0.5f, -0.5f, 0.5f, 1, 0);
+    ret.vertex(-0.5f, -0.5f, 0.5f, 1, 1);
+    ret.vertex(-0.5f, -0.5f, -0.5f, 0, 1);
+
+    ret.endShape();
+    break;
+
+  case SPHERE:
+    if (p_texture == null)
+      return null;
+
+    // Thanks, Processing Community! :D
+    int v1, v11, v2, i = 0;
+
+    ret.beginShape(TRIANGLE_STRIP);
+    //p_shape.textureWrap(p_texMode);
+    ret.texture(p_texture);
+    ret.textureMode(IMAGE);
+
+    float iu = (float) (p_texture.width - 1) / SPHERE_DETAIL;
+    float iv = (float) (p_texture.height - 1) / SPHERE_DETAIL;
+    float u = 0, v = iv;
+
+    for (i = 0; i < SPHERE_DETAIL; i++) {
+      ret.vertex(0, -1, 0, u, 0);
+      ret.vertex(sphereX[i], sphereY[i], sphereZ[i], u, v);
+      u += iu;
+    }
+    ret.vertex(0, -1, 0, u, 0);
+    ret.vertex(sphereX[0], sphereY[0], sphereZ[0], u, v);
+    ret.endShape();
+
+    // Middle rings:
+
+    int voff = 0, j;
+    for (i = 2; i < SPHERE_DETAIL; i++) {
+      v1 = v11 = voff;
+      voff += SPHERE_DETAIL;
+      v2 = voff;
+      u = 0;
+
+      ret.beginShape(TRIANGLE_STRIP);
+      //p_shape.textureWrap(p_texMode);
+      ret.texture(p_texture);
+      ret.textureMode(IMAGE);
+
+      for (j = 0; j < SPHERE_DETAIL; j++) {
+        ret.vertex(sphereX[v1], sphereY[v1], sphereZ[v1++], u, v);
+        ret.vertex(sphereX[v2], sphereY[v2], sphereZ[v2++], u, v + iv);
+        u += iu;
+      }
+
+      // Close each ring:
+
+      v1 = v11;
+      v2 = voff;
+      ret.vertex(sphereX[v1], sphereY[v1], sphereZ[v1], u, v);
+      ret.vertex(sphereX[v2], sphereY[v2], sphereZ[v2], u, v + iv);
+      ret.endShape();
+      v += iv;
+    }
+
+    u = 0;
+
+    // Add the northern cap:
+
+    ret.beginShape(TRIANGLE_STRIP);
+    //p_shape.textureWrap(p_texMode);
+    ret.texture(p_texture);
+    ret.textureMode(IMAGE);
+
+    for (i = 0; i < SPHERE_DETAIL; i++) {
+      v2 = voff + i;
+      ret.vertex(sphereX[v2], sphereY[v2], sphereZ[v2], u, v);
+      ret.vertex(0, 1, 0, u, v + iv);
+      u += iu;
+    }
+    ret.vertex(sphereX[voff], sphereY[voff], sphereZ[voff], u, v);
+    ret.endShape();
+    break;
+
+    // [https://stackoverflow.com/a/24843626/13951505]
+    // Only used as a reference! I understand the Math, only forgot the expression :joy:
+    // Fun fact, even *that* code was borrowed from: [http://slabode.exofire.net/circle_draw.shtml]
+
+  case ELLIPSE:
+    ret.beginShape(POLYGON);
+    ret.textureMode(NORMAL);
+    //p_shape.textureWrap(p_texMode);
+    ret.texture(p_texture);
+
+    float ex, ey, eTauFract; // STACK ALLOC!!!11
+    for (int k = 0; k < 36; k++) {
+      eTauFract = k * TAU / 36;
+      ret.vertex(ex = cos(eTauFract), ey = sin(eTauFract), // Wish I had a LUT! 
+        // The addition translates in the texture,
+        // The multiplication *inversely* scales it.
+        0.5f + ex * 0.5f, 
+        0.5f + ey * 0.5f);
+    }
+    ret.endShape(CLOSE);
+    break;
+
+  default:
+    return null;
+  }
+
+  return ret;
 }

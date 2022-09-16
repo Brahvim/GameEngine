@@ -25,16 +25,16 @@ PhysicsSpace bt;
 
 boolean b2dShouldUpdate, btShouldUpdate;
 
-void destroyB2DBody(FBody p_body) {
+void removeB2DBody(FBody p_body) {
   b2d.remove(p_body);
   currentScene.B2D_BODIES.remove(p_body);
 }
 
-void removeFromB2D(FBody p_body) {
+void disableBody(FBody p_body) {
   b2d.remove(p_body);
 }
 
-void addToB2D(FBody p_body) {
+void enableBody(FBody p_body) {
   b2d.add(p_body);
 }
 

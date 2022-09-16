@@ -1,7 +1,32 @@
 import processing.sound.*;
 
+// BAD IDEA:
+
+// Fun fact: the code could've had an alternate approach by having made a class to load assets,
+// ..and then making a class wrapping that class doing the task async.
+// (The super class would load the asset itself in a different method!)
+// Only the async loader class would then implement the `onLoad` runnable / extra method.
+// I'd might want to do this in a future version for workflow improvements, maybe?
+// It is a de-optimization for performance...
+
 // Do I really need this?
 ArrayList<Asset> ASSETS = new ArrayList<Asset>();
+
+Asset loadAsync(String p_path, AssetType p_type, Runnable p_onLoad) {
+  return new Asset(p_path, p_type, p_onLoad).beginAsyncLoad();
+}
+
+Asset loadAsync(String p_path, AssetType p_type) {
+  return new Asset(p_path, p_type).beginAsyncLoad();
+}
+
+Asset loadNow(String p_path, AssetType p_type, Runnable p_onLoad) {
+  return new Asset(p_path, p_type, p_onLoad).load();
+}
+
+Asset loadNow(String p_path, AssetType p_type) {
+  return new Asset(p_path, p_type).load();
+}
 
 // We're only loading a few types, so there is no use of generics:
 static enum AssetType {
@@ -78,7 +103,7 @@ class Asset extends Thread {
   Object loadedData = null;
 
   // Extra helper data:
-  Runnable onLoad = null;
+  Runnable onLoad = null; // Should be replaced with an overload.
   boolean loaded, ploaded;
   int id = -1, loadFrame = -1;
   float loadTime = -1;

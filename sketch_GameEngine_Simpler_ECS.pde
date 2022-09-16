@@ -249,7 +249,7 @@ void draw() {
     currentCam.applyMatrix();
 
   for (Component c : currentScene.components)
-    if (!(c instanceof BasicRenderer))
+    if (!(c instanceof RenderingComponent))
       if (c.enabled && c.parent.enabled)
         c.update();
       else c.disabledUpdate();
@@ -262,7 +262,7 @@ void draw() {
 
   if (doAnyDrawing && doRendering) 
     // I applied ^^^ that check EVEN to post processing as well but GPU usage remained unchanged.
-    for (BasicRenderer r : currentScene.renderers) {
+    for (RenderingComponent r : currentScene.renderers) {
       r.parent.render();
       if (r.enabled)
         r.update();
