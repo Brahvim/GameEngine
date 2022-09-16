@@ -95,7 +95,7 @@ Scene testScene = new Scene() {
       Transformation form = new Transformation(this);
       InstancedRenderer display;
       public void setup() {
-        this.display = new InstancedRenderer(this, nerdCreateShape(BOX));
+        this.display = new InstancedRenderer(this, BOX, boxTexture);
         //this.display.enabled = false;
         //this.display.instance.fill(255);
         this.form.scale.set(5, 5, 5);

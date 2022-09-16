@@ -651,6 +651,7 @@ class InstancedRenderer extends RenderingComponent {
     this(p_entity);
     this.type = p_type;
     this.texture = p_texture;
+    this.instance = nerdCreateShape(p_type, this.texture);
   }
 
   InstancedRenderer(Entity p_entity, int p_type, Asset p_textureLoader) {
@@ -659,13 +660,16 @@ class InstancedRenderer extends RenderingComponent {
     this.textureLoader = p_textureLoader;
   }
 
-  void textureLoaderCheck() {
-    if (this.textureLoader != null)
-      this.texture = (PImage)this.textureLoader.loadedData; //this.textureLoader.asPicture();
-  }
-
   void update() {
-    this.textureLoaderCheck();
+    if (this.textureLoader != null) {
+      if (this.textureLoader.loaded && !this.textureLoader.ploaded) {
+        println("Creating instance...");
+        this.instance = nerdCreateShape(this.type);
+      } else return;
+      this.texture = (PImage)this.textureLoader.loadedData;
+    }
+
+    // This can take `null`, too!:
     this.instance.setTexture(this.texture);
 
     pushMatrix();
@@ -680,6 +684,7 @@ class InstancedRenderer extends RenderingComponent {
 }
 
 PShape nerdCreateShape(int p_type) {
+  println("Welcome to shape creation.");
   return nerdCreateShape(p_type, null);
 }
 
@@ -749,29 +754,32 @@ PShape nerdCreateShape(int p_type, PImage p_texture) {
     break;
 
   case SPHERE:
-    if (p_texture == null)
-      return null;
+    //if (p_texture == null)
+    //return null;
 
     // Thanks, Processing Community! :D
     int v1, v11, v2, i = 0;
 
-    ret.beginShape(TRIANGLE_STRIP);
+    PShape sphereMain = createShape();
+    sphereMain.beginShape(TRIANGLE_STRIP);
     //p_shape.textureWrap(p_texMode);
-    ret.texture(p_texture);
-    ret.textureMode(IMAGE);
+    sphereMain.texture(p_texture);
+    sphereMain.textureMode(IMAGE);
 
-    float iu = (float) (p_texture.width - 1) / SPHERE_DETAIL;
-    float iv = (float) (p_texture.height - 1) / SPHERE_DETAIL;
+    float iu = p_texture == null? 0 : (float) (p_texture.width - 1) / SPHERE_DETAIL;
+    float iv = p_texture == null? 0 : (float) (p_texture.height - 1) / SPHERE_DETAIL;
     float u = 0, v = iv;
 
     for (i = 0; i < SPHERE_DETAIL; i++) {
-      ret.vertex(0, -1, 0, u, 0);
-      ret.vertex(sphereX[i], sphereY[i], sphereZ[i], u, v);
+      sphereMain.vertex(0, -1, 0, u, 0);
+      sphereMain.vertex(sphereX[i], sphereY[i], sphereZ[i], u, v);
       u += iu;
     }
-    ret.vertex(0, -1, 0, u, 0);
-    ret.vertex(sphereX[0], sphereY[0], sphereZ[0], u, v);
-    ret.endShape();
+    sphereMain.vertex(0, -1, 0, u, 0);
+    sphereMain.vertex(sphereX[0], sphereY[0], sphereZ[0], u, v);
+    sphereMain.endShape();
+
+    ret.addChild(sphereMain);
 
     // Middle rings:
 
@@ -782,14 +790,15 @@ PShape nerdCreateShape(int p_type, PImage p_texture) {
       v2 = voff;
       u = 0;
 
-      ret.beginShape(TRIANGLE_STRIP);
+      PShape sphereMidRing = createShape();
+      sphereMidRing.beginShape(TRIANGLE_STRIP);
       //p_shape.textureWrap(p_texMode);
-      ret.texture(p_texture);
-      ret.textureMode(IMAGE);
+      sphereMidRing.texture(p_texture);
+      sphereMidRing.textureMode(IMAGE);
 
       for (j = 0; j < SPHERE_DETAIL; j++) {
-        ret.vertex(sphereX[v1], sphereY[v1], sphereZ[v1++], u, v);
-        ret.vertex(sphereX[v2], sphereY[v2], sphereZ[v2++], u, v + iv);
+        sphereMidRing.vertex(sphereX[v1], sphereY[v1], sphereZ[v1++], u, v);
+        sphereMidRing.vertex(sphereX[v2], sphereY[v2], sphereZ[v2++], u, v + iv);
         u += iu;
       }
 
@@ -797,9 +806,11 @@ PShape nerdCreateShape(int p_type, PImage p_texture) {
 
       v1 = v11;
       v2 = voff;
-      ret.vertex(sphereX[v1], sphereY[v1], sphereZ[v1], u, v);
-      ret.vertex(sphereX[v2], sphereY[v2], sphereZ[v2], u, v + iv);
-      ret.endShape();
+      sphereMidRing.vertex(sphereX[v1], sphereY[v1], sphereZ[v1], u, v);
+      sphereMidRing.vertex(sphereX[v2], sphereY[v2], sphereZ[v2], u, v + iv);
+      sphereMidRing.endShape();
+
+      ret.addChild(sphereMidRing);
       v += iv;
     }
 
@@ -807,19 +818,23 @@ PShape nerdCreateShape(int p_type, PImage p_texture) {
 
     // Add the northern cap:
 
-    ret.beginShape(TRIANGLE_STRIP);
+    PShape sphereNorthCap = createShape();
+    sphereNorthCap.beginShape(TRIANGLE_STRIP);
     //p_shape.textureWrap(p_texMode);
-    ret.texture(p_texture);
-    ret.textureMode(IMAGE);
+    sphereNorthCap.texture(p_texture);
+    sphereNorthCap.textureMode(IMAGE);
+    println("Considered adding a northern cap.");
 
     for (i = 0; i < SPHERE_DETAIL; i++) {
       v2 = voff + i;
-      ret.vertex(sphereX[v2], sphereY[v2], sphereZ[v2], u, v);
-      ret.vertex(0, 1, 0, u, v + iv);
+      sphereNorthCap.vertex(sphereX[v2], sphereY[v2], sphereZ[v2], u, v);
+      sphereNorthCap.vertex(0, 1, 0, u, v + iv);
       u += iu;
     }
-    ret.vertex(sphereX[voff], sphereY[voff], sphereZ[voff], u, v);
-    ret.endShape();
+    sphereNorthCap.vertex(sphereX[voff], sphereY[voff], sphereZ[voff], u, v);
+    sphereNorthCap.endShape();
+
+    ret.addChild(sphereNorthCap);
     break;
 
     // [https://stackoverflow.com/a/24843626/13951505]

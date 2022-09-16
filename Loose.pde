@@ -151,7 +151,7 @@ void initSphere(int p_resolution) {
   // Calculate a unit circle in the `X`-`Z` plane:
   for (int i = 0; i < p_resolution; i++) {
     cxVal[i] = -cosLUT[(int) (i * delta) % SINCOS_LENGTH];
-    czVal[i] =sinLUT[(int) (i * delta) % SINCOS_LENGTH];
+    czVal[i] = sinLUT[(int) (i * delta) % SINCOS_LENGTH];
   }
 
   // Computing vertices - they start at the south pole:
@@ -165,7 +165,7 @@ void initSphere(int p_resolution) {
   float angleStep = (SINCOS_LENGTH * 0.5f) / p_resolution;
   float angle = angleStep;
 
-  // Step along Y axis
+  // Step along Y axis:
   for (int i = 1; i < p_resolution; i++) {
     float curRad = sinLUT[(int) angle % SINCOS_LENGTH];
     float curY = -cosLUT[(int) angle % SINCOS_LENGTH];

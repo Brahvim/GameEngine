@@ -104,7 +104,7 @@ class Asset extends Thread {
 
   // Extra helper data:
   Runnable onLoad = null; // Should be replaced with an overload.
-  boolean loaded, ploaded;
+  Boolean loaded = new Boolean(false), ploaded = new Boolean(false);
   int id = -1, loadFrame = -1;
   float loadTime = -1;
 
@@ -189,9 +189,11 @@ class Asset extends Thread {
       break;
     }
 
-    this.loaded = true;
-    this.loadFrame = frameCount;
-    this.loadTime = millis();
+    synchronized(this.loaded) {
+      this.loaded = true;
+      this.loadFrame = frameCount;
+      this.loadTime = millis();
+    }
 
     if (this.onLoad != null)
       this.onLoad.run();

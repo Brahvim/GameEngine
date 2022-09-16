@@ -336,9 +336,11 @@ void post() {
   window.setPointerVisible(cursorVisible);
   while (cursorVisible ? !window.isPointerVisible() : window.isPointerVisible());
 
-  // Doing this in the end as a test:
+  // Doing this in the end:
   for (Asset a : ASSETS)
-    a.ploaded = a.loaded;
+    synchronized(a) {
+      a.ploaded = a.loaded;
+    }
 }
 
 void mousePressed() {
