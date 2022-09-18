@@ -283,8 +283,6 @@ class BasicRenderer extends RenderingComponent {
   // Texturing:
   Asset textureLoader;
   int textureWrap = CLAMP; 
-  // ^^^ Will I remove this? If they really want so much control,
-  // they better write their own render method.
   PImage texture;
 
   BasicRenderer(Entity p_entity) {
@@ -292,7 +290,8 @@ class BasicRenderer extends RenderingComponent {
     this.form = p_entity.getComponent(Transformation.class);
 
     if (this.form == null)
-      nerdLogEx(new NullPointerException("A `ShapeRenderer` needs a `Transformation`!"));
+      nerdLogEx(new NullPointerException("Any kind of renderer needs a `Transformation` component" 
+        + " to be present in your `Entity`!"));
   }
 
   BasicRenderer(Entity p_entity, int p_type) {
@@ -591,7 +590,7 @@ class SvgRenderer extends BasicRenderer {
 
         // Re-render on the image loading :D
         if (!super.textureLoader.ploaded && super.textureLoader.loaded) {
-          println("Texture loader rasterized SVG.");
+          //println("Texture loader rasterized SVG.");
           this.rasterize(); // Apparently the SVG might not be visible if not exporting with Java!
         }
       } else if (super.textureLoader.type == AssetType.IMAGE)
@@ -622,30 +621,44 @@ class ModelRenderer extends BasicRenderer {
   }
 }
 
+// "Favor composition over inheritance."
 class InstancedRenderer extends RenderingComponent {
-  Transformation form;
+  protected Transformation form;
   PShape instance;
 
-  Asset textureLoader;
+  int fill, stroke;
+  float strokeWeight = 1;
+  int type, ptype, strokeCap = MITER, strokeJoin = ROUND, vertCount = -1;
+  boolean doFill = true, doStroke = true, doTexture = true;
 
-  PImage texture, ptexture;
-  int type, ptype;
-  boolean createdInstance; // State management :P
+  Asset textureLoader;
+  PImage texture;
+
+  boolean exists; // State management :P
   // (It took me an entire week to figure out I could do that
   // instead of constantly checking `ploaded` and `loaded`!)
 
   InstancedRenderer(Entity p_entity) {
     super(p_entity);
+
     this.form = p_entity.getComponent(Transformation.class);
 
     if (this.form == null)
-      nerdLogEx(new NullPointerException("An `InstancedRenderer` needs a `Transformation`!"));
+      nerdLogEx(new NullPointerException("An `InstacedRenderer` needs a `Transformation` component" 
+        + " to be present in your `Entity`!"));
   }
 
   // Caching shapes is useless. I already have the vertices for cubes, and
   // Sphere and circles need a quality/edge/resolution control!
   // (It is a totally good idea to cache their vertices anyway so people can
   // actually make use of the `Entity.render()` method :D)
+
+  InstancedRenderer(Entity p_entity, int p_type) {
+    this(p_entity);
+    this.type = p_type;
+    this.instance = nerdCreateShape(p_type);
+  }
+
   InstancedRenderer(Entity p_entity, PShape p_instance) {
     this(p_entity);
     this.instance = p_instance;
@@ -665,21 +678,28 @@ class InstancedRenderer extends RenderingComponent {
   }
 
   void update() {
-    if (this.textureLoader != null) {
-      //if (this.textureLoader.loaded && !this.textureLoader.ploaded)
-      if (!this.createdInstance) {
-        this.createdInstance = true;
-        //println("Creating instance...");
-        this.instance = nerdCreateShape(this.type);
-      }
+    if (!(this.textureLoader == null && this.exists)) {
+      this.exists = true;
+      this.instance = nerdCreateShape(this.type, this.texture);
       this.texture = (PImage)this.textureLoader.loadedData;
     }
 
     if (this.instance == null)
       return;
 
+    this.vertCount = this.instance.getVertexCount();
+
     // This can take `null`, too!:
-    this.instance.setTexture(this.texture);
+    this.instance.setTexture(this.doTexture? this.texture : null);
+
+    this.instance.setStroke(this.stroke);
+    this.instance.setStrokeWeight(this.strokeWeight);
+    this.instance.setStrokeCap(this.strokeCap);
+    this.instance.setStrokeJoin(this.strokeJoin);
+    this.instance.setStroke(this.doStroke); // Do this later! Are those settings we fixed, useless?
+
+    this.instance.setFill(this.fill);
+    this.instance.setFill(this.doFill); // Are we supposed to do a fill? 
 
     pushMatrix();
     this.form.applyMatrix();
@@ -693,10 +713,6 @@ PShape nerdCreateShape(int p_type) {
 }
 
 PShape nerdCreateShape(int p_type, PImage p_texture) {
-  return nerdCreateShape(p_type, p_texture, false);
-}
-
-PShape nerdCreateShape(int p_type, PImage p_texture, boolean p_doStroke) {
   PShape ret;
 
   switch(p_type) {
@@ -735,7 +751,7 @@ PShape nerdCreateShape(int p_type, PImage p_texture, boolean p_doStroke) {
   return ret;
 }
 
-void nerdShapeSettings(boolean a) {
+void nerdShapeStyling(PShape p_shape, boolean p_doStroke, boolean p_doFill) {
 }
 
 void nerdGiveVertices(PShape p_shape, int p_type, PImage p_texture) {
