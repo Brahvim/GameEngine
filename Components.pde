@@ -76,7 +76,7 @@ class Transformation extends SerializableComponent { //<>//
     try {
       this.readImpl(p_fname);
     }
-    catch (FileNotFoundException e) {
+    catch (Exception e) {
       p_catcher.run(e);
     }
   }
@@ -85,7 +85,7 @@ class Transformation extends SerializableComponent { //<>//
     try {
       this.readImpl(p_fname);
     }
-    catch (FileNotFoundException e) {
+    catch (Exception e) {
       nerdLogError("Failed to load `" + p_fname + "`.");
       return;
     }
@@ -515,12 +515,12 @@ class SvgRenderer extends BasicRenderer {
   // In a setter, you'd be rendering the SVG to a texture.
   // With this approach, you render in the update loop itself
   // when an update is needed.
-  boolean doStyle = true, doAutoCalc = true, doAutoRaster;
+  boolean doStyle = true, doAutoCalc = true, doAutoRaster, hasRasterizedOnLoad;
   PGraphics rasterizer;
 
   PShape svg, psvg = null;
   // ^^^ That's the magic of this approach!
-  // `if (this.psvg != this.svg) reRender();`!
+  // `if (this.psvg != this.svg) this.rasterize();`!
 
   PVector pscale;
   float resScale;
@@ -542,14 +542,14 @@ class SvgRenderer extends BasicRenderer {
     super.type = p_type;
     this.svg = p_shape;
     this.pscale = new PVector();
-    this.resScale = dist(0, 0, this.svg.width, this.svg.height) * 0.05f;
+    this.calcScale();
     this.rasterizer.setSize(
       (int)Math.abs(this.form.scale.x * this.resScale), 
       (int)Math.abs(this.form.scale.y * this.resScale));
   }
 
   public void calcScale() {
-    this.resScale = dist(0, 0, this.svg.width, this.svg.height) * 0.05f;
+    this.resScale = dist(0, 0, this.svg.width, this.svg.height) * 0.5f;
   }
 
   public void rasterize() {
@@ -569,12 +569,6 @@ class SvgRenderer extends BasicRenderer {
     this.rasterizer.endDraw();
 
     super.texture = this.rasterizer;
-
-    //if (this.svg != null)
-    //this.texture = svgToImage(this.svg, abs(this.form.scale.x * this.resScale), 
-    //abs(this.form.scale.y * this.resScale));
-
-    //println("Re-rendererd SVG.");
   }
 
   public void textureLoaderCheck() {
@@ -586,15 +580,17 @@ class SvgRenderer extends BasicRenderer {
         // Calculate the rasterization scale before rasterizing!:
         if (this.svg != null)
           if (this.doAutoCalc)
-            this.resScale = dist(0, 0, this.svg.width, this.svg.height) * 0.05f;
+            this.calcScale();
 
         // Re-render on the image loading :D
-        if (!super.textureLoader.ploaded && super.textureLoader.loaded) {
+        if (//!super.textureLoader.ploaded && super.textureLoader.loaded
+          !this.hasRasterizedOnLoad) {
           //println("Texture loader rasterized SVG.");
-          this.rasterize(); // Apparently the SVG might not be visible if not exporting with Java!
-        }
-      } else if (super.textureLoader.type == AssetType.IMAGE)
-        super.texture = (PImage)this.textureLoader.loadedData;
+          this.hasRasterizedOnLoad = true;
+          this.rasterize();
+        } else if (super.textureLoader.type == AssetType.IMAGE)
+          super.texture = (PImage)this.textureLoader.loadedData;
+      }
   }
 
   public void applyTexture() {
@@ -749,9 +745,6 @@ PShape nerdCreateShape(int p_type, PImage p_texture) {
   }
 
   return ret;
-}
-
-void nerdShapeStyling(PShape p_shape, boolean p_doStroke, boolean p_doFill) {
 }
 
 void nerdGiveVertices(PShape p_shape, int p_type, PImage p_texture) {

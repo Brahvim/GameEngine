@@ -135,10 +135,12 @@ void setup() {
   // Alternative:
   //REFRESH_RATE = getActivity().getWindowManager().getDefaultDisplay().getRefreshRate();
 
-  if (REFRESH_RATE == DisplayMode.REFRESH_RATE_UNKNOWN)
-    REFRESH_RATE= -1;
-
-  //frameRate(REFRESH_RATE);
+  if (REFRESH_RATE == DisplayMode.REFRESH_RATE_UNKNOWN) {
+    REFRESH_RATE = -1;
+    frameRate(60); // Unknown refresh rate, let's run at the standard for FPS video games!
+  } else
+    frameRate(REFRESH_RATE); // Let the user enjoy the magic of VSync!
+  // Processing already looks good both with and without it, but anyway!
 
   surface.setResizable(true);
   surface.setSize(INIT_WIDTH, INIT_HEIGHT);

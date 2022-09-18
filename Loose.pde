@@ -2,7 +2,7 @@
 import com.jogamp.newt.opengl.GLWindow;
 
 // `PJOGL` holds references to `gl` and `glu`! (...and even the OpenGL context!)
-// [file:///C:/Projects/ProcessingAll_JavaDocs/core/index.html]
+// [file:///C:/Projects/ProcessingAll_JavaDocs/core/processing/opengl/PJOGL.html]
 //import com.jogamp.opengl.glu.GLU;
 //import java.nio.*; //FloatBuffer;
 
