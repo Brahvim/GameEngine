@@ -189,6 +189,10 @@ void setup() {
 }
 
 void pre() {
+  preBegun = true;
+  frameDidUpdate = false;
+  // More update cancellation goes here...
+
   mouseScrollDelta = mouseScroll - pmouseScroll;
 
   if (!(pwidth == width || pheight == height)) {
@@ -196,10 +200,13 @@ void pre() {
     updateRatios();
     currentScene.windowResized();
   }
+  preEnded = true;
 }
 
 // Trying to ONLY keep things, that need rendering, here:
 void draw() {
+  drawBegun = true;
+
   // ...ahahaha! Do this first!:
   frameStartTime = millis(); // Timestamp.
   frameTime = frameStartTime - pframeTime;
@@ -254,11 +261,17 @@ void draw() {
         c.update();
       else c.disabledUpdate();
 
+  frameDidComponentUpdate = true;
+
   currentScene.draw();
+  frameDidSceneUpdate = true;
 
   for (Entity e : currentScene.entities)
     if (e.enabled)
       e.update();
+
+  frameDidEntityUpdate = true;
+  frameDidUpdate = true;
 
   if (doAnyDrawing && doRendering) 
     // I applied ^^^ that check EVEN to post processing as well but GPU usage remained unchanged.
@@ -268,6 +281,8 @@ void draw() {
         r.update();
       r.parent.postRender();
     }
+
+  frameDidRender = true;
 
   // Step the Physics Engines later, because...
   // I'd like to be at the origin of the world on my first frame...
@@ -279,6 +294,8 @@ void draw() {
     bt.update(deltaTime);
   pop();
 
+  frameDidPhysics = true;
+
   if (doAnyDrawing && doUIRendering) {
     begin2D();
     noLights();
@@ -286,12 +303,16 @@ void draw() {
     end2D();
   }
 
+  frameDidUI = true;
   endPGL();
+
+  drawEnded = true;
 }
 
 
 // Ayo, do the post - update!:
 void post() {
+  postBegun = true;
   // "Post Processing":
   // (...get it? :rofl:)
 
@@ -341,6 +362,8 @@ void post() {
     synchronized(a) {
       a.ploaded = a.loaded;
     }
+
+  postEnded = true;
 }
 
 void mousePressed() {

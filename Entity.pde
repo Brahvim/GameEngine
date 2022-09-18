@@ -1,5 +1,5 @@
 class Entity extends EventReceiver {
-  String name = null;
+  //String name = null;
   int tag;
   boolean enabled = true;
   ArrayList<Component> components;

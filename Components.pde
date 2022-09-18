@@ -1,4 +1,4 @@
-class Transformation extends SerializableComponent {
+class Transformation extends SerializableComponent { //<>//
   PVector pos, rot, scale;
   PMatrix3D mat;
 
@@ -507,9 +507,7 @@ class BasicRenderer extends RenderingComponent {
 }
 
 
-// DO NOT INHERIT FROM THIS.
-// ...I guess :P
-
+// YES inheritance is bad, but at least it saves me from copy-pasting `update()` again...
 class SvgRenderer extends BasicRenderer {
   // I could've declared `shape` as `private` and used a pair of
   // getter and setter / accessor and modifier methods, but I
@@ -518,7 +516,7 @@ class SvgRenderer extends BasicRenderer {
   // In a setter, you'd be rendering the SVG to a texture.
   // With this approach, you render in the update loop itself
   // when an update is needed.
-  boolean doStyle = true, doAutoCalc = true, doAutoRaster = false;
+  boolean doStyle = true, doAutoCalc = true, doAutoRaster;
   PGraphics rasterizer;
 
   PShape svg, psvg = null;
@@ -547,8 +545,8 @@ class SvgRenderer extends BasicRenderer {
     this.pscale = new PVector();
     this.resScale = dist(0, 0, this.svg.width, this.svg.height) * 0.05f;
     this.rasterizer.setSize(
-      (int)abs(this.form.scale.x * this.resScale), 
-      (int)abs(this.form.scale.y * this.resScale));
+      (int)Math.abs(this.form.scale.x * this.resScale), 
+      (int)Math.abs(this.form.scale.y * this.resScale));
   }
 
   public void calcScale() {
@@ -559,11 +557,13 @@ class SvgRenderer extends BasicRenderer {
     if (this.svg == null)
       return;
 
-    float reqX = abs(this.form.scale.x * this.resScale), 
-      reqY = abs(this.form.scale.y * this.resScale);
+    float reqX = Math.abs(this.form.scale.x * this.resScale), 
+      reqY = Math.abs(this.form.scale.y * this.resScale);
 
     if (!(this.rasterizer.width == reqX && this.rasterizer.height == reqY))
-      this.rasterizer.setSize((int)reqX, (int)reqY); // `PShape` width and height are `float`s?!
+      this.rasterizer.setSize((int)reqX, (int)reqY);
+
+    // Apparently the `PShape` width and height fields are `float`s?!
 
     this.rasterizer.beginDraw();
     this.rasterizer.shape(this.svg, 0, 0, reqX, reqY);
@@ -572,9 +572,10 @@ class SvgRenderer extends BasicRenderer {
     super.texture = this.rasterizer;
 
     //if (this.svg != null)
-    //  this.texture = svgToImage(this.svg, abs(this.form.scale.x * this.resScale), 
-    //    abs(this.form.scale.y * this.resScale));
-    println("Re-rendererd SVG.");
+    //this.texture = svgToImage(this.svg, abs(this.form.scale.x * this.resScale), 
+    //abs(this.form.scale.y * this.resScale));
+
+    //println("Re-rendererd SVG.");
   }
 
   public void textureLoaderCheck() {
@@ -629,6 +630,9 @@ class InstancedRenderer extends RenderingComponent {
 
   PImage texture, ptexture;
   int type, ptype;
+  boolean createdInstance; // State management :P
+  // (It took me an entire week to figure out I could do that
+  // instead of constantly checking `ploaded` and `loaded`!)
 
   InstancedRenderer(Entity p_entity) {
     super(p_entity);
@@ -662,12 +666,17 @@ class InstancedRenderer extends RenderingComponent {
 
   void update() {
     if (this.textureLoader != null) {
-      if (this.textureLoader.loaded && !this.textureLoader.ploaded) {
-        println("Creating instance...");
+      //if (this.textureLoader.loaded && !this.textureLoader.ploaded)
+      if (!this.createdInstance) {
+        this.createdInstance = true;
+        //println("Creating instance...");
         this.instance = nerdCreateShape(this.type);
-      } else return;
+      }
       this.texture = (PImage)this.textureLoader.loadedData;
     }
+
+    if (this.instance == null)
+      return;
 
     // This can take `null`, too!:
     this.instance.setTexture(this.texture);
@@ -677,80 +686,115 @@ class InstancedRenderer extends RenderingComponent {
     shape(this.instance);
     popMatrix();
   }
-
-  void render() {
-    this.instance = createShape();
-  }
 }
 
 PShape nerdCreateShape(int p_type) {
-  println("Welcome to shape creation.");
   return nerdCreateShape(p_type, null);
 }
 
 PShape nerdCreateShape(int p_type, PImage p_texture) {
-  PShape ret = createShape();
+  return nerdCreateShape(p_type, p_texture, false);
+}
+
+PShape nerdCreateShape(int p_type, PImage p_texture, boolean p_doStroke) {
+  PShape ret;
 
   switch(p_type) {
   case QUAD:
-    ret.beginShape(QUAD);
-    ret.textureMode(NORMAL);
-    //p_shape.textureWrap(p_texMode);
-    ret.texture(p_texture);
-    // Yes. You bind a texture AFTER `glBegin()`. 
-    ret.vertex(-0.5f, -0.5f, 0, 0);
-    ret.vertex(0.5f, -0.5f, 1, 0);
-    ret.vertex(0.5f, 0.5f, 1, 1);
-    ret.vertex(-0.5f, 0.5f, 0, 1);
+    ret = createShape();
+    nerdGiveVertices(ret, QUAD, p_texture);
     ret.endShape(CLOSE);
+    break;
+
+  case BOX:
+    ret = createShape();
+    nerdGiveVertices(ret, BOX, p_texture);
+    ret.endShape();
+    break;
+
+  case SPHERE:
+    ret = createShape(GROUP);
+    nerdGiveVertices(ret, SPHERE, p_texture);
+    break;
+
+    // [https://stackoverflow.com/a/24843626/13951505]
+    // Only used as a reference! I understand the Math, only forgot the expression :joy:
+    // Fun fact, even *that* code was borrowed from: [http://slabode.exofire.net/circle_draw.shtml]
+
+  case ELLIPSE:
+    ret = createShape();
+    ret.beginShape(POLYGON);
+    nerdGiveVertices(ret, ELLIPSE, p_texture);
+    ret.endShape(CLOSE);
+    break;
+
+  default:
+    return null;
+  }
+
+  return ret;
+}
+
+void nerdShapeSettings(boolean a) {
+}
+
+void nerdGiveVertices(PShape p_shape, int p_type, PImage p_texture) {
+  switch(p_type) {
+  case QUAD:
+    p_shape.textureMode(NORMAL);
+    //p_shape.textureWrap(p_texMode);
+    p_shape.texture(p_texture);
+    // Yes. You bind a texture AFTER `glBegin()`. 
+    p_shape.vertex(-0.5f, -0.5f, 0, 0);
+    p_shape.vertex(0.5f, -0.5f, 1, 0);
+    p_shape.vertex(0.5f, 0.5f, 1, 1);
+    p_shape.vertex(-0.5f, 0.5f, 0, 1);
     break;
 
   case BOX:
     // Coordinate data from:
     // [https://www.wikihow.com/Make-a-Cube-in-OpenGL]
     // ...and that's how you get work done faster. Pfft.
-    ret.beginShape(QUADS);
-    ret.textureMode(NORMAL);
+    p_shape.beginShape(QUADS);
+    p_shape.textureMode(NORMAL);
     //p_shape.textureWrap(p_texMode);
-    ret.texture(p_texture);
+    p_shape.texture(p_texture);
 
     // Frontside:
-    ret.vertex(0.5f, -0.5f, -0.5f, 0, 0);
-    ret.vertex(0.5f, 0.5f, -0.5f, 1, 0);
-    ret.vertex(-0.5f, 0.5f, -0.5f, 1, 1);     
-    ret.vertex(-0.5f, -0.5f, -0.5f, 0, 1);
+    p_shape.vertex(0.5f, -0.5f, -0.5f, 0, 0);
+    p_shape.vertex(0.5f, 0.5f, -0.5f, 1, 0);
+    p_shape.vertex(-0.5f, 0.5f, -0.5f, 1, 1);     
+    p_shape.vertex(-0.5f, -0.5f, -0.5f, 0, 1);
 
     // Backside:
-    ret.vertex(0.5f, -0.5f, 0.5f, 0, 0);
-    ret.vertex(0.5f, 0.5f, 0.5f, 1, 0);
-    ret.vertex(-0.5f, 0.5f, 0.5f, 1, 1);
-    ret.vertex(-0.5f, -0.5f, 0.5f, 0, 1);
+    p_shape.vertex(0.5f, -0.5f, 0.5f, 0, 0);
+    p_shape.vertex(0.5f, 0.5f, 0.5f, 1, 0);
+    p_shape.vertex(-0.5f, 0.5f, 0.5f, 1, 1);
+    p_shape.vertex(-0.5f, -0.5f, 0.5f, 0, 1);
 
     // Right:
-    ret.vertex(0.5f, -0.5f, -0.5f, 0, 0);
-    ret.vertex(0.5f, 0.5f, -0.5f, 1, 0);
-    ret.vertex(0.5f, 0.5f, 0.5f, 1, 1);
-    ret.vertex(0.5f, -0.5f, 0.5f, 0, 1);
+    p_shape.vertex(0.5f, -0.5f, -0.5f, 0, 0);
+    p_shape.vertex(0.5f, 0.5f, -0.5f, 1, 0);
+    p_shape.vertex(0.5f, 0.5f, 0.5f, 1, 1);
+    p_shape.vertex(0.5f, -0.5f, 0.5f, 0, 1);
 
     // Left:
-    ret.vertex(-0.5f, -0.5f, 0.5f, 0, 0);
-    ret.vertex(-0.5f, 0.5f, 0.5f, 1, 0);
-    ret.vertex(-0.5f, 0.5f, -0.5f, 1, 1);
-    ret.vertex(-0.5f, -0.5f, -0.5f, 0, 1);
+    p_shape.vertex(-0.5f, -0.5f, 0.5f, 0, 0);
+    p_shape.vertex(-0.5f, 0.5f, 0.5f, 1, 0);
+    p_shape.vertex(-0.5f, 0.5f, -0.5f, 1, 1);
+    p_shape.vertex(-0.5f, -0.5f, -0.5f, 0, 1);
 
     // Top:
-    ret.vertex( 0.5f, 0.5f, 0.5f, 0, 0);
-    ret.vertex( 0.5f, 0.5f, -0.5f, 1, 0);
-    ret.vertex(-0.5f, 0.5f, -0.5f, 1, 1);
-    ret.vertex(-0.5f, 0.5f, 0.5f, 0, 1);
+    p_shape.vertex( 0.5f, 0.5f, 0.5f, 0, 0);
+    p_shape.vertex( 0.5f, 0.5f, -0.5f, 1, 0);
+    p_shape.vertex(-0.5f, 0.5f, -0.5f, 1, 1);
+    p_shape.vertex(-0.5f, 0.5f, 0.5f, 0, 1);
 
     // Bottom:
-    ret.vertex(0.5f, -0.5f, -0.5f, 0, 0);
-    ret.vertex(0.5f, -0.5f, 0.5f, 1, 0);
-    ret.vertex(-0.5f, -0.5f, 0.5f, 1, 1);
-    ret.vertex(-0.5f, -0.5f, -0.5f, 0, 1);
-
-    ret.endShape();
+    p_shape.vertex(0.5f, -0.5f, -0.5f, 0, 0);
+    p_shape.vertex(0.5f, -0.5f, 0.5f, 1, 0);
+    p_shape.vertex(-0.5f, -0.5f, 0.5f, 1, 1);
+    p_shape.vertex(-0.5f, -0.5f, -0.5f, 0, 1);
     break;
 
   case SPHERE:
@@ -779,7 +823,7 @@ PShape nerdCreateShape(int p_type, PImage p_texture) {
     sphereMain.vertex(sphereX[0], sphereY[0], sphereZ[0], u, v);
     sphereMain.endShape();
 
-    ret.addChild(sphereMain);
+    p_shape.addChild(sphereMain);
 
     // Middle rings:
 
@@ -810,7 +854,7 @@ PShape nerdCreateShape(int p_type, PImage p_texture) {
       sphereMidRing.vertex(sphereX[v2], sphereY[v2], sphereZ[v2], u, v + iv);
       sphereMidRing.endShape();
 
-      ret.addChild(sphereMidRing);
+      p_shape.addChild(sphereMidRing);
       v += iv;
     }
 
@@ -823,7 +867,6 @@ PShape nerdCreateShape(int p_type, PImage p_texture) {
     //p_shape.textureWrap(p_texMode);
     sphereNorthCap.texture(p_texture);
     sphereNorthCap.textureMode(IMAGE);
-    println("Considered adding a northern cap.");
 
     for (i = 0; i < SPHERE_DETAIL; i++) {
       v2 = voff + i;
@@ -834,7 +877,7 @@ PShape nerdCreateShape(int p_type, PImage p_texture) {
     sphereNorthCap.vertex(sphereX[voff], sphereY[voff], sphereZ[voff], u, v);
     sphereNorthCap.endShape();
 
-    ret.addChild(sphereNorthCap);
+    p_shape.addChild(sphereNorthCap);
     break;
 
     // [https://stackoverflow.com/a/24843626/13951505]
@@ -842,26 +885,20 @@ PShape nerdCreateShape(int p_type, PImage p_texture) {
     // Fun fact, even *that* code was borrowed from: [http://slabode.exofire.net/circle_draw.shtml]
 
   case ELLIPSE:
-    ret.beginShape(POLYGON);
-    ret.textureMode(NORMAL);
+    p_shape.beginShape(POLYGON);
+    p_shape.textureMode(NORMAL);
     //p_shape.textureWrap(p_texMode);
-    ret.texture(p_texture);
+    p_shape.texture(p_texture);
 
     float ex, ey, eTauFract; // STACK ALLOC!!!11
     for (int k = 0; k < 36; k++) {
       eTauFract = k * TAU / 36;
-      ret.vertex(ex = cos(eTauFract), ey = sin(eTauFract), // Wish I had a LUT! 
+      p_shape.vertex(ex = cos(eTauFract), ey = sin(eTauFract), // Wish I had a LUT! 
         // The addition translates in the texture,
         // The multiplication *inversely* scales it.
         0.5f + ex * 0.5f, 
         0.5f + ey * 0.5f);
     }
-    ret.endShape(CLOSE);
     break;
-
-  default:
-    return null;
   }
-
-  return ret;
 }

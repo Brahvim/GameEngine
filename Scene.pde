@@ -118,14 +118,14 @@ class Scene extends EventReceiver {
   }
 
   Scene addEntity(Entity p_entity, String p_name) {
-    p_entity.name = p_name;
+    //p_entity.name = p_name;
     this.namedEntities.put(this.entities.size(), p_entity);
     this.entities.add(p_entity);
     return this;
   }
 
   Scene addEntity(Entity p_entity, String p_name, int p_tag) {
-    p_entity.name = p_name;
+    //p_entity.name = p_name;
     p_entity.tag = p_tag;
     this.namedEntities.put(this.entities.size(), p_entity);
     this.entities.add(p_entity);
@@ -159,12 +159,14 @@ class Scene extends EventReceiver {
     return (Entity[])ret.toArray();
   }
 
+  /*
   Entity getEntityNamed(String p_name) {
-    for (Entity e : this.entities)
-      if (e.name.equals(p_name))
-        return e;
-    return null;
-  }
+   for (Entity e : this.entities)
+   if (e.name.equals(p_name))
+   return e;
+   return null;
+   }
+   */
 
   Entity[] getEntitiesWithTag(int p_tag) {
     ArrayList<Entity> ret = new ArrayList<Entity>();

@@ -1,10 +1,12 @@
 static class Log {
   public final static byte lvInfo = 0, lvWarn = 1, lvError = 2; 
-  public static boolean canInfo = true, canWarn = true, canError = true;
-  public static boolean nerdCanInfo = true, nerdCanWarn = true, nerdCanError = true;
-  public static boolean logToFile = true, openFileOnExit = false, 
-    logToConsole = true, enabled = true, canFile = true, 
+  public static boolean canInfo = true, canWarn = true, canError = true, canFile = true;
+
+  public static boolean nerdCanInfo = true, nerdCanWarn = true, nerdCanError = true, 
     nerdCanLog = true, nerdCanFile = true;
+
+  public static boolean canFileAtAll = true, 
+    canLogAtAll = true, enabled = true, openFileOnExit = false;
 
   public static SimpleDateFormat dateFormat
     = new SimpleDateFormat("h':'m' 'a', 'EEEEEEEE', 'd' 'MMMM', 'yyyy");
@@ -21,7 +23,7 @@ public void initLog() {
   Log.absPath = Log.logFile.getAbsolutePath();
 
   // MAKE THE PROGRAM FASTER outside the PDE by disabling console-only logging!:
-  Log.logToConsole = INSIDE_PDE;
+  Log.canLogAtAll = INSIDE_PDE;
   Log.nerdCanLog = INSIDE_PDE;
 
   if (!Log.logFile.exists())
@@ -54,10 +56,10 @@ public static void logInfo(String p_message) {
   if (!Log.canInfo)
     return;
 
-  if (Log.logToConsole)
+  if (Log.canLogAtAll)
     System.out.println(p_message);
 
-  if (Log.logToFile) {
+  if (Log.canFileAtAll) {
     Log.fileLogger.printf("[Info] [%s] %s\n", Log.dateFormat.format(new Date()), p_message);
     Log.fileLogger.flush();
   }
@@ -88,10 +90,10 @@ public static void logWarn(String p_message) {
   if (!Log.canWarn)
     return;
 
-  if (Log.logToConsole)
+  if (Log.canLogAtAll)
     System.out.println("[!] " + p_message);
 
-  if (Log.logToFile) {
+  if (Log.canFileAtAll) {
     Log.fileLogger.printf("[Warn] [%s] %s\n", Log.dateFormat.format(new Date()), p_message);
     Log.fileLogger.flush();
   }
@@ -121,10 +123,10 @@ public static void logError(String p_message) {
   if (!Log.canError)
     return;
 
-  if (Log.logToConsole)
+  if (Log.canLogAtAll)
     System.err.println(p_message);
 
-  if (Log.logToFile) {
+  if (Log.canFileAtAll) {
     Log.fileLogger.printf("[ERROR] [%s] %s\n", Log.dateFormat.format(new Date()), p_message);
     Log.fileLogger.flush();
   }
@@ -158,7 +160,7 @@ public static void logEx(Exception p_except) {
     p_except.printStackTrace(); // To the console it goes!
 
   // I learnt this on Stackoverflow, too. Didn't mention the source ; - ;)
-  if (Log.logToFile) {
+  if (Log.canFileAtAll) {
     StringWriter sw = new StringWriter();
     PrintWriter pw = new PrintWriter(sw);
     p_except.printStackTrace(pw);
@@ -190,7 +192,7 @@ public static void nerdLogEx(Exception p_except) {
     p_except.printStackTrace(); // To the console it goes!
 
   // I learnt this on Stackoverflow, too. Didn't mention the source ; - ;)
-  if (Log.logToFile) {
+  if (Log.canFileAtAll) {
     StringWriter sw = new StringWriter();
     PrintWriter pw = new PrintWriter(sw);
     p_except.printStackTrace(pw);
@@ -251,7 +253,7 @@ public static void logInfo(Object... p_args) {
   if (!(Log.enabled || Log.canInfo)) 
     return;
 
-  if (Log.logToConsole) {
+  if (Log.canLogAtAll) {
     for (int i = 0; i < p_args.length; i++)
       System.out.printf("%s", p_args[i]);
     System.out.write('\n');
@@ -300,13 +302,13 @@ public static void logWarn(Object... p_args) {
   if (!Log.enabled) 
     return;
 
-  if (Log.logToConsole && Log.canWarn) {
+  if (Log.canLogAtAll && Log.canWarn) {
     for (int i = 0; i < p_args.length; i++)
       System.out.printf("%s", p_args[i]);
     System.out.write('\n');
   }
 
-  if (Log.logToFile) {
+  if (Log.canFileAtAll) {
     Log.fileLogger.printf("[Warn] [%s] ", Log.dateFormat.format(new Date()));
 
     for (int i = 0; i < p_args.length; i++)
@@ -348,13 +350,13 @@ public static void logError(Object... p_args) {
   if (!Log.enabled)
     return;
 
-  if (Log.logToConsole && Log.canError) {
+  if (Log.canLogAtAll && Log.canError) {
     for (int i = 0; i < p_args.length; i++)
       System.out.printf("%s", p_args[i]);
     System.out.write('\n');
   }
 
-  if (Log.logToFile) {
+  if (Log.canFileAtAll) {
     Log.fileLogger.printf("[ERROR] [%s] ", Log.dateFormat.format(new Date()));
 
     for (int i = 0; i < p_args.length; i++)
@@ -389,10 +391,10 @@ void nerdLogToFile(int p_lv, Object... p_args) {
 }
 
 void logToFile(int p_lv, Object... p_args) {
-  if (!(Log.logToFile && Log.enabled))
+  if (!(Log.canFileAtAll && Log.enabled))
     return;
 
-  if (Log.logToFile) {
+  if (Log.canFileAtAll) {
     Log.fileLogger.printf(
       p_lv == Log.lvError? "[ERROR]" : p_lv == Log.lvWarn? "[Warn]" : "[Info]" 
       + " [%s] ", Log.dateFormat.format(new Date()));

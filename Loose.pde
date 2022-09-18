@@ -78,8 +78,11 @@ final int TEXT_TEXTURE_SIZE = 72,
   TEXT_TEXTURE_SIZE_2 = 2 * TEXT_TEXTURE_SIZE, 
   DEFAULT_TEXT_SIZE = 40;
 
-// Timing:
+// Timing and status:
 float frameStartTime, deltaTime, pframeTime, frameTime;
+boolean frameDidUpdate, frameDidComponentUpdate, frameDidSceneUpdate, frameDidEntityUpdate;
+boolean frameDidRender, frameDidPhysics, frameDidUI;
+boolean preBegun, preEnded, drawBegun, drawEnded, postBegun, postEnded;
 //long millisBegin; // `PApplet.millisOffset` is not visible, so I made this!.
 // `PApplet.millis()` starts counting from when the class is instantiated, and returns an `int`.
 // Bad, bad, bad!

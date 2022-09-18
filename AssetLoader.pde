@@ -106,7 +106,7 @@ class Asset extends Thread {
   Runnable onLoad = null; // Should be replaced with an overload.
   Boolean loaded = new Boolean(false), ploaded = new Boolean(false);
   int id = -1, loadFrame = -1;
-  float loadTime = -1;
+  int loadTime = -1;
 
   Asset(String p_path, AssetType p_type) {
     ASSETS.add(this);
@@ -191,9 +191,10 @@ class Asset extends Thread {
 
     synchronized(this.loaded) {
       this.loaded = true;
-      this.loadFrame = frameCount;
-      this.loadTime = millis();
     }
+
+    this.loadFrame = frameCount;
+    this.loadTime = millis();
 
     if (this.onLoad != null)
       this.onLoad.run();

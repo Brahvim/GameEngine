@@ -1,4 +1,4 @@
-/*
+/* //<>//
 // Expected workflow - now possible!:
  ```java
  
@@ -59,6 +59,7 @@ void engineSetup() {
 
   // The Engine won't load any scenes automatically to avoid allocating too much memory:
   setScene(testScene);
+  Log.canLogAtAll = false;
 }
 
 Scene testScene = new Scene() {
@@ -73,32 +74,31 @@ Scene testScene = new Scene() {
 
   public void setup() {
     //bloomPass = new BloomPass(SKETCH, 0.5f, 20, 30);
-    cursorImage = new Asset("Unnamed_RPG_cursor.png", AssetType.IMAGE, new Runnable() {
+    cursorImage = loadAsync("Unnamed_RPG_cursor.png", AssetType.IMAGE, new Runnable() {
       public void run() {
         cursor(cursorImage.asImage(), -4, -4);
       }
     }
-    ).beginAsyncLoad();
+    );
 
-    audio = new Asset("UnicycleGirrafe.mp3", AssetType.SOUND, new Runnable() {
+    audio = loadAsync("UnicycleGirrafe.mp3", AssetType.SOUND, new Runnable() {
       public void run() {
         //audio.asSound().loop();
       }
     }
-    ).beginAsyncLoad();
+    );
 
-    boxTexture = new Asset("LearnOpenGL_container2.png", AssetType.IMAGE).beginAsyncLoad();
-    circleTexture = new Asset("PFP.jpg", AssetType.IMAGE).beginAsyncLoad();
-    svgImage = new Asset("bot1.svg", AssetType.SHAPE).beginAsyncLoad();
+    boxTexture = loadAsync("LearnOpenGL_container2.png", AssetType.IMAGE);
+    circleTexture = loadAsync("PFP.jpg", AssetType.IMAGE);
+    svgImage = loadAsync("bot1.svg", AssetType.SHAPE);
 
     instanceTest = new Entity() {
       Transformation form = new Transformation(this);
       InstancedRenderer display;
       public void setup() {
-        this.display = new InstancedRenderer(this, BOX, boxTexture);
+        this.display = new InstancedRenderer(this, SPHERE, boxTexture);
         //this.display.enabled = false;
-        //this.display.instance.fill(255);
-        this.form.scale.set(5, 5, 5);
+        this.form.scale.mult(2.5f);
       }
 
       public void update() {
@@ -115,6 +115,7 @@ Scene testScene = new Scene() {
         this.display.fill = color(230);
         this.display.stroke = color(0);
         this.display.strokeWeight = 0.05f;
+        //this.display.doStroke = false;
 
         // Simply prints an error message to the console on failure:
         this.form.read("circle_transform");
@@ -167,8 +168,6 @@ Scene testScene = new Scene() {
         this.display.strokeWeight = 0.05f;
         this.display.doStroke = false;
         this.display.fill = 255;
-        //this.display.textureWrap = REPEAT;
-        this.display.doAutoRaster = false;
         this.display.resScale *= 15;
         this.display.rasterize();
       }
@@ -181,7 +180,7 @@ Scene testScene = new Scene() {
     };
 
     light = new Entity() {
-      // Didn't we want to avoid this type of instantiation in general...?
+      // Didn't I want to avoid this type of instantiation in general...?
       Transformation form = new Transformation(this), quadForm;
       ParticleEmitter part;
       Light light = new Light(this);
