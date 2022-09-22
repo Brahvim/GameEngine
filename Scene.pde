@@ -4,6 +4,26 @@ Scene currentScene = null; // Reference to the current scene.
 void addScene(Scene p_scene) {
   SCENES.add(p_scene);
 }
+<T> void addScene(Class p_sceneClass) {
+  try {
+    Constructor<T> constructor = p_sceneClass.getConstructor();
+    SCENES.add((Scene)constructor.newInstance());
+  }
+  catch (InstantiationException e) {
+    nerdLogError("Could not instantiate that class...");
+  }
+  catch (IllegalAccessException e) {
+    nerdLogError("Ayo, no private scene classes >:O");
+    nerdLogEx(e);
+  }
+  catch (NoSuchMethodException e) {
+    nerdLogError("No constructor for this `Scene` -_-");
+    nerdLogEx(e);
+  }
+  catch (InvocationTargetException e) {
+    nerdLogEx(e);
+  }
+}
 
 void switchScene(Scene p_scene) {
   if (p_scene == null)

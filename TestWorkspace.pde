@@ -13,7 +13,7 @@
  restOfTheSetup();
  }
  
- // Entity extending type that is needed across scenes:
+ // Entity extending type thagetConstructors() is needed across scenes:
  class Collectable extends Entity {
  // ...
  }
@@ -61,6 +61,11 @@ void engineSetup() {
 
   // The Engine won't load any scenes automatically to avoid allocating too much memory:
   setScene(testScene);
+  addScene(MyScene.class);
+  println(SCENES.size());
+}
+
+class MyScene extends Scene {
 }
 
 Scene testScene = new Scene() {
@@ -94,9 +99,10 @@ Scene testScene = new Scene() {
     svgImage = loadAsync("bot1.svg", AssetType.SHAPE);
 
     instanceTest = new Entity() {
-      Transformation form = new Transformation(this);
+      Transformation form;
       InstancedRenderer display;
       public void setup() {
+        this.form = new Transformation(this);
         this.display = new InstancedRenderer(this, BOX, circleTexture);
         this.display.doStroke = false;
         this.display.doFill = false;
@@ -110,10 +116,11 @@ Scene testScene = new Scene() {
     };
 
     circle = new Entity() {
-      Transformation form = new Transformation(this);
+      Transformation form;
       BasicRenderer display;
 
       public void setup() {
+        this.form = new Transformation(this);
         this.display = new BasicRenderer(this, ELLIPSE, circleTexture);
         this.display.fill = color(230);
         this.display.stroke = color(0);
@@ -179,30 +186,26 @@ Scene testScene = new Scene() {
       public void setup() {
         this.form = new Transformation(this);
         this.display = new SvgRenderer(this, ELLIPSE, svgImage);
-        //this.display.strokeWeight = 0.05f;
-        //this.display.doStroke = false;
-        //this.display.fill = 255;
-        this.display.updateScale();
-        this.display.resScale *= 15;
-        //this.display.rasterize();
       }
 
       public void update() {
         this.display.rasterize();
         this.form.pos.set(mouse);
-        //float scale = sin(millis() * 0.001f) * 5;
         this.form.scale.set(5, 5, 5);
       }
     };
 
     light = new Entity() {
       // Didn't I want to avoid this type of instantiation in general...?
-      Transformation form = new Transformation(this), quadForm;
+      Transformation form, quadForm;
       //ParticleEmitter part;
-      Light light = new Light(this);
+      Light light;
 
       public void setup() {
+        this.form = new Transformation(this);
+        this.light = new Light(this);
         this.quadForm = quad.getComponent(Transformation.class);
+
         this.light.col.set(255, 255, 255);
         this.light.off.z = 1.5f;
       }
@@ -225,7 +228,7 @@ Scene testScene = new Scene() {
     };
 
     cam.clearColor = color(0); 
-    rev.clearColor = color(30, 120, 170);//, 1); //80);
+    rev.clearColor = color(30, 120, 170); //80);
     //rev.doAutoClear = false;
     setCam(rev);
 

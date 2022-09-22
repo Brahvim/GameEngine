@@ -5,8 +5,8 @@ static class Log {
   public static boolean nerdCanInfo = true, nerdCanWarn = true, nerdCanError = true, 
     nerdCanLog = true, nerdCanFile = true;
 
-  public static boolean canFileAtAll = true, 
-    canLogAtAll = true, enabled = true, openFileOnExit = false;
+  public static boolean canLogAtAll = true, canFileAtAll = true, 
+    enabled = true, openFileOnExit = false;
 
   public static SimpleDateFormat dateFormat
     = new SimpleDateFormat("h':'m' 'a', 'EEEEEEEE', 'd' 'MMMM', 'yyyy");

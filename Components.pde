@@ -530,12 +530,14 @@ class SvgRenderer extends BasicRenderer {
 
   SvgRenderer(Entity p_entity) {
     super(p_entity);
+    this.updateScale();
     this.pscale = new PVector();
     this.rasterBuffer = createGraphics(0, 0, P3D);
   }
 
   SvgRenderer(Entity p_entity, int p_type, Asset p_assetLoader) {
     super(p_entity, p_type, p_assetLoader);
+    this.updateScale();
     this.pscale = new PVector();
     this.rasterBuffer = createGraphics(0, 0, P3D);
   }
@@ -545,7 +547,6 @@ class SvgRenderer extends BasicRenderer {
     super.type = p_type;
     this.svg = p_shape;
     this.pscale = new PVector();
-    this.updateScale();
     this.rasterBuffer.setSize(
       (int)Math.abs(this.form.scale.x * this.resScale), 
       (int)Math.abs(this.form.scale.y * this.resScale));
@@ -554,7 +555,7 @@ class SvgRenderer extends BasicRenderer {
 
   public void updateScale() {
     //this.resScale = dist(0, 0, this.svg.width, this.svg.height) * 0.5f;
-    this.resScale = dist(0, 0, super.form.scale.x, super.form.scale.y) * 2;
+    this.resScale = dist(0, 0, super.form.scale.x, super.form.scale.y) * 30;
   }
 
   public boolean rasterize() {
@@ -570,9 +571,14 @@ class SvgRenderer extends BasicRenderer {
 
     // Apparently the `PShape` width and height fields are `float`s?!
 
-    this.rasterBuffer.beginDraw();
-    this.rasterBuffer.shape(this.svg, 0, 0, reqx, reqy);
-    this.rasterBuffer.endDraw();
+    try {
+      this.rasterBuffer.beginDraw();
+      this.rasterBuffer.shape(this.svg, 0, 0, reqx, reqy);
+      this.rasterBuffer.endDraw();
+    } 
+    catch (NullPointerException e) {
+      return false;
+    }
 
     super.texture = (PImage)this.rasterBuffer;
     return true;
