@@ -603,35 +603,16 @@ class SvgRenderer extends BasicRenderer {
       break;
     default:
     }
-
-    /*
-    if (super.textureLoader != null)
-     
-     if (super.textureLoader.type == AssetType.SHAPE) {
-     this.svg = (PShape)super.textureLoader.loadedData; //super.textureLoader.asShape();
-     
-     // Calculate the rasterization scale before rasterizing!:
-     if (this.svg != null)
-     if (this.doAutoCalc)
-     this.calcScale();
-     
-     // Re-render on the image loading :D
-     if (//!super.textureLoader.ploaded && super.textureLoader.loaded
-     //!this.hasRasterizedOnLoad) {
-     ////println("Texture loader rasterized SVG.");
-     //this.hasRasterizedOnLoad = true;
-     //this.rasterize();
-     } else if (super.textureLoader.type == AssetType.IMAGE)
-     super.texture = (PImage)this.textureLoader.loadedData;
-     }
-     */
   }
 
   public void applyTexture() {
     this.textureLoaderCheck();
 
     // Re-render on size changes :D
+
+    // If the SVG ain't `null`, scale "ain't `null`",
     if (!(this.svg == null && super.form.scale.x == 0 && super.form.scale.y == 0))
+      // If the previous scale transform and the current one ain't the same object, and yee can rasterize,
       if (this.form.scale != this.pscale && this.doAutoRaster)
         this.rasterize();
 

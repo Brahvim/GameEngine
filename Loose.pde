@@ -98,21 +98,6 @@ float cosLUT[];
 float SINCOS_PRECISION = 0.5f;
 int SINCOS_LENGTH = (int)(360.0f / SINCOS_PRECISION);
 
-// Failed to get these via reflection, copy-pasted them. I hope I use these at some point!:
-// [https://github.com/processing/processing/blob/master/core/src/processing/core/PGraphics.java]
-//static float[] sinLUT;
-//static float[] cosLUT;
-//static float SINCOS_PRECISION = 0.5f;
-//static int SINCOS_LENGTH = (int) (360.0f / SINCOS_PRECISION);
-
-//static {
-//  sinLUT = new float[SINCOS_LENGTH];
-//  cosLUT = new float[SINCOS_LENGTH];
-//  for (int i = 0; i < SINCOS_LENGTH; i++) {
-//    sinLUT[i] = (float) Math.sin(i * DEG_TO_RAD * SINCOS_PRECISION);
-//    cosLUT[i] = (float) Math.cos(i * DEG_TO_RAD * SINCOS_PRECISION);
-//  }
-//}
 
 // The `PostFX` library:
 //import ch.bildspur.postfx.builder.*;
@@ -245,12 +230,12 @@ void pop() {
 
 PImage svgToImage(PShape p_shape, float p_width, float p_height) {
   if (p_shape == null)
-    new NullPointerException("`svgToImage(null , p_width, p_height)` won't work.").printStackTrace();
+    nerdLogEx(new NullPointerException("`svgToImage(null , p_width, p_height)` won't work."));
 
   PGraphics buffer = createGraphics((int)ceil(p_width), (int)ceil(p_height), P3D);
 
   if (buffer == null) {
-    logEx(new NullPointerException("`buffer` is `null`!")); //.printStackTrace();
+    nerdLogEx(new NullPointerException("`svgToImage()`'s `buffer` is `null`!"));
     return null;
   }
 
@@ -262,7 +247,9 @@ PImage svgToImage(PShape p_shape, float p_width, float p_height) {
 
 PImage svgToImage(Asset p_shapeLoader, float p_width, float p_height) {
   PGraphics buffer = createGraphics((int)ceil(p_width), (int)ceil(p_height), P3D);
-  //while (!p_shapeLoader.loaded);
+
+  if (!p_shapeLoader.loaded)
+    return null;
 
   buffer.beginDraw();
   buffer.shape(p_shapeLoader.asShape(), 0, 0, p_width, p_height);
@@ -297,10 +284,8 @@ void image(Asset p_imageAsset, float p_x, float p_y, float p_width, float p_heig
     super.image(p_imageAsset.asImage(), p_x, p_y, p_width, p_height);
 }
 
-
 // ..I'll let the underscores remain. Nostalgia...
 // I feel cold inside when I see these functions...
-
 
 // Using these where `static` 
 // methods cause issues:
@@ -322,9 +307,10 @@ PVector mult(PVector _v, float _f) {
 }
 
 void centerWindow() {
-  updateRatios();
+  updateRatios(); // You called this function when the window changed its size or position, right?
   // Remember: computers with multiple displays exist! We shouldn't cache this:
   window.setPosition((int)(displayWidth / 2 - cx), (int)(displayHeight / 2 - cy));
+  // (Well, changing the display does NOT effect those variables in any way :|)
 }
 
 PVector vecLerp(PVector p_from, PVector p_to, float p_lerpAmt) {
@@ -334,7 +320,8 @@ PVector vecLerp(PVector p_from, PVector p_to, float p_lerpAmt) {
 }
 
 void vecLerp(PVector p_from, PVector p_to, float p_lerpAmt, PVector p_out) {
-  //if (p_out == null) p_out = new PVector(); // Skipping for 'oPtImZiATion'.
+  if (p_out == null)
+    p_out = new PVector();
   // ...this method remains unused in the engine. It's for users! :sparkles:
 
   p_out.set(p_from.x + (p_to.x - p_from.x) * p_lerpAmt, 

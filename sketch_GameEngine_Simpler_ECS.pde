@@ -11,7 +11,6 @@ void settings() {
   // For when you need to provide multiple resolution icons yourself!
 }
 
-
 // This used to be an overload for `exit()`.
 void dispose() {
   window.setVisible(false);

@@ -164,8 +164,6 @@ Scene testScene = new Scene() {
           logInfo("I wrote you a save file! :D");
         }
 
-
-
         // ^^^ This works in `update()` without any problems (O_O")
 
         // Works in both `update()` and this method!
