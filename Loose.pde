@@ -249,8 +249,10 @@ PImage svgToImage(PShape p_shape, float p_width, float p_height) {
 
   PGraphics buffer = createGraphics((int)ceil(p_width), (int)ceil(p_height), P3D);
 
-  if (buffer == null)
-    new NullPointerException("`buffer` is `null`!").printStackTrace();
+  if (buffer == null) {
+    logEx(new NullPointerException("`buffer` is `null`!")); //.printStackTrace();
+    return null;
+  }
 
   buffer.beginDraw();
   buffer.shape(p_shape, 0, 0, p_width, p_height);

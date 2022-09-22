@@ -503,8 +503,11 @@ class BasicRenderer extends RenderingComponent {
     popStyle();
     popMatrix();
   }
-}
 
+  void setTexture(Asset p_asset) {
+    this.texture = (PImage)p_asset.loadedData;
+  }
+}
 
 // YES inheritance is bad, but at least it saves me from copy-pasting `update()` again...
 class SvgRenderer extends BasicRenderer {
@@ -515,8 +518,8 @@ class SvgRenderer extends BasicRenderer {
   // In a setter, you'd be rendering the SVG to a texture.
   // With this approach, you render in the update loop itself
   // when an update is needed.
-  boolean doStyle = true, doAutoCalc = true, doAutoRaster, hasRasterizedOnLoad;
-  PGraphics rasterizer;
+  boolean doStyle = true, doAutoScale, doAutoRaster, hasRasterized;
+  PGraphics rasterBuffer;
 
   PShape svg, psvg = null;
   // ^^^ That's the magic of this approach!
@@ -528,13 +531,13 @@ class SvgRenderer extends BasicRenderer {
   SvgRenderer(Entity p_entity) {
     super(p_entity);
     this.pscale = new PVector();
-    this.rasterizer = createGraphics(0, 0, P3D);
+    this.rasterBuffer = createGraphics(0, 0, P3D);
   }
 
   SvgRenderer(Entity p_entity, int p_type, Asset p_assetLoader) {
     super(p_entity, p_type, p_assetLoader);
     this.pscale = new PVector();
-    this.rasterizer = createGraphics(0, 0, P3D);
+    this.rasterBuffer = createGraphics(0, 0, P3D);
   }
 
   SvgRenderer(Entity p_entity, int p_type, PShape p_shape) {
@@ -542,55 +545,86 @@ class SvgRenderer extends BasicRenderer {
     super.type = p_type;
     this.svg = p_shape;
     this.pscale = new PVector();
-    this.calcScale();
-    this.rasterizer.setSize(
+    this.updateScale();
+    this.rasterBuffer.setSize(
       (int)Math.abs(this.form.scale.x * this.resScale), 
       (int)Math.abs(this.form.scale.y * this.resScale));
+    // The SVG will be rasterized later.
   }
 
-  public void calcScale() {
-    this.resScale = dist(0, 0, this.svg.width, this.svg.height) * 0.5f;
+  public void updateScale() {
+    //this.resScale = dist(0, 0, this.svg.width, this.svg.height) * 0.5f;
+    this.resScale = dist(0, 0, super.form.scale.x, super.form.scale.y) * 2;
   }
 
-  public void rasterize() {
+  public boolean rasterize() {
     if (this.svg == null)
-      return;
+      return false;
 
-    float reqX = Math.abs(this.form.scale.x * this.resScale), 
-      reqY = Math.abs(this.form.scale.y * this.resScale);
+    float reqx = Math.abs(this.form.scale.x * this.resScale), 
+      reqy = Math.abs(this.form.scale.y * this.resScale);
+    int irx = (int)reqx, iry = (int)reqy;
 
-    if (!(this.rasterizer.width == reqX && this.rasterizer.height == reqY))
-      this.rasterizer.setSize((int)reqX, (int)reqY);
+    if (!(this.rasterBuffer.width == irx && this.rasterBuffer.height == iry))
+      this.rasterBuffer.setSize(irx, iry);
 
     // Apparently the `PShape` width and height fields are `float`s?!
 
-    this.rasterizer.beginDraw();
-    this.rasterizer.shape(this.svg, 0, 0, reqX, reqY);
-    this.rasterizer.endDraw();
+    this.rasterBuffer.beginDraw();
+    this.rasterBuffer.shape(this.svg, 0, 0, reqx, reqy);
+    this.rasterBuffer.endDraw();
 
-    super.texture = this.rasterizer;
+    super.texture = (PImage)this.rasterBuffer;
+    return true;
   }
 
   public void textureLoaderCheck() {
-    if (super.textureLoader != null)
+    if (super.textureLoader == null)
+      return;
 
-      if (super.textureLoader.type == AssetType.SHAPE) {
-        this.svg = (PShape)super.textureLoader.loadedData; //super.textureLoader.asShape();
+    switch(super.textureLoader.type) {
+    case SHAPE:
+      if (!this.hasRasterized) {
+        // Update SVG:
+        this.svg = (PShape)super.textureLoader.loadedData;
 
-        // Calculate the rasterization scale before rasterizing!:
-        if (this.svg != null)
-          if (this.doAutoCalc)
-            this.calcScale();
+        // Let's not disturb those two functions down there... (things run faster with this check!):
+        if (this.svg == null)
+          return;
 
-        // Re-render on the image loading :D
-        if (//!super.textureLoader.ploaded && super.textureLoader.loaded
-          !this.hasRasterizedOnLoad) {
-          //println("Texture loader rasterized SVG.");
-          this.hasRasterizedOnLoad = true;
-          this.rasterize();
-        } else if (super.textureLoader.type == AssetType.IMAGE)
-          super.texture = (PImage)this.textureLoader.loadedData;
+        if (this.doAutoScale)
+          this.updateScale();
+
+        this.hasRasterized = this.rasterize();
       }
+      break;
+    case IMAGE:
+      super.texture = (PImage)super.textureLoader.loadedData;
+      break;
+    default:
+    }
+
+    /*
+    if (super.textureLoader != null)
+     
+     if (super.textureLoader.type == AssetType.SHAPE) {
+     this.svg = (PShape)super.textureLoader.loadedData; //super.textureLoader.asShape();
+     
+     // Calculate the rasterization scale before rasterizing!:
+     if (this.svg != null)
+     if (this.doAutoCalc)
+     this.calcScale();
+     
+     // Re-render on the image loading :D
+     if (//!super.textureLoader.ploaded && super.textureLoader.loaded
+     //!this.hasRasterizedOnLoad) {
+     ////println("Texture loader rasterized SVG.");
+     //this.hasRasterizedOnLoad = true;
+     //this.rasterize();
+     } else if (super.textureLoader.type == AssetType.IMAGE)
+     super.texture = (PImage)this.textureLoader.loadedData;
+     }
+     */
   }
 
   public void applyTexture() {
@@ -608,6 +642,11 @@ class SvgRenderer extends BasicRenderer {
     textureMode(NORMAL);
     textureWrap(this.textureWrap);
     texture(this.texture);
+  }
+
+  void setTexture(Asset p_asset) {
+    this.svg = (PShape)p_asset.loadedData;
+    this.hasRasterized = false;
   }
 }
 

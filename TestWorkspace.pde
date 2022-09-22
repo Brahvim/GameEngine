@@ -147,6 +147,12 @@ Scene testScene = new Scene() {
           this.form.pos.x--;
       }
 
+      public void mousePressed() {
+        if (mouseButton == LEFT)
+          this.display.texture = this.display.texture == circleTexture.asImage()? 
+            boxTexture.asImage() : circleTexture.asImage();
+      }
+
       public void keyPressed() {
         // Saving and loading states :D
 
@@ -157,6 +163,8 @@ Scene testScene = new Scene() {
           this.form.write("circle_transform");
           logInfo("I wrote you a save file! :D");
         }
+
+
 
         // ^^^ This works in `update()` without any problems (O_O")
 
@@ -172,26 +180,27 @@ Scene testScene = new Scene() {
 
       public void setup() {
         this.form = new Transformation(this);
-        this.form.scale.mult(15);
         this.display = new SvgRenderer(this, ELLIPSE, svgImage);
-        this.display.strokeWeight = 0.05f;
-        this.display.doStroke = false;
-        this.display.fill = 255;
+        //this.display.strokeWeight = 0.05f;
+        //this.display.doStroke = false;
+        //this.display.fill = 255;
+        this.display.updateScale();
         this.display.resScale *= 15;
         //this.display.rasterize();
       }
 
       public void update() {
+        this.display.rasterize();
         this.form.pos.set(mouse);
-        float scale = sin(millis() * 0.001f) * 5;
-        this.form.scale.set(scale, scale, scale);
+        //float scale = sin(millis() * 0.001f) * 5;
+        this.form.scale.set(5, 5, 5);
       }
     };
 
     light = new Entity() {
       // Didn't I want to avoid this type of instantiation in general...?
       Transformation form = new Transformation(this), quadForm;
-      ParticleEmitter part;
+      //ParticleEmitter part;
       Light light = new Light(this);
 
       public void setup() {
