@@ -76,6 +76,7 @@ Scene testScene = new Scene() {
 
   @SuppressWarnings("unused")
     Entity circle, quad, light, groundBox, instanceTest;
+  ArrayList<Entity> circles;
   SineWave wave = new SineWave(0.001f);
 
   public void setup() {
@@ -99,10 +100,10 @@ Scene testScene = new Scene() {
     svgImage = loadAsync("bot1.svg", AssetType.SHAPE);
 
     instanceTest = new Entity() {
-      Transformation form;
+      NerdTransform form;
       InstancedRenderer display;
       public void setup() {
-        this.form = new Transformation(this);
+        this.form = new NerdTransform(this);
         this.display = new InstancedRenderer(this, BOX, circleTexture);
         this.display.doStroke = false;
         this.display.doFill = false;
@@ -116,11 +117,11 @@ Scene testScene = new Scene() {
     };
 
     circle = new Entity() {
-      Transformation form;
+      NerdTransform form;
       BasicRenderer display;
 
       public void setup() {
-        this.form = new Transformation(this);
+        this.form = new NerdTransform(this);
         this.display = new BasicRenderer(this, ELLIPSE, circleTexture);
         this.display.fill = color(230);
         this.display.stroke = color(0);
@@ -180,11 +181,11 @@ Scene testScene = new Scene() {
     };
 
     quad = new Entity() {
-      Transformation form;
+      NerdTransform form;
       SvgRenderer display;
 
       public void setup() {
-        this.form = new Transformation(this);
+        this.form = new NerdTransform(this);
         this.display = new SvgRenderer(this, ELLIPSE, svgImage);
       }
 
@@ -197,14 +198,14 @@ Scene testScene = new Scene() {
 
     light = new Entity() {
       // Didn't I want to avoid this type of instantiation in general...?
-      Transformation form, quadForm;
+      NerdTransform form, quadForm;
       //ParticleEmitter part;
       Light light;
 
       public void setup() {
-        this.form = new Transformation(this);
+        this.form = new NerdTransform(this);
         this.light = new Light(this);
-        this.quadForm = quad.getComponent(Transformation.class);
+        this.quadForm = quad.getComponent(NerdTransform.class);
 
         this.light.col.set(255, 255, 255);
         this.light.off.z = 1.5f;
@@ -216,7 +217,7 @@ Scene testScene = new Scene() {
     };
 
     groundBox = new Entity() {
-      Transformation form = new Transformation(this);
+      NerdTransform form = new NerdTransform(this);
       BasicRenderer display = new BasicRenderer(this, BOX, boxTexture);
 
       public void setup() {
@@ -227,37 +228,60 @@ Scene testScene = new Scene() {
       }
     };
 
+    circles = new ArrayList<Entity>(10);
+
+    final PShape sphereShape = nerdCreateShape(SPHERE);
+
+    class Sphere extends Entity {
+      NerdTransform form;
+      InstancedRenderer display;
+
+      public void setup() {
+        this.form = new NerdTransform(this);
+        this.display = new InstancedRenderer(this, sphereShape);
+        this.form.scale.set(5, 5, 5);
+      }
+
+      public void update() {
+        this.form.pos.set(random(mouse.x), random(mouse.y));
+      }
+    }
+
+    for (int i = 0; i < 10; i++)
+      circles.add(new Sphere());
+
+
     cam.clearColor = color(0); 
     rev.clearColor = color(30, 120, 170); //80);
     //rev.doAutoClear = false;
-    setCam(rev);
+    setCam(rev); 
 
     cam.script = new CamScript() {
       public void run(Camera p_cam) {
-        p_cam.pos.x = 0;
+        p_cam.pos.x = 0; 
         p_cam.pos.y = 0;
       }
     };
 
     rev.script = new CamScript() {
       public void run(Camera p_cam) {
-        p_cam.pos.x = cos(millis() * 0.001f) * 100;
-        p_cam.pos.z = sin(millis() * 0.001f) * 100;
+        p_cam.pos.x = cos(millis() * 0.001f) * 100; 
+        p_cam.pos.z = sin(millis() * 0.001f) * 100; 
         p_cam.pos.z += mouseScroll * 12;
       }
     };
 
-    doCamera = false;
-    wave.start(0);
-    wave.endIn(3600);
+    doCamera = false; 
+    wave.start(0); 
+    wave.endIn(3600); 
     wave.extendEndBy(10000);
   }
 
   public void draw() {
-    doCamera = !mouseLeft;
+    doCamera = !mouseLeft; 
     if (mouseLeft)
-      camLerpUpdate(cam, rev, (float)mouseX / (float)width);
-    else currentCam.applyMatrix();
+      camLerpUpdate(cam, rev, (float)mouseX / (float)width); 
+    else currentCam.applyMatrix(); 
 
     //doPostProcessing = true;
     //applyPass(bloomPass);
@@ -273,26 +297,26 @@ Scene testScene = new Scene() {
     //image(boxTexture, cx + wave.get() * cx, mouseY, 160, 160);
 
     fill(255, 0, 0, 60); // The alpha used to be `80`.
-    circle(mouseX, mouseY, 60);
+    circle(mouseX, mouseY, 60); 
 
     translate(0.5f * textWidth(Integer.toString((int)frameRate)), 
-      textAscent() - textDescent());
-    fill(255);
+      textAscent() - textDescent()); 
+    fill(255); 
     text((int)frameRate, 0, 0);
   }  
 
-  boolean isLightDimmed;
+  boolean isLightDimmed; 
   public void mousePressed() {
     if (mouseButton == RIGHT)
-      setCam(currentCam == rev? cam : rev);
+      setCam(currentCam == rev? cam : rev); 
     else if (mouseButton == CENTER) {
       //light.enabled = !light.enabled; // Causes COMPLETE darkness!
-      isLightDimmed = !isLightDimmed;
-      Light l = light.getComponent(Light.class);
+      isLightDimmed = !isLightDimmed; 
+      Light l = light.getComponent(Light.class); 
       if (isLightDimmed)
-        l.col.set(65, 50, 50);
+        l.col.set(65, 50, 50); 
       else
-        l.col.set(255, 255, 255);
+        l.col.set(255, 255, 255); 
       doLights = !isLightDimmed;
     }
   } // End of `mousePressed()`.

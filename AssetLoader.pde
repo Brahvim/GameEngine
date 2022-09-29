@@ -1,6 +1,6 @@
 import processing.sound.*;
 
-// BAD IDEA:
+// *Bad idea?*
 
 // Fun fact: the code could've had an alternate approach by having made a class to load assets,
 // ..and then making a class wrapping that class doing the task async.

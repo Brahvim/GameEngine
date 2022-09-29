@@ -27,6 +27,7 @@ final PApplet SKETCH = this;
 
 // DO NOT use `getFields()`! That will scan for ones from `super` classes as well!:
 final Field[] SKETCH_FIELDS = SKETCH.getClass().getDeclaredFields();
+Method[] SKETCH_METHODS = SKETCH.getClass().getDeclaredMethods();
 
 // Deeper access into Processing's inner workings:
 GLWindow window;

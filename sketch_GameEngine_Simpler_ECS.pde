@@ -1,10 +1,3 @@
-// YO! Go work on the Renderer class.
-// The `update()` method's `switch` needs stuff to draw! (For `SPHERE`!)
-// Also, get it textured! :joy: 
-
-// It's in the "Components" tab.
-// Go, go, go! ":D!
-
 void settings() {
   size(INIT_WIDTH, INIT_HEIGHT, P3D);
   //PJOGL.setIcon(new String[]{"sunglass_nerd.png"});
@@ -158,35 +151,48 @@ void setup() {
 
   nerdLogInfo("`engineSetup()` TO BE CALLED!"); // Errors would occur after this.
 
-  /*
-  Method[] sketchMethods = this.getClass().getDeclaredMethods();
-   Method engineSetupMethod = null;
-   
-   for (Method m : sketchMethods) {
-   if (m.getName() == "engineSetup") {
-   engineSetupMethod = m;
-   break;
-   }
-   }
-   
-   if (engineSetupMethod == null) {
-   if (SCENES.size() > 0)
-   setScene(SCENES.get(0));
-   } else try {
-   // You have to pass an object instance if the method isn't static.
-   // If the method is parameterless, pass `null`.
-   // Else, pass parameters into `invoke()` - it is a `varargs` method.
-   // The return value of the method called, is what `invoke` returns, as well.
-   engineSetupMethod.invoke(this);
-   }  
-   catch (Exception e) {
-   logError("`engineSetup()` encountered an exception!");
-   logEx(e);
-   }
-   */
+  int beforeEngineSetup = millis();
 
-  engineSetup();
-  nerdLogInfo("`engineSetup()` succeded."); // Errors would occur... after this.
+  Method engineSetupMethod = null;
+
+  // Could "search the array from both sides" for speed!
+  // Nope! This is not faster because CPU cache is not utilized at all!
+
+  //for (int i = 0; i < SKETCH_METHODS.length; i++) {
+  //Method m = SKETCH_METHODS[(i & 1) == 1? i : SKETCH_METHODS.length - i];
+  for (Method m : SKETCH_METHODS) // Comment this out to use the "both side" method.
+    if (m.getName() == "engineSetup") {
+      engineSetupMethod = m;
+      break;
+    }
+  //}
+
+  if (engineSetupMethod == null) {
+    nerdLogError("Found no `engineSetup()`, loading up `SCENES.get(0)`.");
+    if (SCENES.size() > 0)
+      setScene(SCENES.get(0));
+  } else try {
+    // You have to pass an object instance to invoke the method on if the method isn't static.
+    // If the method is parameterless, pass `null`.
+    // Else, pass parameters into `invoke()` - it is a `varargs` method.
+    // The return value of the method called, is what `invoke` returns, as well.
+    engineSetupMethod.invoke(this);
+  }  
+  catch (InvocationTargetException e) {
+    logError("`engineSetup()` encountered an exception!");
+    logEx(e);
+  }
+  catch (IllegalAccessException e) {
+    logError("Please declare `engineSetup()` as `public`!");
+  }
+  catch (IllegalArgumentException e) {
+    logError("Please declare `engineSetup()` without any parameters!");
+  }
+
+  //engineSetup(); // Was here just for da teshts.
+  // Funnily enough using reflection to invoke the method is not slow at all! 
+  nerdLogInfo("`engineSetup()` succeded in `", millis() - beforeEngineSetup
+    , "` milliseconds."); // Errors would occur... after this.
 }
 
 void pre() {

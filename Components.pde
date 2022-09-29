@@ -1,8 +1,8 @@
-class Transformation extends SerializableComponent { //<>//
+class NerdTransform extends SerializableComponent { //<>//
   PVector pos, rot, scale;
   PMatrix3D mat;
 
-  Transformation(Entity p_entity) {
+  NerdTransform(Entity p_entity) {
     super(p_entity);
 
     this.pos = new PVector();
@@ -11,7 +11,7 @@ class Transformation extends SerializableComponent { //<>//
     this.mat = new PMatrix3D();
   }
 
-  Transformation(Entity p_entity, PVector p_pos) {
+  NerdTransform(Entity p_entity, PVector p_pos) {
     super(p_entity);
 
     this.pos = p_pos;
@@ -20,7 +20,7 @@ class Transformation extends SerializableComponent { //<>//
     this.mat = new PMatrix3D();
   }
 
-  Transformation(Entity p_entity, PVector p_pos, PVector p_rot, PVector p_scale) {
+  NerdTransform(Entity p_entity, PVector p_pos, PVector p_rot, PVector p_scale) {
     super(p_entity);
 
     this.pos = p_pos;
@@ -29,7 +29,7 @@ class Transformation extends SerializableComponent { //<>//
     this.mat = new PMatrix3D();
   }
 
-  public void set(Transformation p_form) {
+  public void set(NerdTransform p_form) {
     if (p_form == null)
       throw new NullPointerException(
         "`Transform.set()` received a `null` `Transform` object :|");
@@ -148,14 +148,14 @@ class Material extends SerializableComponent {
 }
 
 class Light extends Component {
-  protected Transformation form; // There's NO reason to call it `parentForm`.
+  protected NerdTransform form; // There's NO reason to call it `parentForm`.
   PVector pos;
   PVector off, col;
   int type;
 
   Light(Entity p_entity) {
     super(p_entity);
-    this.form = p_entity.getComponent(Transformation.class);
+    this.form = p_entity.getComponent(NerdTransform.class);
 
     if (this.form == null)
       throw new NullPointerException("A `Light` needs a `Transform` in the submitted `Entity`!");
@@ -237,18 +237,18 @@ class SpotLight extends Light {
 }
 
 class ParticleEmitter extends Component {
-  Transformation startPos;
+  NerdTransform startPos;
   PShape shape;
   float lifetime = -1, startTime = 0;
 
   ParticleEmitter(Entity p_entity) {
     super(p_entity);
-    this.startPos = p_entity.getComponent(Transformation.class);
+    this.startPos = p_entity.getComponent(NerdTransform.class);
   }
 
   ParticleEmitter(Entity p_entity, int p_shape) {
     super(p_entity);
-    this.startPos = p_entity.getComponent(Transformation.class);
+    this.startPos = p_entity.getComponent(NerdTransform.class);
   }
 
   void start() {
@@ -273,7 +273,7 @@ class RenderingComponent extends Component {
 
 // What to name this now that we have the need for so many renderers? `ImmediateShapeRenderer`?
 class BasicRenderer extends RenderingComponent {
-  protected Transformation form;
+  protected NerdTransform form;
 
   int fill, stroke; // Tinting should be done by the user themselves.
   float strokeWeight = 1;
@@ -287,7 +287,7 @@ class BasicRenderer extends RenderingComponent {
 
   BasicRenderer(Entity p_entity) {
     super(p_entity);
-    this.form = p_entity.getComponent(Transformation.class);
+    this.form = p_entity.getComponent(NerdTransform.class);
 
     if (this.form == null)
       nerdLogEx(new NullPointerException("Any kind of renderer needs a `Transformation` component" 
@@ -645,7 +645,7 @@ class ModelRenderer extends BasicRenderer {
 
 // "Favor composition over inheritance."
 class InstancedRenderer extends RenderingComponent {
-  protected Transformation form;
+  protected NerdTransform form;
   PShape instance;
 
   int fill, stroke;
@@ -656,14 +656,14 @@ class InstancedRenderer extends RenderingComponent {
   Asset textureLoader;
   PImage texture;
 
-  boolean exists; // State management :P
+  boolean madeInstance; // State management :P
   // (It took me an entire week to figure out I could do that
   // instead of constantly checking `ploaded` and `loaded`!)
 
   InstancedRenderer(Entity p_entity) {
     super(p_entity);
 
-    this.form = p_entity.getComponent(Transformation.class);
+    this.form = p_entity.getComponent(NerdTransform.class);
 
     if (this.form == null)
       nerdLogEx(new NullPointerException("An `InstacedRenderer` needs a `Transformation` component" 
@@ -686,6 +686,18 @@ class InstancedRenderer extends RenderingComponent {
     this.instance = p_instance;
   }
 
+  InstancedRenderer(Entity p_entity, PShape p_instance, PImage p_texture) {
+    this(p_entity);
+    this.instance = p_instance;
+    this.texture = p_texture;
+  }
+
+  InstancedRenderer(Entity p_entity, PShape p_instance, Asset p_textureLoader) {
+    this(p_entity);
+    this.instance = p_instance;
+    this.textureLoader = p_textureLoader;
+  }
+
   InstancedRenderer(Entity p_entity, int p_type, PImage p_texture) {
     this(p_entity);
     this.type = p_type;
@@ -700,11 +712,12 @@ class InstancedRenderer extends RenderingComponent {
   }
 
   void update() {
-    if (!(this.textureLoader == null && this.exists)) {
-      this.exists = true;
-      this.instance = nerdCreateShape(this.type, this.texture);
-      this.texture = (PImage)this.textureLoader.loadedData;
-    }
+    if (this.textureLoader != null)
+      if (!(this.textureLoader == null && this.madeInstance)) {
+        this.madeInstance = true;
+        this.instance = nerdCreateShape(this.type, this.texture);
+        this.texture = (PImage)this.textureLoader.loadedData;
+      }
 
     if (this.instance == null)
       return;

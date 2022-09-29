@@ -117,7 +117,7 @@ void camLerpUpdate(Camera p_from, Camera p_to, float p_lerpAmt, float p_start, f
   // by passing them by reference.
 }
 
-class Camera extends Entity {
+class Camera {
   PVector pos, center, up;
   float fov = DEFAULT_CAM_FOV, near = 0.05f, far = 10000, mouseZ = 25;
   CamScript script;

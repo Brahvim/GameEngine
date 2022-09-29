@@ -85,6 +85,7 @@ void writeObject(Serializable p_object, String p_fname) {
       oStream.close();
       fin.close();
     }
+
     return ret;
   } 
   catch (FileNotFoundException e) {
@@ -148,7 +149,7 @@ static class TransformationSerializer implements Serializable {
   private final static long serialVersionUID = 856598746L;
   float[] data = new float[9];
 
-  TransformationSerializer(Transformation p_form) {
+  TransformationSerializer(NerdTransform p_form) {
     this.data[0] = p_form.pos.x;
     this.data[1] = p_form.pos.y;
     this.data[2] = p_form.pos.z;
