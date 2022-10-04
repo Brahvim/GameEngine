@@ -62,9 +62,12 @@ void setup() {
   // [https://github.com/processing/processing/blob/8b15e4f548c1426df3a5ebe4c2106619faf7c4ba/
   // core/src/processing/core/PApplet.java#L2343]
 
+  sketchFolder = new File(sketchPath());
+  dataFolder = new File(sketchFolder, "data");
+
   sketchArgsStr = System.getProperty("sun.java.command");
   sketchArgs = sketchArgsStr.split(" ");
-  INSIDE_PDE = sketchArgs.length > 2 && 
+  insidePde = sketchArgs.length > 2 && 
     sketchArgs[1].contains("display") && sketchArgs[2].contains("sketch-path");
 
   // This was one of the ways to get the sketch's path:
@@ -105,7 +108,7 @@ void setup() {
   for (String s : sketchArgs)
     nerdLogInfo('\t', s);
 
-  nerdLogInfo(INSIDE_PDE? "Yep! The sketch is running inside the PDE!" 
+  nerdLogInfo(insidePde? "Yep! The sketch is running inside the PDE!" 
     : "Nope, the sketch wasn't running in the PDE.");
 
   window = (GLWindow)surface.getNative();
@@ -306,7 +309,7 @@ void draw() {
   if (doAnyDrawing && doUIRendering) {
     begin2D();
     noLights();
-    currentScene.drawUI();
+    currentScene.drawUi();
     end2D();
   }
 
@@ -345,6 +348,7 @@ void post() {
   pmouseRight = mouseRight;
   pmouseButton = mouseButton;
   pmouseScroll = mouseScroll;
+  pmouseScrollDelta = mouseScrollDelta;
 
   pkey = key;
   pkeyCode = keyCode;
@@ -374,7 +378,7 @@ void post() {
 }
 
 void mousePressed() {
-  lastMousePressTime = millis();
+  Timers.mousePress = millis();
   switch(mouseButton) {
   case LEFT:
     mouseLeft = true;
@@ -439,7 +443,7 @@ void mouseWheel(MouseEvent p_event) {
 }
 
 void keyPressed() {
-  lastKeyPressTime = millis();
+  Timers.keyPress = millis();
 
   // `Shift + Esc` to close, by the way.
   if (keyCode == 27) // If `Esc` is pressed,

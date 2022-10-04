@@ -23,8 +23,8 @@ public void initLog() {
   Log.absPath = Log.logFile.getAbsolutePath();
 
   // MAKE THE PROGRAM FASTER outside the PDE by disabling console-only logging!:
-  Log.canLogAtAll = INSIDE_PDE;
-  Log.nerdCanLog = INSIDE_PDE;
+  Log.canLogAtAll = insidePde;
+  Log.nerdCanLog = insidePde;
 
   if (!Log.logFile.exists())
   try {

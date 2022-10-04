@@ -44,7 +44,7 @@ Runnable onExit = null;
 
 // Environment identification:
 final String SKETCH_NAME = SKETCH.getClass().getSimpleName();
-boolean INSIDE_PDE;
+boolean insidePde;
 String sketchArgsStr;
 String[] sketchArgs; // `sketchArgs.length` is only `1` when the application runs outside the PDE.
 String sketchPath; // Do I actually need this?

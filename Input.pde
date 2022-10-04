@@ -1,24 +1,25 @@
+// Mouse non-button settings:
 PVector mouse = new PVector(), pmouse = new PVector();
-int mouseScroll, pmouseScroll, mouseScrollDelta;
+int mouseScroll, pmouseScroll, mouseScrollDelta, pmouseScrollDelta;
 boolean cursorVisible = true, cursorConfined;
 
-char pkey, pframekey; 
-boolean pkeyPressed, pmousePressed;
-boolean mouseLeft, mouseMid, mouseRight;
-boolean pmouseLeft, pmouseMid, pmouseRight;
-int pmouseButton;
-int pkeyCode, pframekeyCode;
-int lastMousePressTime, lastKeyPressTime;
+// Keyboard and mouse button states:
+char pkey; // Key pressed during the last frame. 
+// This WILL change on a keypress event as well, so... nothing stores the last keypress event's key!
+
+boolean pkeyPressed, pmousePressed; // Previous frame...
+boolean mouseLeft, mouseMid, mouseRight; // Current frame!
+boolean pmouseLeft, pmouseMid, pmouseRight; // Previous frame...
+int pmouseButton; // Previous fraaaaaame!...
+
+int pkeyCode; // Of course, the value from the previous frame. No event version.
+
+// Timers:
+static class Timers {
+  static int mousePress, keyPress, mouseLeft, mouseRight, mouseMid, mouseWheel;
+}
 
 ArrayList<Integer> keysHeld = new ArrayList<Integer>();
-
-final File DATA_FOLDER = new File(sketchPath("data" + File.separator));
-HashMap<String, PImage> cursorImages;
-
-void loadCursorImages() {
-  //File data = new File(sketchPath(""));
-  cursorImages = new HashMap<String, PImage>();
-}
 
 boolean keyIsPressed(int p_keyCode) {
   return keysHeld.contains(p_keyCode);
@@ -52,8 +53,6 @@ void unprojectMouse() {
   if (currentCam != null)
     currentCam.near = originalNear;
 }
-
-
 
 //  Remember that these (variables) exist!:
 //  `mouseButton`,
